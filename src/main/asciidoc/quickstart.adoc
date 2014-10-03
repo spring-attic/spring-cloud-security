@@ -1,0 +1,124 @@
+=== OAuth Single Sign On
+
+Here's a Spring Cloud "Hello World" app with HTTP Basic
+authentication and a single user account:
+
+.app.groovy
+[source,java]
+----
+@Grab('spring-boot-starter-security')
+@Controller
+class Application {
+  
+  @RequestMapping('/'
+  String home() {
+    'Hello World'
+  }
+
+}
+----
+
+You can run it with `spring run app.groovy` and watch the logs for the password (username is "user"). So far this is just the default for a Spring Boot app.
+
+Here's a Spring Cloud app with OAuth2 SSO:
+
+.app.groovy
+[source,java]
+----
+@Grab('spring-cloud-starter-security')
+@Controller
+@EnableOAuth2Sso
+class Application {
+  
+  @RequestMapping('/'
+  String home() {
+    'Hello World'
+  }
+
+}
+----
+
+Spot the difference? This app will actually behave exactly the same as
+the previous one, because it doesn't know it's OAuth2 credentals
+yet. 
+
+You can register an app in github quite easily, so try that if you
+want a production app on your own domain. If you are happy to test on
+localhost:8080, then set up these properties in your application
+configuration:
+
+.application.yml
+[source,yaml]
+----
+oauth2:
+  client:
+    clientId: bd1c0a783ccdd1c9b9e4
+    clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
+    tokenUri: https://github.com/login/oauth/access_token
+    authorizationUri: https://github.com/login/oauth/authorize
+    authenticationScheme: form
+  resource:
+    userInfoUri: https://api.github.com/user
+    preferTokenInfo: false
+----
+
+run the app above and it will redirect to github for authorization. If
+you are already signed into github you won't even notice that it has
+authenticated.  These credentials will only work if your app is
+running on port 8080.
+
+If you now drop the app into Cloud Foundry:
+
+----
+$ spring jar app.jar app.groovy
+$ cf push -p app.jar
+----
+
+and bind it to a service called "sso" with the following properties
+(e.g. created as a
+http://docs.pivotal.io/pivotalcf/devguide/services/user-provided.html[user-provided
+service]):
+
+----
+$ cf create-user-provided-service sso -p '{clientId:"<my-client>",clientSecret:"<my-secret>",userInfoUri:"https://uaa.run.pivotal.io/userinfo",tokenUri: "https://login.run.pivotal.io/oauth/token",authorizationUri:"https://login.run.pivotal.io/oauth/authorize"}
+$ cf push app -p app.jar
+----
+
+and then visit it in a browser, then it will redirect to the Cloud
+Foundry (PWS) login server instead of challenging for Basic
+authentication credentials. The `clientId` and `clientSecret` are
+credentials of a registered client in Cloud Foundry.  It's quite hard
+to get a Cloud Foundry client registration for testing (but please ask
+at support@run.pivotal.io if you want one on PWS).
+
+=== OAuth Protected Resource
+
+You want to protect an API resource with an OAuth2 token? Here's a
+simple example (paired with the client above):
+
+.app.groovy
+[source,java]
+----
+@Grab('spring-cloud-starter-security')
+@RestController
+@EnableOAuth2Resource
+class Application {
+  
+  @RequestMapping('/'
+  def home() {
+    [message: 'Hello World']
+  }
+
+}
+----
+
+and
+
+.application.yml
+[source,yaml]
+----
+oauth2:
+  resource:
+    userInfoUri: https://api.github.com/user
+    preferTokenInfo: false
+----

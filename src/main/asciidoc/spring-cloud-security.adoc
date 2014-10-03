@@ -1,0 +1,35 @@
+= Spring Cloud Cluster
+
+include::intro.adoc[]
+
+== Quickstart
+
+include::quickstart.adoc[]
+
+=== Token Relay
+
+If your app has a
+http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy[Spring
+Cloud Zuul] embedded reverse proxy (using `@EnableZuulProxy`) then you
+can ask it to forward OAuth2 access tokens downstream to the services
+it is proxying. Thus the SSO app above can be enhanced simply like this:
+
+.app.groovy
+[source,java]
+----
+@Grab('spring-cloud-starter-security')
+@Controller
+@EnableOAuth2Sso
+@EnableZuulProxy
+class Application {
+  
+  @RequestMapping('/'
+  String home() {
+    'Hello World'
+  }
+
+}
+----
+
+and it will (in addition to loggin the user in and grabbing a token)
+pass the authentication token downstream to the `/proxy/*` services.
