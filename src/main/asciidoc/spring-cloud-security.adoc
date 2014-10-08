@@ -1,4 +1,6 @@
-= Spring Cloud Cluster
+= Spring Cloud Security
+:github-base: https://github.com/spring-cloud
+:security-base: https://github.com/spring-cloud/spring-cloud-security
 
 include::intro.adoc[]
 
@@ -17,7 +19,6 @@ it is proxying. Thus the SSO app above can be enhanced simply like this:
 .app.groovy
 [source,java]
 ----
-@Grab('spring-cloud-starter-security')
 @Controller
 @EnableOAuth2Sso
 @EnableZuulProxy
@@ -32,4 +33,16 @@ class Application {
 ----
 
 and it will (in addition to loggin the user in and grabbing a token)
-pass the authentication token downstream to the `/proxy/*` services.
+pass the authentication token downstream to the `/proxy/*`
+services. If those services are implemented with
+`@EnableOAuth2Resource` then they will get a valid token in the
+correct header.
+
+How does it work? The `@EnableOAuth2Sso` annotation pulls in
+`spring-cloud-starter-security` (which you could do manually in a
+traditional app), and that has some autoconfiguration for a
+`ZuulFilter`, which itself is activated because Zuul is on the
+classpath (via `@EnableZuulProxy`). The
+{security-base}/tree/master/src/main/java/org/springframework/cloud/security/proxy/OAuth2TokenRelayFilter.java[filter]
+just extracts an access token from the currently authenticated user,
+and puts it in a request header for the downstream requests.
