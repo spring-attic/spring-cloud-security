@@ -1,2 +1,8 @@
+# Autoconfig
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.cloud.security.proxy.OAuth2ProxyAutoConfiguration
+
+# Bootstrap components
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+org.springframework.cloud.security.bootstrap.ConfigClientSecurityBootstrapConfiguration,\
+org.springframework.cloud.security.bootstrap.ConfigServerSecurityBootstrapConfiguration

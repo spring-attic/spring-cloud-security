@@ -1,0 +1,153 @@
+In a real system (not a demo) the Config Server should be able to
+authenticate clients that want to use the property source resources.
+
+=== Certificate Based Security (X509)
+
+If clients can communicate with the Config Server directly over HTTPS,
+then they can authenticate through a certificate. This requires the
+certificate to be installed in the client (could be a shared keystore
+file), and to be readable (usually requires a password). If the Config
+Server only accepts HTTP connections (like in Cloud Foundry) it's a
+challenge because then the front-end router has to have the
+certificate processing and header population, and you probably want it
+to be different in different environments (e.g. production vs. test).
+
+=== Kerberos
+
+If the client apps can be kerberized (the user they run as is trusted
+by a Kerberos server), then they might be able to authenticate with
+the server with minimal changes to the clients. That should be a
+winning strategy in a lot of environments, but currently not really
+very convenient in Cloud Foundry. The server has to be kerberized as
+well, which is a tightly controlled process, but could be arranged
+given that it can be given network access to a Kerberos installation
+somewhere. The hardest thing to achieve (e.g. in a PaaS) might be a
+reverse-resolvable hostname (but if you control the Kerberos
+installation you can switch off that requirement).
+
+TBD: Kerberos client (how do you do `RestTemplate` for the current
+UN*X user?). Theoretically it's possible, but not supported yet in
+Spring Kerberos.
+
+=== OAuth2 Bearer Token
+
+OAuth2 bearer tokens are a standard way for computers to authenticate
+with one another. This is a valuable option for the Spring Cloud
+Config Client if it happens to be running in an environment where
+OAuth2 tokens are relatively easy to come by (e.g. if we had an OAuth2
+service for client credentials in Cloud Foundry).
+
+=== HTTP Basic Security
+
+The simplest thing that could possibly work would be HTTP Basic
+security, and Spring Boot already does that for free with almost no
+hassle on the server (really just a question of setting
+`security.user.password`). The problem then becomes how to keep the
+password safe and have it distributed to clients. So what are the
+options? The password is stored in a client via
+`ConfigSecurityProperties` with a property "password". The password
+can be set using an external config property
+`config.security.password`, or it can be set using a more elaborate
+scheme if that turns out to be desirable.
+
+Desirable features of whatever scheme we choose to protect the
+password:
+
+* Apps can still be developed and deployed in a non-production
+environment without jumping through too many hoops or repeating
+configuration too much.
+
+* Deploying into production should not require a lot of extra steps or
+repetitive tasks for operations people or automation agents.
+
+* Whatever scheme or schemes we provide there has to be something that
+  works well in a PaaS environment (Cloud Foundry in particular).
+
+* Secrets can be changed if compromised. Ideally all client apps would
+be able to refresh without a restart, e.g. using a Spring Cloud Bus
+signal, assuming they might need the Config Server in between
+restarts.
+
+==== Configuration File
+
+A configuration file can have the password in plain text as long as
+only apps (or config admin users) can read it. The problem is reduced
+to how to protect the configuration file, and there are several
+options.
+
+* UN*X file permissions. Client apps all have access to a filesystem
+resource that is protected by UN*X permissions. E.g. apps run as the
+"app" user, and the config file belongs to the "config" user (in the
+same group as the app user), with group read permissions (640). This
+is pretty robust and if there is a shared file system with proper then
+the password can be changed easily in a single place. Doesn't work
+very well in a PaaS unless you can fabricate a shared filesystem from
+somewhere, and that isn't easy if you fold in the requirement for file
+permissions.
+
+* HTTP(S) server (or any URL resource). Doesn't really solve the
+problem on its own since you need to secure access to the file server
+for the same reasons you need to secure the Config Server. At best you
+might have a generic solution already in place in a given production
+environment (e.g. kerberized authentication) that cannot be easily
+duplicated in the Config Server. In that case it works pretty well.
+
+==== Environment Variables
+
+Every client app has to be started with an environment variable for
+the password (e.g. `CONFIG_SECURITY_PASSWORD`). This can be made
+relatively secure since presumably only a privileged user can start an
+app. It can be a pain to set up, unless there is a platform for
+deploying apps that can be configured to set the environment
+variable. You could do that (for instance) with a CI system deploying
+to a PaaS, and then the security is all in the CI server. Also, if you
+want to change the password, you have to restart all the app instances
+(since an environment variable is baked into the process).
+
+==== Cloud Foundry Service Binding
+
+A special case of environment variables is credentials from a Cloud
+Foundry service, since they are embedded in a JSON object that is an
+environment variable. Apps in Cloud Foundry already benefit (a bit)
+from binding to a Config Server service (they get the base URL), but
+if the credentials also (optionally) contained a password, that would
+be more valuable. Using a Spring Cloud Connector we might even be able
+to reduce the level of involvement for both users and operators. It
+would really be a sweet spot if the Config Server itself didn't have
+to configure its own password (say it was generated randomly), but
+it was still transmitted to client apps as credentials.
+
+==== Config Server
+
+The Config Server itself could be enhanced to be able to reveal its
+own secret to trusted parties. How is this any better than just being
+insecure (trust everyone)? It's a question of who you trust, and how
+flexible you want to be about changing the secret. For instance you
+might be prepared to trust anyone who can prove that they own an IP
+address in the same subnet as the Config Server, or an app deployed in
+a particular space ID in a Cloud Foundry instance.
+
+Example flow:
+
+* Config Server exposes a `/password` endpoint
+
+* Client POSTs to `/password` with a body containing data (or hashes
+of data) that it can derive from its environment (like a space ID, an
+IP address, or a hostname, or some combination of those)
+
+* Server verifies the data (e.g. by pinging an endpoint on the Client
+and getting a successful response, or looking up a space ID in a
+database)
+
+* Server returns password in body of response (or 403 if the request
+cannot be validated)
+
+(There is an assumption that doing this once in return for a password,
+is better than having to do it for all the endpoints in the Config
+Server.)
+
+To make it (optionally) more secure the server could XOR the password
+with the value of a shared secret (e.g. shared by environment
+variables amongst all apps). This *is* actually better than just
+sharing the password using an environment variable because the server
+gets to do the extra computations on the data provided by the client.

@@ -46,3 +46,4 @@ classpath (via `@EnableZuulProxy`). The
 {security-base}/tree/master/src/main/java/org/springframework/cloud/security/proxy/OAuth2TokenRelayFilter.java[filter]
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.
+
