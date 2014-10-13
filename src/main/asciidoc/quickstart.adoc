@@ -80,6 +80,7 @@ service]):
 
 ----
 $ cf create-user-provided-service sso -p '{clientId:"<my-client>",clientSecret:"<my-secret>",userInfoUri:"https://uaa.run.pivotal.io/userinfo",tokenUri: "https://login.run.pivotal.io/oauth/token",authorizationUri:"https://login.run.pivotal.io/oauth/authorize"}
+$ cf bind-service app sso
 $ cf push app -p app.jar
 ----
 
