@@ -25,7 +25,6 @@ Here's a Spring Cloud app with OAuth2 SSO:
 .app.groovy
 [source,java]
 ----
-@Grab('spring-cloud-starter-security')
 @Controller
 @EnableOAuth2Sso
 class Application {
