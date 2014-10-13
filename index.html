@@ -1,0 +1,94 @@
+---
+# The name of your project
+title: Spring Cloud Security
+
+badges:
+
+  # Customize your project's badges. Delete any entries that do not apply.
+  custom:
+    - name: Source (GitHub)
+      url:  https://github.com/spring-cloud/spring-cloud-security
+      icon: github
+
+    - name: StackOverflow
+      url:  http://stackoverflow.com/questions/tagged/spring-cloud
+      icon: stackoverflow
+
+---
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<!-- Specify the parent of this project (or delete if none) to influence the rendering of the breadcrumb -->
+{% capture parent_link %}
+[Spring Cloud]({{ site.projects_site_url }}/spring-cloud)
+{% endcapture %}
+
+
+{% capture billboard_description %}
+
+Spring Cloud Security offers a set of primitives for building secure applications and services with minimum fuss. A declarative model which can be heavily configured externally (or centrally) lends itself to the implementation of large systems of co-operating, remote components, usually with a central indentity management service. It is also extremely easy to use in a service platform like Cloud Foundry. Building on Spring Boot and Spring Security OAuth2 we can quickly create systems that implement common patterns like single sign on, token relay and token exchange.
+
+{% endcapture %}
+
+{% capture main_content %}
+
+## Features
+
+Spring Cloud Security features:
+
+* Single sign on for OAuth2 with a single annotation
+* Protect an application or service with OAuth2 bearer tokens with a single annotation
+* Relay SSO tokens from a front end to a back end service (e.g. with a Zuul proxy)
+
+<span id="quick-start"></span>
+## Quick Start
+
+{% include download_widget.md %}
+
+Here's a Spring Cloud app with OAuth2 SSO:
+
+```groovy
+@Controller
+@EnableOAuth2Sso
+class Application {
+  
+  @RequestMapping('/'
+  String home() {
+    'Hello World'
+  }
+
+}
+```
+
+This app will actually behave exactly the same as any Spring Boot app
+with basic Security, because it doesn't know it's OAuth2 credentals
+yet. Add this to your configuration and you will be able to login with
+Github (as long as you run your app on localhost:8080):
+
+```yaml
+oauth2:
+  client:
+    clientId: bd1c0a783ccdd1c9b9e4
+    clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
+    tokenUri: https://github.com/login/oauth/access_token
+    authorizationUri: https://github.com/login/oauth/authorize
+    authenticationScheme: form
+  resource:
+    userInfoUri: https://api.github.com/user
+    preferTokenInfo: false
+```
+
+{% endcapture %}
+
+
+{% capture related_resources %}
+
+### Sample Projects
+
+* [SSO](https://github.com/spring-cloud-samples/scripts/demo/sso.groovy)
+* [Resource server](https://github.com/spring-cloud-samples/scripts/demo/resource.groovy)
+
+{% endcapture %}
+
+{% include project_page.html %}
+</html>
