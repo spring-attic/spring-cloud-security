@@ -24,7 +24,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 public class OAuth2SsoConfigurerAdapter implements OAuth2SsoConfigurer {
 
 	@Override
-	public void configure(HttpSecurity http) {
+	public void configure(HttpSecurity http) throws Exception {
 	}
 
 }
