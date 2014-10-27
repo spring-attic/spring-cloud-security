@@ -10,7 +10,7 @@ authentication and a single user account:
 @Controller
 class Application {
   
-  @RequestMapping('/'
+  @RequestMapping('/')
   String home() {
     'Hello World'
   }
@@ -29,7 +29,7 @@ Here's a Spring Cloud app with OAuth2 SSO:
 @EnableOAuth2Sso
 class Application {
   
-  @RequestMapping('/'
+  @RequestMapping('/')
   String home() {
     'Hello World'
   }
