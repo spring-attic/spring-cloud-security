@@ -1,1 +1,5 @@
 include::intro.adoc[]
+
+== Building
+
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/src/main/asciidoc/building.adoc[]
