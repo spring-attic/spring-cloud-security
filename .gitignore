@@ -8,4 +8,5 @@ _site
 .project
 .project
 .settings/
+target/
 sample-pages
