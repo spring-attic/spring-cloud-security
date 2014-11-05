@@ -40,7 +40,6 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -59,9 +58,6 @@ import org.springframework.util.ClassUtils;
 @EnableConfigurationProperties(OAuth2SsoProperties.class)
 @Import(ResourceServerTokenServicesConfiguration.class)
 public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter implements Ordered {
-
-	@Autowired
-	private OAuth2ProtectedResourceDetails remote;
 
 	@Autowired
 	private OAuth2SsoProperties sso;
