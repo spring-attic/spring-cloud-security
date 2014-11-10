@@ -105,6 +105,8 @@ public class ClientConfiguration {
 					OAuth2ProtectedResourceDetails resource,
 					MultiValueMap<String, String> form, HttpHeaders headers) {
 				headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+				String authHeader = resource.getClientId() + ":" + resource.getClientSecret();
+				headers.add("Authorization", "Basic " + DatatypeConverter.printBase64Binary(authHeader.getBytes()));
 			}
 		});
 		template.setAccessTokenProvider(accessTokenProvider);
