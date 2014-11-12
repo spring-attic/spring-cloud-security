@@ -46,6 +46,8 @@ public class OAuth2SsoProperties {
 
 	private Home home = new Home();
 
+	private boolean logoutRedirect;
+
 	@Data
 	public static class Home {
 		private String path = "/";
@@ -53,8 +55,8 @@ public class OAuth2SsoProperties {
 	}
 
 	public String getLogoutUri(String redirectUrl) {
-		return StringUtils.hasText(logoutUri) ? logoutUri : client.getTokenUri().replace("/oauth/token",
-				"/logout.do?redirect=" + redirectUrl);
+		return StringUtils.hasText(logoutUri) ? logoutUri : client.getTokenUri().replace(
+				"/oauth/token", "/logout.do?redirect=" + redirectUrl);
 	}
 
 }

@@ -37,6 +37,7 @@ import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
@@ -57,7 +58,8 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(OAuth2SsoProperties.class)
 @Import(ResourceServerTokenServicesConfiguration.class)
-public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter implements Ordered {
+public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter implements
+		Ordered {
 
 	@Autowired
 	private OAuth2SsoProperties sso;
@@ -112,12 +114,20 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 			requests.anyRequest().authenticated();
 		}
 
-		http.logout()
+		LogoutConfigurer<HttpSecurity> logout = http.logout();
+		logout.logoutSuccessUrl(sso.getHome().getPath())
 				.logoutRequestMatcher(new AntPathRequestMatcher(sso.getLogoutPath()))
-				.addLogoutHandler(logoutHandler()).permitAll();
+				.permitAll();
+		addRedirectToLogout(logout);
 		http.exceptionHandling().authenticationEntryPoint(
 				new LoginUrlAuthenticationEntryPoint(sso.getLoginPath()));
 
+	}
+
+	private void addRedirectToLogout(LogoutConfigurer<HttpSecurity> logout) {
+		if (sso.isLogoutRedirect()) {
+			logout.addLogoutHandler(logoutHandler());
+		}
 	}
 
 	protected OAuth2ClientAuthenticationProcessingFilter cloudfoundrySsoFilter() {
