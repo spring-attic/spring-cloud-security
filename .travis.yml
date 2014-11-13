@@ -13,4 +13,5 @@ env:
   global:
   - GIT_NAME="Dave Syer"
   - GIT_EMAIL=dsyer@pivotal.io
-  - secure: qGLijNHHTh2hJaA2BtNsWP6C29QnsRUCDtX5ihneRh8bHSwd5oPOe0a9eMTDaM8IVIy9N9QE5vYB2eXjnXeShJJbIHQJAj02wAZvPm1MdYErbJemic55zjO1FDCYi+tY1sDPdyai2tQ1xZ7jv0u+0BaSHI3AwdI1ZYx5nlU9fY4=
+  - CI_DEPLOY_USERNAME=buildmaster
+  - secure: aeLXRC5oFSddwnZt1/7G2/OHr7jDbxz0ET7sej3I+eSbe3N5vbzQ6FC08es4l89l54ciXd90I1g2BMw7DTYKOO373FP78XPdAEbifJTU4DGd6fCELmoTtUPhjunBIk7E49hisPbv82892IYYA7qi/hzG548cPyZ1IgiJjq0NCsc=
