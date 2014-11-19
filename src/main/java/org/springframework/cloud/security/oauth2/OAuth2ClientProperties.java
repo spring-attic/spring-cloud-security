@@ -15,6 +15,8 @@
  */
 package org.springframework.cloud.security.oauth2;
 
+import java.util.List;
+
 import lombok.Data;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +45,9 @@ public class OAuth2ClientProperties implements Validator {
 
 	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.clientSecret:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.clientSecret:}}")
 	private String clientSecret;
+
+	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.scope:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.scope:}}")
+	private List<String> scope;
 
 	private AuthenticationScheme authenticationScheme = AuthenticationScheme.header;
 

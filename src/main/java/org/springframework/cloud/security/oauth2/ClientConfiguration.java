@@ -57,7 +57,7 @@ import org.springframework.util.MultiValueMap;
 public class ClientConfiguration {
 
 	@Autowired
-	private OAuth2ClientProperties sso;
+	private OAuth2ClientProperties client;
 
 	@Resource
 	@Qualifier("accessTokenRequest")
@@ -76,11 +76,12 @@ public class ClientConfiguration {
 	public OAuth2ProtectedResourceDetails oauth2RemoteResource() {
 		AuthorizationCodeResourceDetails details = new AuthorizationCodeResourceDetails();
 		// set up resource details, OAuth2 URLs etc.
-		details.setClientId(sso.getClientId());
-		details.setClientSecret(sso.getClientSecret());
-		details.setAccessTokenUri(sso.getTokenUri());
-		details.setUserAuthorizationUri(sso.getAuthorizationUri());
-		details.setClientAuthenticationScheme(sso.getAuthenticationScheme());
+		details.setClientId(client.getClientId());
+		details.setClientSecret(client.getClientSecret());
+		details.setScope(client.getScope());
+		details.setAccessTokenUri(client.getTokenUri());
+		details.setUserAuthorizationUri(client.getAuthorizationUri());
+		details.setClientAuthenticationScheme(client.getAuthenticationScheme());
 		return details;
 	}
 

@@ -89,7 +89,14 @@ Foundry (PWS) login server instead of challenging for Basic
 authentication credentials. The `clientId` and `clientSecret` are
 credentials of a registered client in Cloud Foundry.  It's quite hard
 to get a Cloud Foundry client registration for testing (but please ask
-at support@run.pivotal.io if you want one on PWS).
+at support@run.pivotal.io if you want one on PWS, or your local
+platform administrator if it's a private instance).
+
+To limit the scope that the client asks for when it obtains an access token
+you can set `oauth2.client.scope` (comma separated or an array in YAML). By
+default the scope is empty and it is up to to Authorization Server to 
+decide what the defaults should be, usually depending on the settings in
+the client registration that it holds.
 
 === OAuth Protected Resource
 
