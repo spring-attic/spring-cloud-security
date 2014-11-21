@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.cloud.security.sso;
+package org.springframework.cloud.security.oauth2.sso;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 

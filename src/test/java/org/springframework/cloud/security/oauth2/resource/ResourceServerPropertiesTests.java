@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.cloud.security.oauth2;
+package org.springframework.cloud.security.oauth2.resource;
 
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.cloud.security.resource;
+package org.springframework.cloud.security.oauth2.sso;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(OAuth2ResourceConfiguration.class)
-public @interface EnableOAuth2Resource {
+@Import(OAuth2SsoConfiguration.class)
+public @interface EnableOAuth2Sso {
 
 }

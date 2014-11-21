@@ -1,4 +1,4 @@
-package org.springframework.cloud.security.proxy;
+package org.springframework.cloud.security.oauth2.proxy;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
