@@ -25,6 +25,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Dave Syer
  *
@@ -34,6 +36,7 @@ import org.springframework.validation.Validator;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ResourceServerProperties implements Validator {
 	
+	@JsonIgnore
 	private final OAuth2ClientProperties client;
 
 	private String serviceId = "resource";
@@ -48,6 +51,8 @@ public class ResourceServerProperties implements Validator {
 	private String tokenInfoUri;
 
 	private boolean preferTokenInfo = true;
+	
+	private Jwt jwt = new Jwt();
 
 	public String getResourceId() {
 		return id;
@@ -73,6 +78,21 @@ public class ResourceServerProperties implements Validator {
 							"Missing tokenInfoUri");
 				}				
 			}
+		}
+	}
+	
+	@Data
+	public class Jwt {
+		private String keyValue;
+		private String keyUri;
+		public String getKeyUri() {
+			if (keyUri!=null) {
+				return keyUri;
+			}
+			if (userInfoUri!=null && userInfoUri.endsWith("/userinfo")) {
+				return userInfoUri.replace("/userinfo", "/token_key");
+			}
+			return null;
 		}
 	}
 
