@@ -74,6 +74,10 @@ public class ResourceServerProperties implements Validator {
 				}
 			} else {
 				if (isPreferTokenInfo() && !StringUtils.hasText(resource.getTokenInfoUri())) {
+					if (StringUtils.hasText(getJwt().getKeyUri()) || StringUtils.hasText(getJwt().getKeyValue())) {
+						// It's a JWT decoder
+						return;
+					}
 					errors.rejectValue("tokenInfoUri", "missing.tokenInfoUri",
 							"Missing tokenInfoUri");
 				}				
@@ -91,6 +95,9 @@ public class ResourceServerProperties implements Validator {
 			}
 			if (userInfoUri!=null && userInfoUri.endsWith("/userinfo")) {
 				return userInfoUri.replace("/userinfo", "/token_key");
+			}
+			if (tokenInfoUri!=null && tokenInfoUri.endsWith("/check_token")) {
+				return userInfoUri.replace("/check_token", "/token_key");
 			}
 			return null;
 		}

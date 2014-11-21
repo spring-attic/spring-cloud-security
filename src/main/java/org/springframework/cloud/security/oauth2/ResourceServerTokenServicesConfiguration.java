@@ -134,12 +134,12 @@ public class ResourceServerTokenServicesConfiguration {
 
 		@Autowired
 		private ResourceServerProperties resource;
-
+		
 		@Bean
-		public DefaultTokenServices jwtTokenServices() {
+		@ConditionalOnMissingBean(ResourceServerTokenServices.class)
+		public ResourceServerTokenServices jwtTokenServices() {
 			DefaultTokenServices services = new DefaultTokenServices();
 			services.setTokenStore(jwtTokenStore());
-			// TODO: maybe add ClientDetailsService that only works for the configured client
 			return services;
 		}
 
