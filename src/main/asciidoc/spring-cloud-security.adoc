@@ -8,6 +8,43 @@ include::intro.adoc[]
 
 include::quickstart.adoc[]
 
+== More Detail
+
+=== Single Sign On
+
+An app will activate `@EnableOAuth2Sso` if you bind provide the
+following properties in the `Environment`:
+
+* `oauth2.client.\*` with `*` equal to `clientId`, `clientSecret`,
+  `tokenUri` and `authorizationUri` and;
+
+* `oauth2.resource.preferTokenInfo=false` and
+  `oauth2.resource.userInfoUri` to use the "/me" resource
+  (e.g. "https://uaa.run.pivotal.io/userinfo" on PWS), or
+
+* `oauth2.resource.tokenInfoUri` to use the token decoding endpoint
+  (e.g. "https://uaa.run.pivotal.io/check_token" on PWS), or
+
+* `oauth2.resource.jwt.keyValue` or `oauth2.resource.jwt.keyUri` to
+  decode a JWT token locally, where the key is a verification key. The
+  verification key value is either a symmetric secret or PEM-encoded
+  RSA public key. If you don't have the key and it's public you can
+  provide a URI where it can be downloaded (as a JSON object with a
+  "value" field). E.g. on PWS:
+  + 
+----
+$ curl https://uaa.run.pivotal.io/token_key
+{"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----\n"}
+----
+
+=== Resource Server
+
+The `@EnableOAuth2Resource` annotation will protect your API endpoints
+if you have the same environment settings as the SSO client, except
+that it doesn't need a `tokenUri` or `authorizationUri`, and it also
+doesn't need a `clientId` and `clientSecret` if it isn't using the
+`tokenInfoUri` (i.e. if it has `jwt.*` or `userInfoUri`).
+
 === Token Relay
 
 If your app has a

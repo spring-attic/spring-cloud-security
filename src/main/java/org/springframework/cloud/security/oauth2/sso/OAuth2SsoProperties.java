@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.util.StringUtils;
@@ -39,7 +38,6 @@ public class OAuth2SsoProperties {
 
 	private String logoutPath = "/logout";
 
-	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.logoutUri:}")
 	private String logoutUri;
 
 	private String loginPath = "/login";

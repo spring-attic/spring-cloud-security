@@ -19,7 +19,6 @@ import java.util.List;
 
 import lombok.Data;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.oauth2.common.AuthenticationScheme;
 import org.springframework.util.StringUtils;
@@ -34,19 +33,14 @@ import org.springframework.validation.Validator;
 @Data
 public class OAuth2ClientProperties implements Validator {
 
-	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.tokenUri:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.tokenUri:}}")
 	private String tokenUri;
 
-	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.authorizationUri:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.authorizationUri:}}")
 	private String authorizationUri;
 
-	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.clientId:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.clientId:}}")
 	private String clientId;
 
-	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.clientSecret:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.clientSecret:}}")
 	private String clientSecret;
 
-	@Value("${vcap.services.${oauth2.sso.serviceId:sso}.credentials.scope:${vcap.services.${oauth2.resource.serviceId:resource}.credentials.scope:}}")
 	private List<String> scope;
 
 	private AuthenticationScheme authenticationScheme = AuthenticationScheme.header;

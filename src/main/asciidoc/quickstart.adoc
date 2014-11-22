@@ -1,4 +1,4 @@
-=== OAuth Single Sign On
+=== OAuth2 Single Sign On
 
 Here's a Spring Cloud "Hello World" app with HTTP Basic
 authentication and a single user account:
@@ -66,39 +66,13 @@ you are already signed into github you won't even notice that it has
 authenticated.  These credentials will only work if your app is
 running on port 8080.
 
-If you now drop the app into Cloud Foundry:
-
-----
-$ spring jar app.jar app.groovy
-$ cf push -p app.jar
-----
-
-and bind it to a service called "sso" with the following properties
-(e.g. created as a
-http://docs.pivotal.io/pivotalcf/devguide/services/user-provided.html[user-provided
-service]):
-
-----
-$ cf create-user-provided-service sso -p '{clientId:"<my-client>",clientSecret:"<my-secret>",userInfoUri:"https://uaa.run.pivotal.io/userinfo",tokenUri: "https://login.run.pivotal.io/oauth/token",authorizationUri:"https://login.run.pivotal.io/oauth/authorize"}
-$ cf bind-service app sso
-$ cf push app -p app.jar
-----
-
-and then visit it in a browser, then it will redirect to the Cloud
-Foundry (PWS) login server instead of challenging for Basic
-authentication credentials. The `clientId` and `clientSecret` are
-credentials of a registered client in Cloud Foundry.  It's quite hard
-to get a Cloud Foundry client registration for testing (but please ask
-at support@run.pivotal.io if you want one on PWS, or your local
-platform administrator if it's a private instance).
-
 To limit the scope that the client asks for when it obtains an access token
 you can set `oauth2.client.scope` (comma separated or an array in YAML). By
 default the scope is empty and it is up to to Authorization Server to 
 decide what the defaults should be, usually depending on the settings in
 the client registration that it holds.
 
-=== OAuth Protected Resource
+=== OAuth2 Protected Resource
 
 You want to protect an API resource with an OAuth2 token? Here's a
 simple example (paired with the client above):

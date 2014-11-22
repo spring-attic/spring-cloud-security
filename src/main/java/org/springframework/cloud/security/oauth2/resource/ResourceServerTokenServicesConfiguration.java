@@ -42,6 +42,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -156,12 +157,12 @@ public class ResourceServerTokenServicesConfiguration {
 		public JwtAccessTokenConverter jwtTokenEnhancer() {
 			JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 			String keyValue = resource.getJwt().getKeyValue();
-			if (keyValue == null) {
+			if (!StringUtils.hasText(keyValue)) {
 				keyValue = (String) new RestTemplate().getForObject(
 						resource.getJwt().getKeyUri(), Map.class).get("value");
 			}
 			else {
-				if (!keyValue.startsWith("-----BEGIN")) {
+				if (StringUtils.hasText(keyValue) && !keyValue.startsWith("-----BEGIN")) {
 					converter.setSigningKey(keyValue);
 				}
 			}

@@ -19,7 +19,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.util.StringUtils;
@@ -42,13 +41,10 @@ public class ResourceServerProperties implements Validator {
 
 	private String serviceId = "resource";
 
-	@Value("${vcap.services.${oauth2.resource.serviceId:resource}.credentials.id:}")
 	private String id;
 
-	@Value("${vcap.services.${oauth2.resource.serviceId:resource}.credentials.userInfoUri:${vcap.services.${oauth2.sso.serviceId:sso}.credentials.userInfoUri:}}")
 	private String userInfoUri;
 
-	@Value("${vcap.services.${oauth2.resource.serviceId:resource}.credentials.tokenInfoUri:${vcap.services.${oauth2.sso.serviceId:sso}.credentials.tokenInfoUri:}}")
 	private String tokenInfoUri;
 
 	private boolean preferTokenInfo = true;
