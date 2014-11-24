@@ -16,7 +16,7 @@ An app will activate `@EnableOAuth2Sso` if you bind provide the
 following properties in the `Environment`:
 
 * `oauth2.client.\*` with `*` equal to `clientId`, `clientSecret`,
-  `tokenUri` and `authorizationUri` and;
+  `tokenUri`, `authorizationUri` and one of:
 
 * `oauth2.resource.preferTokenInfo=false` and
   `oauth2.resource.userInfoUri` to use the "/me" resource
@@ -36,6 +36,57 @@ following properties in the `Environment`:
 $ curl https://uaa.run.pivotal.io/token_key
 {"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----\n"}
 ----
+
+You can set the preferred scope (as a comma-separated list or YAML
+array) in `oauth2.client.scope`. It defaults to empty, in which case
+most Authorization Servers will ask the user for approval for the
+maximum allowed scope for the client.
+
+There is also a setting for `oauth2.client.authenticationScheme` which
+defaults to "header" (but you might need to set it to "form" if, like
+Github for instance, your OAuth2 provider doesn't like header
+authentication).
+
+==== Access Decision Rules
+
+By default the whole application will be secured with OAuth2 with the
+same access rule ("authenticated"). This includes the Actuator
+endpoints, which you might prefer to be secured differently, so Spring
+Cloud Security provides a configurer callback that lets you change the
+matching and access rules for OAuth2 authentication. Any bean of type
+`OAuth2SsoConfigurer` (there is a convenient empty base class) will
+get 2 callbacks, one to set the request matchers for the OAuth2
+filter, and one with the full `HttpSecurity` builder (so you can set
+up all sorts of behaviour, but the main application is to control
+access rules).
+
+The default login path, i.e. the one that triggers the redirect to the
+OAuth2 Authorization Server, is "/login". It will always be added to
+the matching patterns for the OAuth2 SSO, even if you have
+`OAuth2SsoConfigurer` beans as well. The default logout path is
+"/logout" and it gets similar treatment, as does the "home" page
+(which is the logout success page, defaults to "/"). Those paths can
+be overriden by setting `oauth2.sso.\*' (`loginPath`, `logoutPath` and
+`home.path`).
+
+For example if you want the resources under "/ui/**" to be protected with OAuth2:
+
+[source,java,indent=0]
+----
+	@Configuration
+	@EnableOAuth2Sso
+	@EnableAutoConfiguration
+	protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
+		@Override
+		public void match(RequestMatchers matchers) {
+			matchers.antMatchers("/ui/**");
+		}
+	}
+----
+
+In this case the rest of the application will default to the normal
+Spring Boot access control (Basic authentication, or whatever custom
+filters you put in place).
 
 === Resource Server
 
