@@ -32,6 +32,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OAuth2SsoProperties {
 
+	public static final String DEFAULT_LOGIN_PATH = "/login";
+
 	private final OAuth2ClientProperties client;
 
 	private String serviceId = "sso";
@@ -40,7 +42,7 @@ public class OAuth2SsoProperties {
 
 	private String logoutUri;
 
-	private String loginPath = "/login";
+	private String loginPath = DEFAULT_LOGIN_PATH;
 
 	private Home home = new Home();
 

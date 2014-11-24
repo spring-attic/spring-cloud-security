@@ -76,7 +76,7 @@ public class ResourceServerProperties implements Validator {
 						return;
 					}
 					errors.rejectValue("tokenInfoUri", "missing.tokenInfoUri",
-							"Missing tokenInfoUri");
+							"Missing tokenInfoUri and there is no JWT verifier key");
 				}				
 			}
 		}

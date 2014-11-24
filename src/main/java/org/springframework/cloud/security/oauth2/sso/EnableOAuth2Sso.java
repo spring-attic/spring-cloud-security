@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
 
 /**
+ * Enable Single Sign On (SSO) with an OAuth2 provider declared in external properties.
+ * 
  * @author Dave Syer
  *
  */

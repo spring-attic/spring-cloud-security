@@ -16,6 +16,7 @@
 package org.springframework.cloud.security.oauth2.sso;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,9 +32,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.security.oauth2.resource.ResourceServerTokenServicesConfiguration;
+import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurer.RequestMatchers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
@@ -89,7 +92,8 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 	 */
 	@Autowired(required = false)
 	public void setConfigurers(List<OAuth2SsoConfigurer> configurers) {
-		this.configurers = configurers;
+		this.configurers = new ArrayList<OAuth2SsoConfigurer>(configurers);
+		AnnotationAwareOrderComparator.sort(this.configurers);
 	}
 
 	@Override
@@ -98,26 +102,36 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		http.addFilterAfter(cloudfoundrySsoFilter(),
 				AbstractPreAuthenticatedProcessingFilter.class);
 
-		for (OAuth2SsoConfigurer configurer : configurers) {
-			// Delegates can add authorizeRequests() here
-			configurer.configure(http);
-		}
+		RequestMatchers matchers = new RequestMatchers();
 		if (configurers.isEmpty()) {
-			// Add anyRequest() last as a fall back. Spring Security would replace an
-			// existing anyRequest() matcher with this one, so to avoid that we only
-			// add it if the user hasn't configured anything.
-			ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry requests = http
-					.antMatcher("/**").authorizeRequests();
-			if (!sso.getHome().isSecure()) {
-				requests.antMatchers(sso.getHome().getPath()).permitAll();
+			// Add anyRequest() if the user hasn't configured anything.
+			matchers.anyRequest();
+		}
+		else {
+			matchers.antMatchers(sso.getLoginPath());
+			for (OAuth2SsoConfigurer configurer : configurers) {
+				// Delegates can add matchers here
+				configurer.match(matchers);
 			}
-			requests.anyRequest().authenticated();
+		}
+		http.requestMatchers().requestMatchers(matchers.getRequestMatchers());
+		ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry requests = http
+				.authorizeRequests();
+		if (!sso.getHome().isSecure()) {
+			requests.antMatchers(sso.getHome().getPath()).permitAll();
+		}
+		// Fallback to authenticated for everything
+		requests.anyRequest().authenticated();
+		for (OAuth2SsoConfigurer configurer : configurers) {
+			// Delegates can add authorizeRequests() here (and if they add more matchers
+			// those will override the ones added above)
+			configurer.configure(http);
 		}
 
 		LogoutConfigurer<HttpSecurity> logout = http.logout();
 		logout.logoutSuccessUrl(sso.getHome().getPath())
 				.logoutRequestMatcher(new AntPathRequestMatcher(sso.getLogoutPath()))
-				.permitAll();
+				.permitAll(!sso.getHome().isSecure());
 		addRedirectToLogout(logout);
 		http.exceptionHandling().authenticationEntryPoint(
 				new LoginUrlAuthenticationEntryPoint(sso.getLoginPath()));

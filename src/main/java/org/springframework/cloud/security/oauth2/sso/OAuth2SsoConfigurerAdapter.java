@@ -27,4 +27,8 @@ public class OAuth2SsoConfigurerAdapter implements OAuth2SsoConfigurer {
 	public void configure(HttpSecurity http) throws Exception {
 	}
 
+	@Override
+	public void match(RequestMatchers matchers) {
+	}
+
 }

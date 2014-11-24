@@ -55,7 +55,7 @@ public class OAuth2ClientProperties implements Validator {
 		OAuth2ClientProperties sso = (OAuth2ClientProperties) target;
 		if (StringUtils.hasText(sso.getClientId())) {
 			if (!StringUtils.hasText(sso.getAuthorizationUri())) {
-				errors.rejectValue("authorizeUri", "missing.authorizeUri",
+				errors.rejectValue("authorizationUri", "missing.authorizationUri",
 						"Missing authorizeUri");
 			}
 			if (!StringUtils.hasText(sso.getTokenUri())) {
