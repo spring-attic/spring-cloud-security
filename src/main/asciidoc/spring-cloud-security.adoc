@@ -96,6 +96,35 @@ that it doesn't need a `tokenUri` or `authorizationUri`, and it also
 doesn't need a `clientId` and `clientSecret` if it isn't using the
 `tokenInfoUri` (i.e. if it has `jwt.*` or `userInfoUri`).
 
+By default *all* your endpoints are protected (i.e. "/**") but you can 
+pick and choose by adding a `ResourceServerConfigurerAdapter` (standard
+Spring OAuth feature), e.g. to protect only the "/api/**" resources
+
+.Application.java
+[source,java]
+----
+@RestController
+@EnableOAuth2Resource
+class Application extends ResourceServerConfigurerAdapter {
+
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
+    http.requestMatchers()
+      .antMatchers("/api/**")
+   .and()
+     .authorizeRequests()
+       .anyRequest().authenticated();
+  }
+  
+  @RequestMapping('/api')
+  String home() {
+    'Hello World'
+  }
+
+}
+----
+
+
 === Token Relay
 
 If your app has a
@@ -112,7 +141,8 @@ it is proxying. Thus the SSO app above can be enhanced simply like this:
 @EnableZuulProxy
 class Application {
   
-  @RequestMapping('/'
+  @RequestMapping('/')
+  @ResponseBody
   String home() {
     'Hello World'
   }
