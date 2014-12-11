@@ -12,4 +12,4 @@ exchange.
 
 == Building
 
-link:https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/src/main/asciidoc/building.adoc[]
+link:https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/building.adoc[]
