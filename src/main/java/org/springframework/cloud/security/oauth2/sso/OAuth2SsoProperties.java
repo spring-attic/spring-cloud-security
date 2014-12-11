@@ -36,12 +36,22 @@ public class OAuth2SsoProperties {
 
 	private final OAuth2ClientProperties client;
 
+	/**
+	 * Id the single sign-on service.
+	 */
 	private String serviceId = "sso";
 
+	/**
+	 * Path to the logout page.
+	 */
 	private String logoutPath = "/logout";
 
 	private String logoutUri;
 
+	/**
+	 * Path to the login page, i.e. the one that triggers the redirect to
+	 * the OAuth2 Authorization Server.
+	 */
 	private String loginPath = DEFAULT_LOGIN_PATH;
 
 	private Home home = new Home();
@@ -50,7 +60,15 @@ public class OAuth2SsoProperties {
 
 	@Data
 	public static class Home {
+
+		/**
+		 * Path to the home page, i.e. the redirect on successful authentication.
+		 */
 		private String path = "/";
+
+		/**
+		 * Specify if the home page is secured.
+		 */
 		private boolean secure = true;
 	}
 

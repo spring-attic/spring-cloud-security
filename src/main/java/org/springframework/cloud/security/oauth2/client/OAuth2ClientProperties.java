@@ -33,14 +33,32 @@ import org.springframework.validation.Validator;
 @Data
 public class OAuth2ClientProperties implements Validator {
 
+	/**
+	 * URI to use to require an access token.
+	 */
 	private String tokenUri;
 
+	/**
+	 * URI to use to request user's authorization.
+	 */
 	private String authorizationUri;
 
+	/**
+	 * Client id of the registered application.
+	 */
 	private String clientId;
 
+	/**
+	 * Client secret of the registered application.
+	 */
 	private String clientSecret;
 
+	/**
+	 * Comma-separated list of scopes to constraint when the client obtains an access token. By
+	 * default the scope is empty and it is up to to Authorization Server to decide what the
+	 * defaults should be, usually depending on the settings in the client registration that
+	 * it holds.
+	 */
 	private List<String> scope;
 
 	private AuthenticationScheme authenticationScheme = AuthenticationScheme.header;

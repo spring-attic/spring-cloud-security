@@ -41,12 +41,24 @@ public class ResourceServerProperties implements Validator {
 
 	private String serviceId = "resource";
 
+	/**
+	 * Identifier of the resource.
+	 */
 	private String id;
 
+	/**
+	 * URI of the user endpoint.
+	 */
 	private String userInfoUri;
 
+	/**
+	 * URI of the token decoding endpoint.
+	 */
 	private String tokenInfoUri;
 
+	/**
+	 * Use the token info, can be set to false to use the user info.
+	 */
 	private boolean preferTokenInfo = true;
 	
 	private Jwt jwt = new Jwt();
@@ -84,8 +96,18 @@ public class ResourceServerProperties implements Validator {
 	
 	@Data
 	public class Jwt {
+
+		/**
+		 * The verification key of the JWT token. Can either be a symmetric secret or PEM-encoded RSA
+		 * public key. If the value is not available, you can set the URI instead.
+		 */
 		private String keyValue;
+
+		/**
+		 * The URI of the JWT token. Can be set if the value is not available and the key is public.
+		 */
 		private String keyUri;
+
 		public String getKeyUri() {
 			if (keyUri!=null) {
 				return keyUri;
