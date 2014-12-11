@@ -30,6 +30,9 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
     		if (details instanceof OAuth2AuthenticationDetails) {
     			OAuth2AuthenticationDetails oauth = (OAuth2AuthenticationDetails) details;
     	        RequestContext ctx = RequestContext.getCurrentContext();
+    	        if (ctx.containsKey("proxy")) {
+    	        	// TODO: check if this is an OAuth2 route
+    	        }
     	        ctx.set(ACCESS_TOKEN, oauth.getTokenValue());
     			return true;
     		}
