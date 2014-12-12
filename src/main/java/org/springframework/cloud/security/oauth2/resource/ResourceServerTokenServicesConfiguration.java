@@ -17,6 +17,8 @@ package org.springframework.cloud.security.oauth2.resource;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -25,6 +27,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.security.oauth2.client.ClientConfiguration;
 import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +46,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -135,6 +139,7 @@ public class ResourceServerTokenServicesConfiguration {
 
 	@Configuration
 	@Conditional(JwtToken.class)
+	@Slf4j
 	protected static class JwtTokenServicesConfiguration {
 
 		@Autowired
@@ -154,12 +159,19 @@ public class ResourceServerTokenServicesConfiguration {
 		}
 
 		@Bean
+		@RefreshScope
 		public JwtAccessTokenConverter jwtTokenEnhancer() {
 			JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 			String keyValue = resource.getJwt().getKeyValue();
 			if (!StringUtils.hasText(keyValue)) {
-				keyValue = (String) new RestTemplate().getForObject(
-						resource.getJwt().getKeyUri(), Map.class).get("value");
+				try {
+					keyValue = (String) new RestTemplate().getForObject(
+							resource.getJwt().getKeyUri(), Map.class).get("value");
+				}
+				catch (ResourceAccessException e) {
+					// ignore
+					log.warn("Failed to fetch token key (you may need to refreh when the auth server is back)");
+				}
 			}
 			else {
 				if (StringUtils.hasText(keyValue) && !keyValue.startsWith("-----BEGIN")) {

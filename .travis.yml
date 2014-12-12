@@ -1,4 +1,8 @@
 language: java
+sudo: false
+cache:
+  directories:
+    - $HOME/.m2
 before_install: 
   - git config user.name "$GIT_NAME"
   - git config user.email "$GIT_EMAIL"

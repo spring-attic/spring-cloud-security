@@ -1,3 +1,6 @@
+auth:
+  routes:
+    foo: oauth2
 logging:
   level:
     org.springframework.security: DEBUG
