@@ -27,7 +27,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.security.oauth2.client.ClientConfiguration;
 import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
@@ -159,7 +158,6 @@ public class ResourceServerTokenServicesConfiguration {
 		}
 
 		@Bean
-		@RefreshScope
 		public JwtAccessTokenConverter jwtTokenEnhancer() {
 			JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 			String keyValue = resource.getJwt().getKeyValue();

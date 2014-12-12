@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.social.SocialWebAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.test.EnvironmentTestUtils;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -93,7 +94,8 @@ public class ResourceServerTokenServicesConfigurationTests {
 
 	@Test
 	public void springSocialUserInfo() {
-		EnvironmentTestUtils.addEnvironment(environment, "oauth2.resource.preferTokenInfo=false",
+		EnvironmentTestUtils.addEnvironment(environment,
+				"oauth2.resource.preferTokenInfo=false",
 				"spring.social.facebook.app-id=foo",
 				"spring.social.facebook.app-secret=bar");
 		context = new SpringApplicationBuilder(SocialResourceConfiguration.class)
@@ -108,7 +110,7 @@ public class ResourceServerTokenServicesConfigurationTests {
 
 	@Configuration
 	@Import({ ResourceServerTokenServicesConfiguration.class,
-			PropertyPlaceholderAutoConfiguration.class })
+			RefreshAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
 	protected static class ResourceConfiguration {
 	}
 
