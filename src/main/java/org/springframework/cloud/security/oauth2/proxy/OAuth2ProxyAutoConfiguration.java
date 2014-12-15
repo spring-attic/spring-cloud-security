@@ -16,10 +16,12 @@
 package org.springframework.cloud.security.oauth2.proxy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.trace.TraceRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
@@ -31,17 +33,37 @@ import com.netflix.zuul.ZuulFilter;
  *
  */
 @Configuration
-@ConditionalOnClass({ ZuulFilter.class, EnableOAuth2Client.class, SecurityProperties.class })
+@ConditionalOnClass({ ZuulFilter.class, EnableOAuth2Client.class,
+		SecurityProperties.class })
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(ProxyAuthenticationProperties.class)
 public class OAuth2ProxyAutoConfiguration {
-	
+
 	@Autowired
 	private ProxyAuthenticationProperties properties;
 
 	@Bean
 	public OAuth2TokenRelayFilter oauth2TokenRelayFilter() {
 		return new OAuth2TokenRelayFilter(properties);
+	}
+
+	@ConditionalOnClass({ ProxyRequestHelper.class, TraceRepository.class })
+	@Configuration
+	protected static class AuthenticationHeaderFilterConfiguration {
+
+		@Autowired(required = false)
+		private TraceRepository traces;
+
+		@Bean
+		public AuthenticationHeaderFilter authenticationHeaderFilter(
+				ProxyAuthenticationProperties properties) {
+			ProxyRequestHelper helper = new ProxyRequestHelper();
+			if (traces != null) {
+				helper.setTraces(traces);
+			}
+			return new AuthenticationHeaderFilter(helper, properties);
+		}
+
 	}
 
 }

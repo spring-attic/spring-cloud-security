@@ -158,10 +158,33 @@ correct header.
 
 How does it work? The `@EnableOAuth2Sso` annotation pulls in
 `spring-cloud-starter-security` (which you could do manually in a
-traditional app), and that has some autoconfiguration for a
-`ZuulFilter`, which itself is activated because Zuul is on the
+traditional app), and that in turn triggers some autoconfiguration for
+a `ZuulFilter`, which itself is activated because Zuul is on the
 classpath (via `@EnableZuulProxy`). The
-{security-base}/tree/master/src/main/java/org/springframework/cloud/security/proxy/OAuth2TokenRelayFilter.java[filter]
+{security-base}/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java[filter]
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.
 
+You can control the authorization behaviour downstream of an
+`@EnableZuulProxy` through the `proxy.auth.*` settings. Example:
+
+.application.yml
+[source,yaml]
+----
+proxy:
+  auth:
+    routes:
+      customers: oauth2
+      stores: passthru
+      recommendations: none
+----
+
+In this example the "customers" service gets an OAuth2 token relay,
+the "stores" service gets a passthrough (the authorization header is
+just passed downstream), and the "recommendations" service has its
+authorization header removed. The default behaviour is to do a token
+relay if there is a token available, and passthru otherwise.
+
+See
+{security-base}/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties[
+ProxyAuthenticationProperties] for full details.

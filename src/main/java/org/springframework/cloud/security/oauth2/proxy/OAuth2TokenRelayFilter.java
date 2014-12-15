@@ -2,9 +2,6 @@ package org.springframework.cloud.security.oauth2.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProperties.Route;
 import org.springframework.security.core.Authentication;
@@ -15,24 +12,20 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 
+/**
+ * Pre-filter that adds an OAuth2 access token as a downstream authorization header if it
+ * can detect the token as part of the currently authenticated principal.
+ * 
+ * @author Dave Syer
+ *
+ */
 public class OAuth2TokenRelayFilter extends ZuulFilter {
 
 	private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
-	private ProxyAuthenticationProperties properties;
 	private Map<String, Route> routes = new HashMap<String, Route>();
 
 	public OAuth2TokenRelayFilter(ProxyAuthenticationProperties properties) {
-		this.properties = properties;
-	}
-
-	@PostConstruct
-	public void init() {
-		this.routes  = properties.getRoutes();
-		for (Entry<String, Route> entry : routes .entrySet()) {
-			if (entry.getValue().getId() == null) {
-				entry.getValue().setId(entry.getKey());
-			}
-		}
+		this.routes = properties.getRoutes();
 	}
 
 	@Override

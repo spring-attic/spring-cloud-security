@@ -1,6 +1,8 @@
-auth:
-  routes:
-    foo: oauth2
+proxy:
+  auth:
+    routes:
+      foo: oauth2
+      bar: none
 logging:
   level:
     org.springframework.security: DEBUG

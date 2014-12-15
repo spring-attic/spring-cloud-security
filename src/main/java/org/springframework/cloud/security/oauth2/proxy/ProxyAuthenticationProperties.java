@@ -17,6 +17,9 @@ package org.springframework.cloud.security.oauth2.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.annotation.PostConstruct;
 
 import lombok.Data;
 import lombok.Getter;
@@ -28,16 +31,34 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Dave Syer
  *
  */
-@ConfigurationProperties("auth")
+@ConfigurationProperties("proxy.auth")
 public class ProxyAuthenticationProperties {
 
+	/**
+	 * Authentication strategy per route. 
+	 */
 	@Getter
 	@Setter
 	private Map<String, Route> routes = new HashMap<String, Route>();
 
+	@PostConstruct
+	public void init() {
+		for (Entry<String, Route> entry : routes.entrySet()) {
+			if (entry.getValue().getId() == null) {
+				entry.getValue().setId(entry.getKey());
+			}
+		}
+	}
+
 	@Data
 	public static class Route {
+		/**
+		 * The id of the route (e.g. discovery virtual hostname).
+		 */
 		private String id;
+		/**
+		 * The authentication scheme to use (e.g. "oauth2", "none").
+		 */
 		private String scheme;
 
 		public Route(String scheme) {

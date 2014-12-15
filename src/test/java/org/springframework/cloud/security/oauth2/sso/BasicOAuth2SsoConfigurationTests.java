@@ -15,6 +15,7 @@
  */
 package org.springframework.cloud.security.oauth2.sso;
 
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProperties;
 import org.springframework.cloud.security.oauth2.sso.BasicOAuth2SsoConfigurationTests.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.TestPropertySource;
@@ -57,12 +59,20 @@ public class BasicOAuth2SsoConfigurationTests {
 	@Autowired
 	@Qualifier("springSecurityFilterChain")
 	private Filter filter;
+	
+	@Autowired
+	private ProxyAuthenticationProperties properties;
 
 	private MockMvc mvc;
 
 	@Before
 	public void init() {
 		mvc = MockMvcBuilders.webAppContextSetup(context).addFilters(filter).build();
+	}
+	
+	@Test
+	public void fooRouteHasAuthenicationScheme() throws Exception {
+		assertEquals("oauth2", properties.getRoutes().get("foo").getScheme());
 	}
 
 	@Test
