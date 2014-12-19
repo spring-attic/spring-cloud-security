@@ -90,7 +90,7 @@ simple example (paired with the client above):
 @EnableOAuth2Resource
 class Application {
   
-  @RequestMapping('/'
+  @RequestMapping('/')
   def home() {
     [message: 'Hello World']
   }
