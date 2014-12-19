@@ -72,6 +72,11 @@ default the scope is empty and it is up to to Authorization Server to
 decide what the defaults should be, usually depending on the settings in
 the client registration that it holds.
 
+NOTE: The examples above are all Groovy scripts. If you want to write the
+same code in Java (or Groovy) you need to add Spring Security OAuth2
+to the classpath (e.g. see the
+https://github.com/spring-cloud-samples/sso[sample here]).
+
 === OAuth2 Protected Resource
 
 You want to protect an API resource with an OAuth2 token? Here's a
