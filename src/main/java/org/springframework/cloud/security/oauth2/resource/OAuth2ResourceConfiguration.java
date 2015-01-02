@@ -19,14 +19,21 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.cloud.security.oauth2.resource.OAuth2ResourceConfiguration.ResourceServerCondition;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfiguration;
@@ -34,13 +41,14 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
  *
  */
 @Configuration
-@ConditionalOnExpression("'${oauth2.client.clientId:}'!=''")
+@Conditional(ResourceServerCondition.class)
 @ConditionalOnClass({ EnableResourceServer.class, SecurityProperties.class })
 @ConditionalOnWebApplication
 @EnableResourceServer
@@ -107,6 +115,25 @@ public class OAuth2ResourceConfiguration {
 			return SecurityProperties.ACCESS_OVERRIDE_ORDER - 10;
 		}
 
+	}
+	
+	protected static class ResourceServerCondition extends SpringBootCondition {
+
+		@Override
+		public ConditionOutcome getMatchOutcome(ConditionContext context,
+				AnnotatedTypeMetadata metadata) {
+			Environment environment = context.getEnvironment();
+			RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment);
+			String client = environment.resolvePlaceholders("${oauth2.client.clientId:}");
+			if (StringUtils.hasText(client)) {
+				return ConditionOutcome.match("found client id");
+			}
+			if (!resolver.getSubProperties("oauth2.resource.jwt").isEmpty()) {
+				return ConditionOutcome.match("found JWT resource configuration");
+			}
+			return ConditionOutcome.noMatch("found neither client id nor JWT resource");
+		}
+		
 	}
 	
 }
