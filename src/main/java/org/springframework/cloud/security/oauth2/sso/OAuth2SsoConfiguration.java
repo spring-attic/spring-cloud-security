@@ -129,7 +129,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		}
 
 		LogoutConfigurer<HttpSecurity> logout = http.logout();
-		logout.logoutSuccessUrl(sso.getHome().getPath())
+		logout.logoutSuccessUrl(sso.getHome().getRoot())
 				.logoutRequestMatcher(new AntPathRequestMatcher(sso.getLogoutPath()))
 				.permitAll(!sso.getHome().isSecure());
 		addRedirectToLogout(logout);
@@ -159,7 +159,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 					Authentication authentication) {
 				restTemplate.getOAuth2ClientContext().setAccessToken(null);
 				String redirect = request.getRequestURL().toString()
-						.replace(sso.getLogoutPath(), sso.getHome().getPath());
+						.replace(sso.getLogoutPath(), sso.getHome().getRoot());
 				try {
 					response.sendRedirect(sso.getLogoutUri(redirect));
 				}

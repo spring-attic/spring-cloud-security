@@ -49,8 +49,8 @@ public class OAuth2SsoProperties {
 	private String logoutUri;
 
 	/**
-	 * Path to the login page, i.e. the one that triggers the redirect to
-	 * the OAuth2 Authorization Server.
+	 * Path to the login page, i.e. the one that triggers the redirect to the OAuth2
+	 * Authorization Server.
 	 */
 	private String loginPath = DEFAULT_LOGIN_PATH;
 
@@ -62,14 +62,30 @@ public class OAuth2SsoProperties {
 	public static class Home {
 
 		/**
-		 * Path to the home page, i.e. the redirect on successful authentication.
+		 * Path to the all protected pages (including.
 		 */
-		private String path = "/";
+		private String[] path = new String[] { "/" };
 
 		/**
 		 * Specify if the home page is secured.
 		 */
 		private boolean secure = true;
+
+		/**
+		 * The root path (usually the first entry in {@link #getPath()}), but defaults to
+		 * "/" if path not specified. If there are wildcards (e.g. "/**") they are
+		 * stripped off.
+		 * 
+		 * @return the root path
+		 */
+		public String getRoot() {
+			String result = path != null && path.length > 0 ? path[0] : "/";
+			if (result.contains("*")) {
+				result = result.substring(0, result.indexOf("*"));
+				result = result.substring(0, result.lastIndexOf("/") + 1);
+			}
+			return result;
+		}
 	}
 
 	public String getLogoutUri(String redirectUrl) {
