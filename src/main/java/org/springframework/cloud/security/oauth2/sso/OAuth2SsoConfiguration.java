@@ -122,11 +122,6 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		}
 		// Fallback to authenticated for everything
 		requests.anyRequest().authenticated();
-		for (OAuth2SsoConfigurer configurer : configurers) {
-			// Delegates can add authorizeRequests() here (and if they add more matchers
-			// those will override the ones added above)
-			configurer.configure(http);
-		}
 
 		LogoutConfigurer<HttpSecurity> logout = http.logout();
 		logout.logoutSuccessUrl(sso.getHome().getRoot())
@@ -136,6 +131,12 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		http.exceptionHandling().authenticationEntryPoint(
 				new LoginUrlAuthenticationEntryPoint(sso.getLoginPath()));
 
+		for (OAuth2SsoConfigurer configurer : configurers) {
+			// Delegates can add authorizeRequests() here (and if they add more matchers
+			// those will override the ones added above). Similarly any logout or
+			// exception handling provided here will override those above.
+			configurer.configure(http);
+		}
 	}
 
 	private void addRedirectToLogout(LogoutConfigurer<HttpSecurity> logout) {

@@ -15,7 +15,7 @@
  */
 package org.springframework.cloud.security.oauth2.sso;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,9 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProperties;
-import org.springframework.cloud.security.oauth2.sso.BasicOAuth2SsoConfigurationTests.TestConfiguration;
+import org.springframework.cloud.security.Http401AuthenticationEntryPoint;
+import org.springframework.cloud.security.oauth2.sso.ExceptionHandlingOAuth2SsoConfigurationTests.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -51,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
 		"oauth2.client.authorizationUri=http://example.com/oauth/authorize",
 		"oauth2.client.tokenUri=http://example.com/oauth/token",
 		"oauth2.resource.jwt.keyValue=SSSSHHH" })
-public class BasicOAuth2SsoConfigurationTests {
+public class ExceptionHandlingOAuth2SsoConfigurationTests {
 
 	@Autowired
 	private WebApplicationContext context;
@@ -59,9 +60,6 @@ public class BasicOAuth2SsoConfigurationTests {
 	@Autowired
 	@Qualifier("springSecurityFilterChain")
 	private Filter filter;
-	
-	@Autowired
-	private ProxyAuthenticationProperties properties;
 
 	private MockMvc mvc;
 
@@ -69,23 +67,27 @@ public class BasicOAuth2SsoConfigurationTests {
 	public void init() {
 		mvc = MockMvcBuilders.webAppContextSetup(context).addFilters(filter).build();
 	}
-	
-	@Test
-	public void fooRouteHasAuthenticationScheme() throws Exception {
-		assertEquals("oauth2", properties.getRoutes().get("foo").getScheme());
-	}
 
 	@Test
-	public void homePageIsSecure() throws Exception {
-		mvc.perform(get("/")).andExpect(status().isFound())
-				.andExpect(header().string("location", "http://localhost/login"));
+	public void uiPageIsSecure() throws Exception {
+		mvc.perform(get("/")).andExpect(status().isUnauthorized())
+				.andExpect(header().string("WWW-Authenticate", startsWith("Session")));
 	}
 
 	@Configuration
 	@EnableOAuth2Sso
 	@EnableAutoConfiguration
-	protected static class TestConfiguration {
+	protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
+		@Override
+		public void match(RequestMatchers matchers) {
+			matchers.antMatchers("/**");
+		}
 
+		@Override
+		public void configure(HttpSecurity http) throws Exception {
+			http.exceptionHandling().authenticationEntryPoint(
+					new Http401AuthenticationEntryPoint("Session realm=\"JSESSIONID\""));
+		}
 	}
 
 }
