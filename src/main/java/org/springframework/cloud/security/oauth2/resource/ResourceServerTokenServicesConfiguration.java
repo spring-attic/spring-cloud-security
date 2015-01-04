@@ -168,7 +168,7 @@ public class ResourceServerTokenServicesConfiguration {
 				}
 				catch (ResourceAccessException e) {
 					// ignore
-					log.warn("Failed to fetch token key (you may need to refreh when the auth server is back)");
+					log.warn("Failed to fetch token key (you may need to refresh when the auth server is back)");
 				}
 			}
 			else {
@@ -176,7 +176,9 @@ public class ResourceServerTokenServicesConfiguration {
 					converter.setSigningKey(keyValue);
 				}
 			}
-			converter.setVerifierKey(keyValue);
+			if (keyValue != null) {
+				converter.setVerifierKey(keyValue);
+			}
 			return converter;
 		}
 
