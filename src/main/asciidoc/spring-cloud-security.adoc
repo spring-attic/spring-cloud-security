@@ -17,20 +17,23 @@ following properties in the `Environment`:
 
 * `oauth2.client.\*` with `*` equal to `clientId`, `clientSecret`,
   `tokenUri`, `authorizationUri` and one of:
-
-* `oauth2.resource.preferTokenInfo=false` and
-  `oauth2.resource.userInfoUri` to use the "/me" resource
++
+  ** `oauth2.resource.userInfoUri` to use the "/me" resource
   (e.g. "https://uaa.run.pivotal.io/userinfo" on PWS), or
++
+  ** `oauth2.resource.tokenInfoUri` to use the token decoding endpoint
+  (e.g. "https://uaa.run.pivotal.io/check_token" on PWS).
++
+If you specify both the `userInfoUri` and the `tokenInfoUri` then 
+you can set a flag to say that one is preferred over the other 
+(`preferTokenInfo=true` is the default). Or
 
-* `oauth2.resource.tokenInfoUri` to use the token decoding endpoint
-  (e.g. "https://uaa.run.pivotal.io/check_token" on PWS), or
-
-* `oauth2.resource.jwt.keyValue` or `oauth2.resource.jwt.keyUri` to
+* `oauth2.resource.jwt.keyValue` to
   decode a JWT token locally, where the key is a verification key. The
   verification key value is either a symmetric secret or PEM-encoded
   RSA public key. If you don't have the key and it's public you can
   provide a URI where it can be downloaded (as a JSON object with a
-  "value" field). E.g. on PWS:
+  "value" field) with `oauth2.resource.jwt.keyUri`. E.g. on PWS:
   + 
 ----
 $ curl https://uaa.run.pivotal.io/token_key
@@ -66,7 +69,7 @@ the matching patterns for the OAuth2 SSO, even if you have
 `OAuth2SsoConfigurer` beans as well. The default logout path is
 "/logout" and it gets similar treatment, as does the "home" page
 (which is the logout success page, defaults to "/"). Those paths can
-be overriden by setting `oauth2.sso.\*' (`loginPath`, `logoutPath` and
+be overriden by setting `oauth2.sso.*' (`loginPath`, `logoutPath` and
 `home.path`).
 
 For example if you want the resources under "/ui/**" to be protected with OAuth2:
@@ -96,7 +99,7 @@ that it doesn't need a `tokenUri` or `authorizationUri`, and it also
 doesn't need a `clientId` and `clientSecret` if it isn't using the
 `tokenInfoUri` (i.e. if it has `jwt.*` or `userInfoUri`).
 
-By default *all* your endpoints are protected (i.e. "/**") but you can 
+By default *all* your endpoints are protected (i.e. "+/**+") but you can 
 pick and choose by adding a `ResourceServerConfigurerAdapter` (standard
 Spring OAuth feature), e.g. to protect only the "/api/**" resources
 
@@ -116,9 +119,9 @@ class Application extends ResourceServerConfigurerAdapter {
        .anyRequest().authenticated();
   }
   
-  @RequestMapping('/api')
-  String home() {
-    'Hello World'
+  @RequestMapping("/api")
+  public String home() {
+    return "Hello World";
   }
 
 }
@@ -141,12 +144,6 @@ it is proxying. Thus the SSO app above can be enhanced simply like this:
 @EnableZuulProxy
 class Application {
   
-  @RequestMapping('/')
-  @ResponseBody
-  String home() {
-    'Hello World'
-  }
-
 }
 ----
 
@@ -164,6 +161,8 @@ classpath (via `@EnableZuulProxy`). The
 {security-base}/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java[filter]
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.
+
+## Configuring Downstream Authentication
 
 You can control the authorization behaviour downstream of an
 `@EnableZuulProxy` through the `proxy.auth.*` settings. Example:
