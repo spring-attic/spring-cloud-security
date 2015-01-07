@@ -87,8 +87,10 @@ public class ResourceServerProperties implements Validator {
 						// It's a JWT decoder
 						return;
 					}
-					errors.rejectValue("tokenInfoUri", "missing.tokenInfoUri",
-							"Missing tokenInfoUri and there is no JWT verifier key");
+					if (!StringUtils.hasText(resource.getUserInfoUri())) {
+						errors.rejectValue("tokenInfoUri", "missing.tokenInfoUri",
+							"Missing tokenInfoUri and userInfoUri and there is no JWT verifier key");
+					}
 				}				
 			}
 		}

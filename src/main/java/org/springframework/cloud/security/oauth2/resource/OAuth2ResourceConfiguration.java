@@ -131,6 +131,9 @@ public class OAuth2ResourceConfiguration {
 			if (!resolver.getSubProperties("oauth2.resource.jwt").isEmpty()) {
 				return ConditionOutcome.match("found JWT resource configuration");
 			}
+			if (!resolver.getSubProperties("oauth2.resource.userInfoUri").isEmpty()) {
+				return ConditionOutcome.match("found UserInfo URI resource configuration");
+			}
 			return ConditionOutcome.noMatch("found neither client id nor JWT resource");
 		}
 		

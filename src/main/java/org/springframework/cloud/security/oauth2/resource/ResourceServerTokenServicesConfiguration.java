@@ -190,10 +190,13 @@ public class ResourceServerTokenServicesConfiguration {
 		public ConditionOutcome getMatchOutcome(ConditionContext context,
 				AnnotatedTypeMetadata metadata) {
 			Environment environment = context.getEnvironment();
-			if (environment
+			boolean preferTokenInfo = environment
 					.resolvePlaceholders(
 							"${oauth2.resource.preferTokenInfo:${OAUTH2_RESOURCE_PREFERTOKENINFO:true}}")
-					.equals("true")) {
+					.equals("true");
+			boolean hasTokenInfo = !environment.resolvePlaceholders(
+					"${oauth2.resource.tokenInfoUri:}").equals("");
+			if (preferTokenInfo || hasTokenInfo) {
 				return ConditionOutcome.match("Token info endpoint is preferred");
 			}
 			return ConditionOutcome.noMatch("Token info endpoint is not preferred");
