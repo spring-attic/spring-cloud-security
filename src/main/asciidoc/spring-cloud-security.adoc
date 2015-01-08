@@ -50,10 +50,11 @@ array) in `oauth2.client.scope`. It defaults to empty, in which case
 most Authorization Servers will ask the user for approval for the
 maximum allowed scope for the client.
 
-There is also a setting for `oauth2.client.authenticationScheme` which
+There is also a setting for `oauth2.client.clientAuthenticationScheme` which
 defaults to "header" (but you might need to set it to "form" if, like
 Github for instance, your OAuth2 provider doesn't like header
-authentication).
+authentication). The `oauth2.client.*` properties are bound to an instance 
+of `AuthorizationCodeResourceDetails` so all its properties can be specified.
 
 ==== Access Decision Rules
 
