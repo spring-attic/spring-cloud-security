@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.util.StringUtils;
 
 /**
@@ -34,7 +33,7 @@ public class OAuth2SsoProperties {
 
 	public static final String DEFAULT_LOGIN_PATH = "/login";
 
-	private final OAuth2ClientProperties client;
+	private final String accessTokenUri;
 
 	/**
 	 * Id the single sign-on service.
@@ -89,7 +88,7 @@ public class OAuth2SsoProperties {
 	}
 
 	public String getLogoutUri(String redirectUrl) {
-		return StringUtils.hasText(logoutUri) ? logoutUri : client.getTokenUri().replace(
+		return StringUtils.hasText(logoutUri) ? logoutUri : accessTokenUri.replace(
 				"/oauth/token", "/logout.do?redirect=" + redirectUrl);
 	}
 

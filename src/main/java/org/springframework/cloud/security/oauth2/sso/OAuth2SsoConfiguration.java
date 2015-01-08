@@ -28,11 +28,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.security.oauth2.resource.ResourceServerTokenServicesConfiguration;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfigurer.RequestMatchers;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
@@ -44,6 +46,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -59,11 +62,11 @@ import org.springframework.util.ClassUtils;
 @ConditionalOnExpression("'${oauth2.client.clientId}'!=''")
 @ConditionalOnClass({ ResourceServerTokenServices.class, SecurityProperties.class })
 @ConditionalOnWebApplication
-@EnableConfigurationProperties(OAuth2SsoProperties.class)
+@EnableConfigurationProperties
 @Import(ResourceServerTokenServicesConfiguration.class)
 public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter implements
 		Ordered {
-
+	
 	@Autowired
 	private OAuth2SsoProperties sso;
 
@@ -75,6 +78,21 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 	private OAuth2RestOperations restTemplate;
 
 	private List<OAuth2SsoConfigurer> configurers = Collections.emptyList();
+	
+	@Configuration
+	protected static class ConfigurationProperties {
+
+		@Autowired
+		private AuthorizationCodeResourceDetails client;
+
+		@Bean
+		@ConditionalOnMissingBean
+		public OAuth2SsoProperties ssoProperties() {
+			return new OAuth2SsoProperties(client.getAccessTokenUri());
+		}
+
+
+	}
 
 	@Override
 	public int getOrder() {

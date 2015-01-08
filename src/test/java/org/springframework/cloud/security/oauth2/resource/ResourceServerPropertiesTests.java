@@ -20,8 +20,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Map;
 
 import org.junit.Test;
-import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,8 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ResourceServerPropertiesTests {
 
-	private ResourceServerProperties properties = new ResourceServerProperties(
-			new OAuth2ClientProperties());
+	private ResourceServerProperties properties = new ResourceServerProperties("client", "secret");
 
 	@Test
 	public void json() throws Exception {

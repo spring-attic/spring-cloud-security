@@ -16,7 +16,7 @@ An app will activate `@EnableOAuth2Sso` if you bind provide the
 following properties in the `Environment`:
 
 * `oauth2.client.\*` with `*` equal to `clientId`, `clientSecret`,
-  `tokenUri`, `authorizationUri` and one of:
+  `accessTokenUri`, `userAuthorizationUri` and one of:
 +
   ** `oauth2.resource.userInfoUri` to use the "/me" resource
   (e.g. "https://uaa.run.pivotal.io/userinfo" on PWS), or

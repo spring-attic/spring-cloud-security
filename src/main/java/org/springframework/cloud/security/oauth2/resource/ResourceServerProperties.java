@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -37,7 +36,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ResourceServerProperties implements Validator {
 	
 	@JsonIgnore
-	private final OAuth2ClientProperties client;
+	private final String clientId;
+
+	@JsonIgnore
+	private final String clientSecret;
 
 	private String serviceId = "resource";
 
@@ -75,8 +77,8 @@ public class ResourceServerProperties implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		ResourceServerProperties resource = (ResourceServerProperties) target;
-		if (StringUtils.hasText(client.getClientId())) {
-			if (!StringUtils.hasText(client.getClientSecret())) {
+		if (StringUtils.hasText(clientId)) {
+			if (!StringUtils.hasText(clientSecret)) {
 				if (!StringUtils.hasText(resource.getUserInfoUri())) {
 					errors.rejectValue("userInfoUri", "missing.userInfoUri",
 							"Missing userInfoUri (no client secret available)");

@@ -15,10 +15,9 @@
  */
 package org.springframework.cloud.security.oauth2.sso;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 
 /**
  * @author Dave Syer
@@ -26,9 +25,7 @@ import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
  */
 public class OAuth2SsoPropertiesTests {
 	
-	private OAuth2ClientProperties client = new OAuth2ClientProperties();
-	
-	private OAuth2SsoProperties properties = new OAuth2SsoProperties(client);
+	private OAuth2SsoProperties properties = new OAuth2SsoProperties("http://example.com");
 
 	@Test
 	public void defaultRoot() {

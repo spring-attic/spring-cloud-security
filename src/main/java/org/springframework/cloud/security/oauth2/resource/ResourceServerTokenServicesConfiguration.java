@@ -27,9 +27,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.security.oauth2.client.ClientConfiguration;
-import org.springframework.cloud.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
@@ -38,6 +36,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -55,9 +54,21 @@ import org.springframework.web.client.RestTemplate;
  *
  */
 @Configuration
-@EnableConfigurationProperties(ResourceServerProperties.class)
 @Import(ClientConfiguration.class)
 public class ResourceServerTokenServicesConfiguration {
+
+	@Configuration
+	protected static class ResourceServerPropertiesConfiguration {
+
+		@Autowired
+		private AuthorizationCodeResourceDetails client;
+
+		@Bean
+		public ResourceServerProperties resourceServerProperties() {
+			return new ResourceServerProperties(client.getClientId(),
+					client.getClientSecret());
+		}
+	}
 
 	@Configuration
 	@Conditional(NotJwtToken.class)
@@ -71,7 +82,7 @@ public class ResourceServerTokenServicesConfiguration {
 			private ResourceServerProperties resource;
 
 			@Autowired
-			private OAuth2ClientProperties client;
+			private AuthorizationCodeResourceDetails client;
 
 			@Bean
 			protected ResourceServerTokenServices remoteTokenServices() {
@@ -93,12 +104,12 @@ public class ResourceServerTokenServicesConfiguration {
 			private ResourceServerProperties sso;
 
 			@Autowired
-			private OAuth2ClientProperties client;
+			private AuthorizationCodeResourceDetails client;
 
 			@Autowired(required = false)
 			private OAuth2ConnectionFactory<?> connectionFactory;
 
-			@Autowired(required=false)
+			@Autowired(required = false)
 			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
 
 			@Bean
@@ -113,8 +124,8 @@ public class ResourceServerTokenServicesConfiguration {
 			@ConditionalOnMissingBean({ ConnectionFactoryLocator.class,
 					ResourceServerTokenServices.class })
 			public ResourceServerTokenServices userInfoTokenServices() {
-				UserInfoTokenServices services = new UserInfoTokenServices(sso.getUserInfoUri(),
-						client.getClientId());
+				UserInfoTokenServices services = new UserInfoTokenServices(
+						sso.getUserInfoUri(), client.getClientId());
 				services.setResources(resources);
 				return services;
 			}
@@ -130,16 +141,16 @@ public class ResourceServerTokenServicesConfiguration {
 			private ResourceServerProperties sso;
 
 			@Autowired
-			private OAuth2ClientProperties client;
+			private AuthorizationCodeResourceDetails client;
 
-			@Autowired(required=false)
+			@Autowired(required = false)
 			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
 
 			@Bean
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
 			public ResourceServerTokenServices userInfoTokenServices() {
-				UserInfoTokenServices services = new UserInfoTokenServices(sso.getUserInfoUri(),
-						client.getClientId());
+				UserInfoTokenServices services = new UserInfoTokenServices(
+						sso.getUserInfoUri(), client.getClientId());
 				services.setResources(resources);
 				return services;
 			}
@@ -208,10 +219,18 @@ public class ResourceServerTokenServicesConfiguration {
 					.equals("true");
 			boolean hasTokenInfo = !environment.resolvePlaceholders(
 					"${oauth2.resource.tokenInfoUri:}").equals("");
-			if (preferTokenInfo || hasTokenInfo) {
-				return ConditionOutcome.match("Token info endpoint is preferred");
+			boolean hasUserInfo = !environment.resolvePlaceholders(
+					"${oauth2.resource.userInfoUri:}").equals("");
+			if (!hasUserInfo) {
+				return ConditionOutcome.match("No user info provided");
 			}
-			return ConditionOutcome.noMatch("Token info endpoint is not preferred");
+			if (hasTokenInfo) {
+				if (preferTokenInfo) {
+					return ConditionOutcome
+							.match("Token info endpoint is preferred and user info provided");
+				}
+			}
+			return ConditionOutcome.noMatch("Token info endpoint is not provided");
 		}
 
 	}

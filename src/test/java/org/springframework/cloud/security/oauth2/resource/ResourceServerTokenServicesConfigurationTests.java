@@ -75,7 +75,20 @@ public class ResourceServerTokenServicesConfigurationTests {
 	@Test
 	public void switchToUserInfo() {
 		EnvironmentTestUtils.addEnvironment(environment,
-				"oauth2.resource.preferTokenInfo=false");
+				"oauth2.resource.userInfoUri:http://example.com");
+		context = new SpringApplicationBuilder(ResourceConfiguration.class)
+				.environment(environment).web(false).run();
+		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
+		assertNotNull(services);
+	}
+
+	@Test
+	public void preferUserInfo() {
+		EnvironmentTestUtils.addEnvironment(environment,
+				"oauth2.resource.userInfoUri:http://example.com",
+				"oauth2.resource.tokenInfoUri:http://example.com",
+				"oauth2.resource.preferTokenInfo:false"
+				);
 		context = new SpringApplicationBuilder(ResourceConfiguration.class)
 				.environment(environment).web(false).run();
 		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
@@ -105,7 +118,7 @@ public class ResourceServerTokenServicesConfigurationTests {
 	@Test
 	public void springSocialUserInfo() {
 		EnvironmentTestUtils.addEnvironment(environment,
-				"oauth2.resource.preferTokenInfo=false",
+				"oauth2.resource.userInfoUri:http://example.com",
 				"spring.social.facebook.app-id=foo",
 				"spring.social.facebook.app-secret=bar");
 		context = new SpringApplicationBuilder(SocialResourceConfiguration.class)

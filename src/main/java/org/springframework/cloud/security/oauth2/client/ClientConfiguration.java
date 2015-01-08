@@ -20,12 +20,13 @@ import java.util.Arrays;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpHeaders;
@@ -53,11 +54,8 @@ import org.springframework.util.MultiValueMap;
  */
 @Configuration
 @EnableOAuth2Client
-@EnableConfigurationProperties(OAuth2ClientProperties.class)
+@EnableConfigurationProperties
 public class ClientConfiguration {
-
-	@Autowired
-	private OAuth2ClientProperties client;
 
 	@Resource
 	@Qualifier("accessTokenRequest")
@@ -73,15 +71,10 @@ public class ClientConfiguration {
 	}
 
 	@Bean
-	public OAuth2ProtectedResourceDetails oauth2RemoteResource() {
+	@ConfigurationProperties("oauth2.client")
+	@Primary
+	public AuthorizationCodeResourceDetails oauth2RemoteResource() {
 		AuthorizationCodeResourceDetails details = new AuthorizationCodeResourceDetails();
-		// set up resource details, OAuth2 URLs etc.
-		details.setClientId(client.getClientId());
-		details.setClientSecret(client.getClientSecret());
-		details.setScope(client.getScope());
-		details.setAccessTokenUri(client.getTokenUri());
-		details.setUserAuthorizationUri(client.getAuthorizationUri());
-		details.setClientAuthenticationScheme(client.getAuthenticationScheme());
 		return details;
 	}
 
