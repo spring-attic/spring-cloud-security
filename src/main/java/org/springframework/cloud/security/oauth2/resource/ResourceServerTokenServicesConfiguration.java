@@ -15,6 +15,7 @@
  */
 package org.springframework.cloud.security.oauth2.resource;
 
+import java.util.Collections;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -96,6 +98,9 @@ public class ResourceServerTokenServicesConfiguration {
 			@Autowired(required = false)
 			private OAuth2ConnectionFactory<?> connectionFactory;
 
+			@Autowired(required=false)
+			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
+
 			@Bean
 			@ConditionalOnBean(ConnectionFactoryLocator.class)
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
@@ -108,8 +113,10 @@ public class ResourceServerTokenServicesConfiguration {
 			@ConditionalOnMissingBean({ ConnectionFactoryLocator.class,
 					ResourceServerTokenServices.class })
 			public ResourceServerTokenServices userInfoTokenServices() {
-				return new UserInfoTokenServices(sso.getUserInfoUri(),
+				UserInfoTokenServices services = new UserInfoTokenServices(sso.getUserInfoUri(),
 						client.getClientId());
+				services.setResources(resources);
+				return services;
 			}
 
 		}
@@ -125,11 +132,16 @@ public class ResourceServerTokenServicesConfiguration {
 			@Autowired
 			private OAuth2ClientProperties client;
 
+			@Autowired(required=false)
+			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
+
 			@Bean
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
 			public ResourceServerTokenServices userInfoTokenServices() {
-				return new UserInfoTokenServices(sso.getUserInfoUri(),
+				UserInfoTokenServices services = new UserInfoTokenServices(sso.getUserInfoUri(),
 						client.getClientId());
+				services.setResources(resources);
+				return services;
 			}
 
 		}

@@ -15,13 +15,18 @@
  */
 package org.springframework.cloud.security.oauth2.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -31,10 +36,6 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 
-/**
- * @author Dave Syer
- *
- */
 public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -43,9 +44,22 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	private String clientId;
 
+	private Collection<OAuth2RestOperations> resources = Collections.emptySet();
+
 	public UserInfoTokenServices(String userInfoEndpointUrl, String clientId) {
 		this.userInfoEndpointUrl = userInfoEndpointUrl;
 		this.clientId = clientId;
+	}
+
+	public void setResources(Map<String, OAuth2RestOperations> resources) {
+		this.resources = new ArrayList<OAuth2RestOperations>();
+		for (Entry<String, OAuth2RestOperations> key : resources.entrySet()) {
+			OAuth2RestOperations value = key.getValue();
+			String clientIdForTemplate = value.getResource().getClientId();
+			if (clientIdForTemplate!=null && clientIdForTemplate.equals(clientId)) {
+				this.resources.add(value);
+			}
+		}
 	}
 
 	@Override
@@ -67,14 +81,14 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 				getPrincipal(map), "N/A",
 				AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
 		user.setDetails(map);
-		OAuth2Request request = new OAuth2Request(null, clientId, null, true, null,
-				null, null, null, null);
+		OAuth2Request request = new OAuth2Request(null, clientId, null, true, null, null,
+				null, null, null);
 		return new OAuth2Authentication(request, user);
 	}
 
 	private Object getPrincipal(Map<String, Object> map) {
-		String[] keys = new String[] { "user", "username", "userid", "user_id",
-				"login", "id" };
+		String[] keys = new String[] { "user", "username", "userid", "user_id", "login",
+				"id" };
 		for (String key : keys) {
 			if (map.containsKey(key)) {
 				return map.get(key);
@@ -90,10 +104,23 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	private Map<String, Object> getMap(String path, String accessToken) {
 		logger.info("Getting user info from: " + path);
-		BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
-		resource.setClientId(clientId);
-		OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(resource);
-		restTemplate.getOAuth2ClientContext().setAccessToken(new DefaultOAuth2AccessToken(accessToken));
+		OAuth2RestOperations restTemplate = null;
+		for (OAuth2RestOperations candidate : resources) {
+			try {
+				if (accessToken.equals(candidate.getAccessToken().getValue())) {
+					restTemplate = candidate;
+				}
+			}
+			catch (Exception e) {
+			}
+		}
+		if (restTemplate == null) {
+			BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
+			resource.setClientId(clientId);
+			restTemplate = new OAuth2RestTemplate(resource);
+			restTemplate.getOAuth2ClientContext().setAccessToken(
+					new DefaultOAuth2AccessToken(accessToken));
+		}
 		@SuppressWarnings("rawtypes")
 		Map map = restTemplate.getForEntity(path, Map.class).getBody();
 		@SuppressWarnings("unchecked")

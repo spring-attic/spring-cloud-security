@@ -40,6 +40,11 @@ $ curl https://uaa.run.pivotal.io/token_key
 {"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----\n"}
 ----
 
+> Warning: If you use the `oauth2.resource.jwt.keyUri` the
+> authorization server needs to be running when your application
+> starts up. It will log a warning if it can't find the key, and tell
+> you what to do to fix it.
+
 You can set the preferred scope (as a comma-separated list or YAML
 array) in `oauth2.client.scope`. It defaults to empty, in which case
 most Authorization Servers will ask the user for approval for the
