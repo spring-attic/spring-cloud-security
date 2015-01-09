@@ -34,16 +34,16 @@ you can set a flag to say that one is preferred over the other
   RSA public key. If you don't have the key and it's public you can
   provide a URI where it can be downloaded (as a JSON object with a
   "value" field) with `oauth2.resource.jwt.keyUri`. E.g. on PWS:
-  + 
++ 
 ----
 $ curl https://uaa.run.pivotal.io/token_key
 {"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----\n"}
 ----
 
-> Warning: If you use the `oauth2.resource.jwt.keyUri` the
-> authorization server needs to be running when your application
-> starts up. It will log a warning if it can't find the key, and tell
-> you what to do to fix it.
+WARNING: If you use the `oauth2.resource.jwt.keyUri` the authorization
+server needs to be running when your application starts up. It will
+log a warning if it can't find the key, and tell you what to do to fix
+it.
 
 You can set the preferred scope (as a comma-separated list or YAML
 array) in `oauth2.client.scope`. It defaults to empty, in which case
@@ -55,6 +55,24 @@ defaults to "header" (but you might need to set it to "form" if, like
 Github for instance, your OAuth2 provider doesn't like header
 authentication). The `oauth2.client.*` properties are bound to an instance 
 of `AuthorizationCodeResourceDetails` so all its properties can be specified.
+
+[TIP]
+====
+To set an RSA key value in YAML use the "pipe" continuation
+marker to split it over multiple lines ("|") and remember to indent
+the key value (it's a standard YAML language feature). Example:
+
+[source,yaml,indent=0]
+----
+        oauth2:
+          resource:
+            jwt:
+              keyValue: |
+                -----BEGIN PUBLIC KEY-----
+                MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC...
+                -----END PUBLIC KEY-----
+----
+====
 
 ==== Access Decision Rules
 
