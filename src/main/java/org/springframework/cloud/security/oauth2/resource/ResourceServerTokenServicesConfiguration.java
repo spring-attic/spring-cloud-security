@@ -240,8 +240,10 @@ public class ResourceServerTokenServicesConfiguration {
 		@Override
 		public ConditionOutcome getMatchOutcome(ConditionContext context,
 				AnnotatedTypeMetadata metadata) {
-			if (context.getEnvironment().getProperty("oauth2.resource.jwt.keyValue") != null
-					|| context.getEnvironment().getProperty("oauth2.resource.jwt.keyUri") != null) {
+			if (StringUtils.hasText(context.getEnvironment().getProperty(
+					"oauth2.resource.jwt.keyValue"))
+					|| StringUtils.hasText(context.getEnvironment().getProperty(
+							"oauth2.resource.jwt.keyUri"))) {
 				return ConditionOutcome.match("Public key is provided");
 			}
 			return ConditionOutcome.noMatch("Public key is not provided");
