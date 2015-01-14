@@ -115,6 +115,37 @@ In this case the rest of the application will default to the normal
 Spring Boot access control (Basic authentication, or whatever custom
 filters you put in place).
 
+==== Integrating with the Actuator Endpoints
+
+The Spring Boot Actuator endpoints ("/env", "/metrics", etc.) if
+present will, by default, be protected by the standard Spring Boot
+basic authentication. The SSO authentication filter is added in a
+position directly behind the filter that intercepts requests to the
+Actuator endpoints by default (i.e.
+`ManagementProperties.BASIC_AUTH_ORDER + 1` which is
+`Ordered.LOWEST_PRECEDENCE-9` or `2147483636`). If you want to change
+the order you can set `spring.oauth2.sso.filterOrder`. If you do that
+and the value is less than the default, then you will need to consider
+setting the access rules for the Actuator, since they will become
+accessible to all authenticated users who sign on with the external
+provider. One way to do that would be to set
+`management.contextPath=/admin` (for instance) and use an
+`OAuth2SsoConfigurer` to set the access rules, e.g.
+
+```java
+	@Configuration
+	@EnableOAuth2Sso
+	@EnableAutoConfiguration
+	protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
+		@Override
+		public void configure(HttpSecurity http) {
+	         http.authorizeRequests()
+                 .antMatchers("/admin/**").role("ADMIN")
+                 .anyRequest().authenticated();
+		}
+	}
+```
+
 === Resource Server
 
 The `@EnableOAuth2Resource` annotation will protect your API endpoints
