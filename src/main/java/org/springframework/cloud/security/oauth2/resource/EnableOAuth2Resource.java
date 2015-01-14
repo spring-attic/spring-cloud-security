@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
 /**
  * Convenient annotation for enabling security (by default globally) using OAuth2 access
  * tokens. The security constraints on the resources and the token decoding mechanisms can
- * be configured externally via {@link ResourceServerProperties "oauth2.resource.*}
+ * be configured externally via {@link ResourceServerProperties "spring.oauth2.resource.*}
  * configuration properties.
  * 
  * @author Dave Syer

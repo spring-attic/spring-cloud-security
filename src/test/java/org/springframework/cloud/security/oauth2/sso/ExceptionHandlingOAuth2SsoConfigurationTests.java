@@ -47,11 +47,11 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestConfiguration.class)
 @WebAppConfiguration
-@TestPropertySource(properties = { "oauth2.client.clientId=client",
-		"oauth2.client.clientSecret=secret",
-		"oauth2.client.authorizationUri=http://example.com/oauth/authorize",
-		"oauth2.client.tokenUri=http://example.com/oauth/token",
-		"oauth2.resource.jwt.keyValue=SSSSHHH" })
+@TestPropertySource(properties = { "spring.oauth2.client.clientId=client",
+		"spring.oauth2.client.clientSecret=secret",
+		"spring.oauth2.client.authorizationUri=http://example.com/oauth/authorize",
+		"spring.oauth2.client.tokenUri=http://example.com/oauth/token",
+		"spring.oauth2.resource.jwt.keyValue=SSSSHHH" })
 public class ExceptionHandlingOAuth2SsoConfigurationTests {
 
 	@Autowired

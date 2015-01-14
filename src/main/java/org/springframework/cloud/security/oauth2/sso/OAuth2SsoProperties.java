@@ -19,6 +19,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
@@ -26,7 +27,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  *
  */
-@ConfigurationProperties("oauth2.sso")
+@ConfigurationProperties("spring.oauth2.sso")
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OAuth2SsoProperties {
@@ -56,6 +57,15 @@ public class OAuth2SsoProperties {
 	private Home home = new Home();
 
 	private boolean logoutRedirect;
+
+	/**
+	 * The order of the Spring Security filter chain installed by by OAuth2 SSO. Defaults
+	 * to a value that allows Actuator endpoints to retain their natural access rules (
+	 * {@link ManagementServerProperties#BASIC_AUTH_ORDER}+1). If you change be less than
+	 * this you will need to think about access rules for those endpoints (e.g. add them
+	 * in a {@link OAuth2SsoConfigurer}. prepared to
+	 */
+	private Integer filterOrder;
 
 	@Data
 	public static class Home {

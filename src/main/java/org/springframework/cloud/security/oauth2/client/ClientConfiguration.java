@@ -71,7 +71,7 @@ public class ClientConfiguration {
 	}
 
 	@Bean
-	@ConfigurationProperties("oauth2.client")
+	@ConfigurationProperties("spring.oauth2.client")
 	@Primary
 	public AuthorizationCodeResourceDetails oauth2RemoteResource() {
 		AuthorizationCodeResourceDetails details = new AuthorizationCodeResourceDetails();

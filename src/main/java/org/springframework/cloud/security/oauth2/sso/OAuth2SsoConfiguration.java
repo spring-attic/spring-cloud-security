@@ -96,11 +96,15 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 
 	@Override
 	public int getOrder() {
+		if (sso.getFilterOrder()!=null) {
+			return sso.getFilterOrder();
+		}
 		if (ClassUtils
 				.isPresent(
 						"org.springframework.boot.actuate.autoconfigure.ManagementServerProperties",
 						null)) {
-			return ManagementServerProperties.ACCESS_OVERRIDE_ORDER;
+			// If > BASIC_AUTH_ORDER then the existing rules for the actuator endpoints will take precedence
+			return ManagementServerProperties.BASIC_AUTH_ORDER + 1;
 		}
 		return SecurityProperties.ACCESS_OVERRIDE_ORDER;
 	}

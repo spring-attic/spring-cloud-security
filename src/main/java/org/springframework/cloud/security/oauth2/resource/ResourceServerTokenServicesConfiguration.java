@@ -241,9 +241,9 @@ public class ResourceServerTokenServicesConfiguration {
 		public ConditionOutcome getMatchOutcome(ConditionContext context,
 				AnnotatedTypeMetadata metadata) {
 			if (StringUtils.hasText(context.getEnvironment().getProperty(
-					"oauth2.resource.jwt.keyValue"))
+					"spring.oauth2.resource.jwt.keyValue"))
 					|| StringUtils.hasText(context.getEnvironment().getProperty(
-							"oauth2.resource.jwt.keyUri"))) {
+							"spring.oauth2.resource.jwt.keyUri"))) {
 				return ConditionOutcome.match("Public key is provided");
 			}
 			return ConditionOutcome.noMatch("Public key is not provided");

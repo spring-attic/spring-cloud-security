@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Dave Syer
  *
  */
-@ConfigurationProperties("oauth2.resource")
+@ConfigurationProperties("spring.oauth2.resource")
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ResourceServerProperties implements Validator {

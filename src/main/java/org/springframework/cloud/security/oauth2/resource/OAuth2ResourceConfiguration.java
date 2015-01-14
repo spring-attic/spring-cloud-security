@@ -128,10 +128,10 @@ public class OAuth2ResourceConfiguration {
 			if (StringUtils.hasText(client)) {
 				return ConditionOutcome.match("found client id");
 			}
-			if (!resolver.getSubProperties("oauth2.resource.jwt").isEmpty()) {
+			if (!resolver.getSubProperties("spring.oauth2.resource.jwt").isEmpty()) {
 				return ConditionOutcome.match("found JWT resource configuration");
 			}
-			if (!resolver.getSubProperties("oauth2.resource.userInfoUri").isEmpty()) {
+			if (!resolver.getSubProperties("spring.oauth2.resource.userInfoUri").isEmpty()) {
 				return ConditionOutcome.match("found UserInfo URI resource configuration");
 			}
 			return ConditionOutcome.noMatch("found neither client id nor JWT resource");

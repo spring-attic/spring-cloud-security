@@ -15,45 +15,45 @@ include::quickstart.adoc[]
 An app will activate `@EnableOAuth2Sso` if you bind provide the
 following properties in the `Environment`:
 
-* `oauth2.client.\*` with `*` equal to `clientId`, `clientSecret`,
+* `spring.oauth2.client.\*` with `*` equal to `clientId`, `clientSecret`,
   `accessTokenUri`, `userAuthorizationUri` and one of:
 +
-  ** `oauth2.resource.userInfoUri` to use the "/me" resource
+  ** `spring.oauth2.resource.userInfoUri` to use the "/me" resource
   (e.g. "https://uaa.run.pivotal.io/userinfo" on PWS), or
 +
-  ** `oauth2.resource.tokenInfoUri` to use the token decoding endpoint
+  ** `spring.oauth2.resource.tokenInfoUri` to use the token decoding endpoint
   (e.g. "https://uaa.run.pivotal.io/check_token" on PWS).
 +
 If you specify both the `userInfoUri` and the `tokenInfoUri` then 
 you can set a flag to say that one is preferred over the other 
 (`preferTokenInfo=true` is the default). Or
 
-* `oauth2.resource.jwt.keyValue` to
+* `spring.oauth2.resource.jwt.keyValue` to
   decode a JWT token locally, where the key is a verification key. The
   verification key value is either a symmetric secret or PEM-encoded
   RSA public key. If you don't have the key and it's public you can
   provide a URI where it can be downloaded (as a JSON object with a
-  "value" field) with `oauth2.resource.jwt.keyUri`. E.g. on PWS:
+  "value" field) with `spring.oauth2.resource.jwt.keyUri`. E.g. on PWS:
 + 
 ----
 $ curl https://uaa.run.pivotal.io/token_key
 {"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----\n"}
 ----
 
-WARNING: If you use the `oauth2.resource.jwt.keyUri` the authorization
+WARNING: If you use the `spring.oauth2.resource.jwt.keyUri` the authorization
 server needs to be running when your application starts up. It will
 log a warning if it can't find the key, and tell you what to do to fix
 it.
 
 You can set the preferred scope (as a comma-separated list or YAML
-array) in `oauth2.client.scope`. It defaults to empty, in which case
+array) in `spring.oauth2.client.scope`. It defaults to empty, in which case
 most Authorization Servers will ask the user for approval for the
 maximum allowed scope for the client.
 
-There is also a setting for `oauth2.client.clientAuthenticationScheme` which
+There is also a setting for `spring.oauth2.client.clientAuthenticationScheme` which
 defaults to "header" (but you might need to set it to "form" if, like
 Github for instance, your OAuth2 provider doesn't like header
-authentication). The `oauth2.client.*` properties are bound to an instance 
+authentication). The `spring.oauth2.client.*` properties are bound to an instance 
 of `AuthorizationCodeResourceDetails` so all its properties can be specified.
 
 [TIP]
@@ -93,7 +93,7 @@ the matching patterns for the OAuth2 SSO, even if you have
 `OAuth2SsoConfigurer` beans as well. The default logout path is
 "/logout" and it gets similar treatment, as does the "home" page
 (which is the logout success page, defaults to "/"). Those paths can
-be overriden by setting `oauth2.sso.*' (`loginPath`, `logoutPath` and
+be overriden by setting `spring.oauth2.sso.*' (`loginPath`, `logoutPath` and
 `home.path`).
 
 For example if you want the resources under "/ui/**" to be protected with OAuth2:
