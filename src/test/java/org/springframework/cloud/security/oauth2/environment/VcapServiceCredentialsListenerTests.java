@@ -63,4 +63,13 @@ public class VcapServiceCredentialsListenerTests {
 		assertEquals("http://example.com", environment.resolvePlaceholders("${spring.oauth2.resource.userInfoUri}"));
 	}
 
+	@Test
+	public void addServiceId() {
+		EnvironmentTestUtils.addEnvironment(environment, "vcap.services.my.credentials.tokenUri:http://example.com",
+				"spring.oauth2.sso.serviceId:my");
+		listener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(
+				new SpringApplication(), null, environment));
+		assertEquals("http://example.com", environment.resolvePlaceholders("${spring.oauth2.client.accessTokenUri}"));
+	}
+
 }
