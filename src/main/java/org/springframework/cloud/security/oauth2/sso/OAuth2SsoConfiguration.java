@@ -59,7 +59,7 @@ import org.springframework.util.ClassUtils;
  *
  */
 @Configuration
-@ConditionalOnExpression("'${oauth2.client.clientId:}'!=''")
+@ConditionalOnExpression("'${spring.oauth2.client.clientId:}'!=''")
 @ConditionalOnClass({ ResourceServerTokenServices.class, SecurityProperties.class })
 @ConditionalOnWebApplication
 @EnableConfigurationProperties

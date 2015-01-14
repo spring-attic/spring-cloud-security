@@ -124,7 +124,7 @@ public class OAuth2ResourceConfiguration {
 				AnnotatedTypeMetadata metadata) {
 			Environment environment = context.getEnvironment();
 			RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment);
-			String client = environment.resolvePlaceholders("${oauth2.client.clientId:}");
+			String client = environment.resolvePlaceholders("${spring.oauth2.client.clientId:}");
 			if (StringUtils.hasText(client)) {
 				return ConditionOutcome.match("found client id");
 			}

@@ -215,12 +215,12 @@ public class ResourceServerTokenServicesConfiguration {
 			Environment environment = context.getEnvironment();
 			boolean preferTokenInfo = environment
 					.resolvePlaceholders(
-							"${oauth2.resource.preferTokenInfo:${OAUTH2_RESOURCE_PREFERTOKENINFO:true}}")
+							"${spring.oauth2.resource.preferTokenInfo:${OAUTH2_RESOURCE_PREFERTOKENINFO:true}}")
 					.equals("true");
 			boolean hasTokenInfo = !environment.resolvePlaceholders(
-					"${oauth2.resource.tokenInfoUri:}").equals("");
+					"${spring.oauth2.resource.tokenInfoUri:}").equals("");
 			boolean hasUserInfo = !environment.resolvePlaceholders(
-					"${oauth2.resource.userInfoUri:}").equals("");
+					"${spring.oauth2.resource.userInfoUri:}").equals("");
 			if (!hasUserInfo) {
 				return ConditionOutcome.match("No user info provided");
 			}
