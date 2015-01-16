@@ -29,6 +29,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
+import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
@@ -64,8 +65,10 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	private boolean clientMatches(OAuth2RestOperations value) {
 		String clientIdForTemplate = value.getResource().getClientId();
-		boolean clientsEqual = clientIdForTemplate!=null && clientIdForTemplate.equals(clientId);
-		boolean clientsBothEmpty = !StringUtils.hasText(clientIdForTemplate) && !StringUtils.hasText(clientId) ;
+		boolean clientsEqual = clientIdForTemplate != null
+				&& clientIdForTemplate.equals(clientId);
+		boolean clientsBothEmpty = !StringUtils.hasText(clientIdForTemplate)
+				&& !StringUtils.hasText(clientId);
 		return clientsEqual || clientsBothEmpty;
 	}
 
@@ -116,7 +119,17 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 			try {
 				if (accessToken.equals(candidate.getAccessToken().getValue())) {
 					restTemplate = candidate;
+					break;
 				}
+			}
+			catch (UserRedirectRequiredException e) {
+				// The template wasn't used yet, but we have an access token that matches
+				// the client
+				restTemplate = candidate;
+				restTemplate.getOAuth2ClientContext().setAccessToken(
+						new DefaultOAuth2AccessToken(accessToken));
+				restTemplate = candidate;
+				break;
 			}
 			catch (Exception e) {
 			}
