@@ -35,6 +35,7 @@ import org.springframework.security.oauth2.common.exceptions.InvalidTokenExcepti
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.util.StringUtils;
 
 public class UserInfoTokenServices implements ResourceServerTokenServices {
 
@@ -55,11 +56,17 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 		this.resources = new ArrayList<OAuth2RestOperations>();
 		for (Entry<String, OAuth2RestOperations> key : resources.entrySet()) {
 			OAuth2RestOperations value = key.getValue();
-			String clientIdForTemplate = value.getResource().getClientId();
-			if (clientIdForTemplate!=null && clientIdForTemplate.equals(clientId)) {
+			if (clientMatches(value)) {
 				this.resources.add(value);
 			}
 		}
+	}
+
+	private boolean clientMatches(OAuth2RestOperations value) {
+		String clientIdForTemplate = value.getResource().getClientId();
+		boolean clientsEqual = clientIdForTemplate!=null && clientIdForTemplate.equals(clientId);
+		boolean clientsBothEmpty = !StringUtils.hasText(clientIdForTemplate) && !StringUtils.hasText(clientId) ;
+		return clientsEqual || clientsBothEmpty;
 	}
 
 	@Override

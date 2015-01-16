@@ -50,7 +50,8 @@ public class UserInfoTokenServicesTests {
 		Mockito.when(
 				template.getForEntity(Mockito.any(String.class), Mockito.any(Class.class)))
 				.thenReturn(new ResponseEntity<Map>(map, HttpStatus.OK));
-		Mockito.when(template.getAccessToken()).thenReturn(new DefaultOAuth2AccessToken("FOO"));
+		Mockito.when(template.getAccessToken()).thenReturn(
+				new DefaultOAuth2AccessToken("FOO"));
 		Mockito.when(template.getResource()).thenReturn(resource);
 		Mockito.when(template.getOAuth2ClientContext()).thenReturn(
 				Mockito.mock(OAuth2ClientContext.class));
@@ -58,6 +59,14 @@ public class UserInfoTokenServicesTests {
 
 	@Test
 	public void sunnyDay() {
+		services.setResources(Collections.singletonMap("foo", template));
+		assertEquals("unknown", services.loadAuthentication("FOO").getName());
+	}
+
+	@Test
+	public void noClientId() {
+		services = new UserInfoTokenServices("http://example.com", null);
+		resource.setClientId(null);
 		services.setResources(Collections.singletonMap("foo", template));
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());
 	}
