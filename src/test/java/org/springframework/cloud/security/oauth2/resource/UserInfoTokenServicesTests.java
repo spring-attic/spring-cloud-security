@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
+import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 
 /**
@@ -65,6 +66,17 @@ public class UserInfoTokenServicesTests {
 
 	@Test
 	public void noClientId() {
+		services = new UserInfoTokenServices("http://example.com", null);
+		resource.setClientId(null);
+		services.setResources(Collections.singletonMap("foo", template));
+		assertEquals("unknown", services.loadAuthentication("FOO").getName());
+	}
+
+	@Test
+	public void noAccessToken() {
+		Mockito.when(template.getAccessToken()).thenThrow(
+				new UserRedirectRequiredException("http://another.com", Collections
+						.<String, String> emptyMap()));
 		services = new UserInfoTokenServices("http://example.com", null);
 		resource.setClientId(null);
 		services.setResources(Collections.singletonMap("foo", template));
