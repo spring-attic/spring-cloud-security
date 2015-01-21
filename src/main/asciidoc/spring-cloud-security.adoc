@@ -182,6 +182,33 @@ class Application extends ResourceServerConfigurerAdapter {
 }
 ----
 
+==== Customizing the JWT Token Converter
+
+When a resource server accepts an access token as a JWT, it has to
+convert it to an `Authentication` so that Spring Security can do its
+access decisions. Different token providers might support JWT tokens
+with different contents, so Spring OAuth2 has an abstraction for
+converting the token into security domain objects
+(`AccessTokenConverter`). You can modify the default behaviour easily
+by providing a `@Bean` of type `JwtAccessTokenConverterConfigurer`,
+e.g.
+
+[source,java,indent=0]
+----
+	@Component
+	public class JwtCustomization extends DefaultAccessTokenConverter implements
+			JwtAccessTokenConverterConfigurer {
+
+		@Override
+		public void configure(JwtAccessTokenConverter converter) {
+			converter.setAccessTokenConverter(this);
+		}
+
+        ... // implement custom AccessTokenConverter here
+
+	}
+
+----
 
 === Token Relay
 

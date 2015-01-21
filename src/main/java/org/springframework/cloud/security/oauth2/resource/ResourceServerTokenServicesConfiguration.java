@@ -16,6 +16,7 @@
 package org.springframework.cloud.security.oauth2.resource;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
@@ -167,6 +169,9 @@ public class ResourceServerTokenServicesConfiguration {
 		@Autowired
 		private ResourceServerProperties resource;
 
+		@Autowired(required=false)
+		private List<JwtAccessTokenConverterConfigurer> configurers = Collections.emptyList();
+
 		@Bean
 		@ConditionalOnMissingBean(ResourceServerTokenServices.class)
 		public ResourceServerTokenServices jwtTokenServices() {
@@ -201,6 +206,10 @@ public class ResourceServerTokenServicesConfiguration {
 			}
 			if (keyValue != null) {
 				converter.setVerifierKey(keyValue);
+			}
+			AnnotationAwareOrderComparator.sort(configurers);
+			for (JwtAccessTokenConverterConfigurer configurer : configurers) {
+				configurer.configure(converter);
 			}
 			return converter;
 		}

@@ -15,6 +15,7 @@
  */
 package org.springframework.cloud.security.oauth2.resource;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.After;
@@ -33,9 +34,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Dave Syer
@@ -65,7 +69,8 @@ public class ResourceServerTokenServicesConfigurationTests {
 	@Test
 	public void useRemoteTokenServices() {
 		EnvironmentTestUtils.addEnvironment(environment,
-				"spring.oauth2.resource.tokenInfoUri=http://example.com", "spring.oauth2.resource.clientId=acme");
+				"spring.oauth2.resource.tokenInfoUri=http://example.com",
+				"spring.oauth2.resource.clientId=acme");
 		context = new SpringApplicationBuilder(ResourceConfiguration.class).web(false)
 				.run();
 		RemoteTokenServices services = context.getBean(RemoteTokenServices.class);
@@ -87,8 +92,7 @@ public class ResourceServerTokenServicesConfigurationTests {
 		EnvironmentTestUtils.addEnvironment(environment,
 				"spring.oauth2.resource.userInfoUri:http://example.com",
 				"spring.oauth2.resource.tokenInfoUri:http://example.com",
-				"spring.oauth2.resource.preferTokenInfo:false"
-				);
+				"spring.oauth2.resource.preferTokenInfo:false");
 		context = new SpringApplicationBuilder(ResourceConfiguration.class)
 				.environment(environment).web(false).run();
 		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
@@ -106,9 +110,21 @@ public class ResourceServerTokenServicesConfigurationTests {
 	}
 
 	@Test
+	public void customizeJwt() {
+		EnvironmentTestUtils.addEnvironment(environment,
+				"spring.oauth2.resource.jwt.keyValue=FOOBAR");
+		context = new SpringApplicationBuilder(ResourceConfiguration.class,
+				JwtCustomization.class).environment(environment).web(false).run();
+		JwtAccessTokenConverter services = context.getBean(JwtAccessTokenConverter.class);
+		assertNotNull(services);
+		assertEquals(context.getBean(JwtAccessTokenConverterConfigurer.class),
+				services.getAccessTokenConverter());
+	}
+
+	@Test
 	public void asymmetricJwt() {
-		EnvironmentTestUtils.addEnvironment(environment, "spring.oauth2.resource.jwt.keyValue="
-				+ publicKey);
+		EnvironmentTestUtils.addEnvironment(environment,
+				"spring.oauth2.resource.jwt.keyValue=" + publicKey);
 		context = new SpringApplicationBuilder(ResourceConfiguration.class)
 				.environment(environment).web(false).run();
 		DefaultTokenServices services = context.getBean(DefaultTokenServices.class);
@@ -135,6 +151,15 @@ public class ResourceServerTokenServicesConfigurationTests {
 	@Import({ ResourceServerTokenServicesConfiguration.class,
 			RefreshAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
 	protected static class ResourceConfiguration {
+	}
+
+	@Component
+	protected static class JwtCustomization extends DefaultAccessTokenConverter implements
+			JwtAccessTokenConverterConfigurer {
+		@Override
+		public void configure(JwtAccessTokenConverter converter) {
+			converter.setAccessTokenConverter(this);
+		}
 	}
 
 	@Import({ FacebookAutoConfiguration.class, SocialWebAutoConfiguration.class })
