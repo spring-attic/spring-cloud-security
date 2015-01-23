@@ -142,8 +142,6 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		if (!sso.getHome().isSecure()) {
 			requests.antMatchers(sso.getHome().getPath()).permitAll();
 		}
-		// Fallback to authenticated for everything
-		requests.anyRequest().authenticated();
 
 		LogoutConfigurer<HttpSecurity> logout = http.logout();
 		logout.logoutSuccessUrl(sso.getHome().getRoot())
@@ -159,6 +157,9 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 			// exception handling provided here will override those above.
 			configurer.configure(http);
 		}
+
+		// Fallback to authenticated for everything
+		requests.anyRequest().authenticated();
 	}
 
 	private void addRedirectToLogout(LogoutConfigurer<HttpSecurity> logout) {

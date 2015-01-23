@@ -17,6 +17,7 @@ package org.springframework.cloud.security.oauth2.sso;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,11 +32,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.security.oauth2.sso.CustomOAuth2SsoConfigurationTests.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.stereotype.Controller;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -78,13 +83,35 @@ public class CustomOAuth2SsoConfigurationTests {
 				.andExpect(header().string("location", "http://localhost/login"));
 	}
 
+	@Test
+	public void uiTestPageIsAccessible() throws Exception {
+		mvc.perform(get("/ui/test")).andExpect(status().isOk())
+				.andExpect(content().string("test"));
+	}
+
 	@Configuration
 	@EnableOAuth2Sso
 	@EnableAutoConfiguration
 	protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
+
+		@Override
+		public void configure(HttpSecurity http) throws Exception {
+			http.authorizeRequests().antMatchers("/ui/test").permitAll();
+		}
+
 		@Override
 		public void match(RequestMatchers matchers) {
 			matchers.antMatchers("/ui/**");
+		}
+
+		@RestController
+		public static class TestController {
+
+			@RequestMapping(value = "/ui/test")
+			public String test() {
+				return "test";
+			}
+
 		}
 	}
 
