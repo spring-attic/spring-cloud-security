@@ -157,9 +157,14 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 			// exception handling provided here will override those above.
 			configurer.configure(http);
 		}
-		// Fallback to authenticated for everything, but allow configurers to provide
-		// rules for specific resources
-		requests.anyRequest().authenticated();
+
+		// Fallback to authenticated for everything.
+		// Spring security only accepts one anyRequest() matcher
+		// so only set it if the user hasn't registered any configurers
+		if(configurers.isEmpty()) {
+			requests.anyRequest().authenticated();
+		}
+
 	}
 
 	private void addRedirectToLogout(LogoutConfigurer<HttpSecurity> logout) {
