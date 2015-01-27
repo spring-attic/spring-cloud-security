@@ -142,8 +142,6 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		if (!sso.getHome().isSecure()) {
 			requests.antMatchers(sso.getHome().getPath()).permitAll();
 		}
-		// Fallback to authenticated for everything
-		requests.anyRequest().authenticated();
 
 		LogoutConfigurer<HttpSecurity> logout = http.logout();
 		logout.logoutSuccessUrl(sso.getHome().getRoot())
@@ -158,6 +156,13 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 			// those will override the ones added above). Similarly any logout or
 			// exception handling provided here will override those above.
 			configurer.configure(http);
+		}
+
+		// Fallback to authenticated for everything.
+		// Spring security only accepts one anyRequest() matcher
+		// so only set it if the user hasn't registered any configurers
+		if(configurers.isEmpty()) {
+			requests.anyRequest().authenticated();
 		}
 	}
 

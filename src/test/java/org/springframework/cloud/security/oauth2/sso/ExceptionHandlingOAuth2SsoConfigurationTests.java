@@ -85,8 +85,9 @@ public class ExceptionHandlingOAuth2SsoConfigurationTests {
 
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-			http.exceptionHandling().authenticationEntryPoint(
-					new Http401AuthenticationEntryPoint("Session realm=\"JSESSIONID\""));
+			http.authorizeRequests().anyRequest().authenticated().and()
+					.exceptionHandling().authenticationEntryPoint(
+						new Http401AuthenticationEntryPoint("Session realm=\"JSESSIONID\""));
 		}
 	}
 
