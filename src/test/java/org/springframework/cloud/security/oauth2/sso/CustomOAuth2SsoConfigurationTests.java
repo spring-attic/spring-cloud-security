@@ -96,7 +96,9 @@ public class CustomOAuth2SsoConfigurationTests {
 
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests().antMatchers("/ui/test").permitAll();
+			http.authorizeRequests()
+					.antMatchers("/ui/test").permitAll()
+					.anyRequest().authenticated();
 		}
 
 		@Override
