@@ -66,7 +66,7 @@ import org.springframework.util.ClassUtils;
 @Import(ResourceServerTokenServicesConfiguration.class)
 public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter implements
 		Ordered {
-	
+
 	@Autowired
 	private OAuth2SsoProperties sso;
 
@@ -78,7 +78,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 	private OAuth2RestOperations restTemplate;
 
 	private List<OAuth2SsoConfigurer> configurers = Collections.emptyList();
-	
+
 	@Configuration
 	protected static class ConfigurationProperties {
 
@@ -91,19 +91,19 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 			return new OAuth2SsoProperties(client.getAccessTokenUri());
 		}
 
-
 	}
 
 	@Override
 	public int getOrder() {
-		if (sso.getFilterOrder()!=null) {
+		if (sso.getFilterOrder() != null) {
 			return sso.getFilterOrder();
 		}
 		if (ClassUtils
 				.isPresent(
 						"org.springframework.boot.actuate.autoconfigure.ManagementServerProperties",
 						null)) {
-			// If > BASIC_AUTH_ORDER then the existing rules for the actuator endpoints will take precedence
+			// If > BASIC_AUTH_ORDER then the existing rules for the actuator endpoints
+			// will take precedence
 			return ManagementServerProperties.BASIC_AUTH_ORDER + 1;
 		}
 		return SecurityProperties.ACCESS_OVERRIDE_ORDER;
@@ -142,8 +142,6 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		if (!sso.getHome().isSecure()) {
 			requests.antMatchers(sso.getHome().getPath()).permitAll();
 		}
-		// Fallback to authenticated for everything
-		requests.anyRequest().authenticated();
 
 		LogoutConfigurer<HttpSecurity> logout = http.logout();
 		logout.logoutSuccessUrl(sso.getHome().getRoot())
@@ -159,6 +157,9 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 			// exception handling provided here will override those above.
 			configurer.configure(http);
 		}
+		// Fallback to authenticated for everything, but allow configurers to provide
+		// rules for specific resources
+		requests.anyRequest().authenticated();
 	}
 
 	private void addRedirectToLogout(LogoutConfigurer<HttpSecurity> logout) {
