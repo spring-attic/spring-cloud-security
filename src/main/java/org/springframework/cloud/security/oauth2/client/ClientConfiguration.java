@@ -18,24 +18,18 @@ package org.springframework.cloud.security.oauth2.client;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -57,10 +51,6 @@ import org.springframework.util.MultiValueMap;
 @EnableConfigurationProperties
 public class ClientConfiguration {
 
-	@Resource
-	@Qualifier("accessTokenRequest")
-	private AccessTokenRequest accessTokenRequest;
-
 	@Bean
 	public FilterRegistrationBean oauth2ClientFilterRegistration(
 			OAuth2ClientContextFilter filter) {
@@ -79,9 +69,9 @@ public class ClientConfiguration {
 	}
 
 	@Bean
-	public OAuth2RestOperations oauth2RestTemplate() {
+	public OAuth2RestOperations oauth2RestTemplate(OAuth2ClientContext oauth2ClientContext) {
 		OAuth2RestTemplate template = new OAuth2RestTemplate(oauth2RemoteResource(),
-				oauth2ClientContext());
+				oauth2ClientContext);
 		template.setInterceptors(Arrays
 				.<ClientHttpRequestInterceptor> asList(new ClientHttpRequestInterceptor() {
 					@Override
@@ -103,12 +93,6 @@ public class ClientConfiguration {
 		});
 		template.setAccessTokenProvider(accessTokenProvider);
 		return template;
-	}
-
-	@Bean
-	@Scope(value = "session", proxyMode = ScopedProxyMode.INTERFACES)
-	public OAuth2ClientContext oauth2ClientContext() {
-		return new DefaultOAuth2ClientContext(accessTokenRequest);
 	}
 
 }

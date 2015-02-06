@@ -58,7 +58,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @Import(ClientConfiguration.class)
 public class ResourceServerTokenServicesConfiguration {
-
+	
 	@Configuration
 	protected static class ResourceServerPropertiesConfiguration {
 
@@ -125,7 +125,7 @@ public class ResourceServerTokenServicesConfiguration {
 			@Bean
 			@ConditionalOnMissingBean({ ConnectionFactoryLocator.class,
 					ResourceServerTokenServices.class })
-			public ResourceServerTokenServices userInfoTokenServices() {
+			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), client.getClientId());
 				services.setResources(resources);
