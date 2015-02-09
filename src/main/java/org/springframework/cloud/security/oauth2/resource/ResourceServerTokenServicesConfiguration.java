@@ -150,7 +150,7 @@ public class ResourceServerTokenServicesConfiguration {
 
 			@Bean
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
-			public ResourceServerTokenServices userInfoTokenServices() {
+			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), client.getClientId());
 				services.setResources(resources);
