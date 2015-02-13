@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.security.oauth2.resource.OAuth2ResourceConfiguration;
 import org.springframework.cloud.security.oauth2.resource.ResourceServerTokenServicesConfiguration;
 import org.springframework.cloud.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfiguration;

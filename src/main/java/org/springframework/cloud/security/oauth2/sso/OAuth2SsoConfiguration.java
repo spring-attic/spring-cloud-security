@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
@@ -48,9 +49,11 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.ClassUtils;
 
@@ -76,8 +79,27 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 	@Autowired
 	@Qualifier("oauth2RestTemplate")
 	private OAuth2RestOperations restTemplate;
-	
+
 	private List<OAuth2SsoConfigurer> configurers = Collections.emptyList();
+
+	public static final class OAuth2ClientAuthenticationConfigurer extends
+			SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
+		private OAuth2ClientAuthenticationProcessingFilter filter;
+
+		public OAuth2ClientAuthenticationConfigurer(
+				OAuth2ClientAuthenticationProcessingFilter filter) {
+			this.filter = filter;
+		}
+
+		@Override
+		public void configure(HttpSecurity builder) throws Exception {
+			OAuth2ClientAuthenticationProcessingFilter ssoFilter = filter;
+			ssoFilter.setSessionAuthenticationStrategy(builder
+					.getSharedObject(SessionAuthenticationStrategy.class));
+			builder.addFilterAfter(ssoFilter,
+					AbstractPreAuthenticatedProcessingFilter.class);
+		}
+	}
 
 	@Configuration
 	protected static class ConfigurationProperties {
@@ -121,8 +143,9 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.addFilterAfter(cloudfoundrySsoFilter(),
-				AbstractPreAuthenticatedProcessingFilter.class);
+		// To get access to the shared state in HttpSecurity you need to register a
+		// callback:
+		http.apply(new OAuth2ClientAuthenticationConfigurer(oauth2SsoFilter()));
 
 		RequestMatchers matchers = new RequestMatchers();
 		if (configurers.isEmpty()) {
@@ -161,7 +184,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		// Fallback to authenticated for everything.
 		// Spring security only accepts one anyRequest() matcher
 		// so only set it if the user hasn't registered any configurers
-		if(configurers.isEmpty()) {
+		if (configurers.isEmpty()) {
 			requests.anyRequest().authenticated();
 		}
 
@@ -173,7 +196,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		}
 	}
 
-	protected OAuth2ClientAuthenticationProcessingFilter cloudfoundrySsoFilter() {
+	protected OAuth2ClientAuthenticationProcessingFilter oauth2SsoFilter() {
 		OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(
 				sso.getLoginPath());
 		filter.setRestTemplate(restTemplate);
