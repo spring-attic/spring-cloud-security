@@ -97,8 +97,8 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 	}
 
 	private Object getPrincipal(Map<String, Object> map) {
-		String[] keys = new String[] { "user", "username", "userid", "user_id", "login",
-				"id" };
+		String[] keys = new String[] { "user", "username", "userid", "user_id", "login", 
+				"id", "name" };
 		for (String key : keys) {
 			if (map.containsKey(key)) {
 				return map.get(key);
