@@ -212,6 +212,13 @@ e.g.
 
 === Token Relay
 
+A Token Relay is where an OAuth2 consumer acts as a Client and
+forwards the incoming token to outgoing resource requests. The
+consumer can be a pure Client (like an SSO application) or a Resource
+Server.
+
+==== Client Token Relay
+
 If your app has a
 http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy[Spring
 Cloud Zuul] embedded reverse proxy (using `@EnableZuulProxy`) then you
@@ -243,6 +250,33 @@ classpath (via `@EnableZuulProxy`). The
 {security-base}/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java[filter]
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.
+
+==== Resource Server Token Relay
+
+If your app has `@EnableOAuth2Resource` and also is a Client (i.e. it
+has a `spring.oauth2.client.clientId`, even if it doesn't use it),
+then the `OAuth2RestOperations` that is provided for `@Autowired`
+users by Spring Cloud (it is declared as `@Primary`) will also forward
+tokens. If you don't want to forward tokens (and that is a valid
+choice, since you might want to act as yourself, rather than the
+client that sent you the token), then you only need to create your own
+`OAuth2RestOperations` instead of autowiring the default one. Here's
+a basic example showing the use of the autowired rest template ("foo.com"
+is a Resource Server accepting the same tokens as the surrounding app):
+
+.MyController.java
+[source,java]
+----
+@Autowired
+private OAuth2RestOperations restTemplate;
+    
+@RequestMapping("/relay")
+public String relay() {
+    ResponseEntity<String> response = 
+      restTemplate.getForEntity("https://foo.com/bar", String.class);
+    return "Success! (" + response.getBody() + ")";
+}
+----
 
 ## Configuring Downstream Authentication
 
