@@ -19,7 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.autoconfigure.social.FacebookAutoConfiguration;
@@ -28,6 +30,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.test.EnvironmentTestUtils;
 import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.cloud.security.oauth2.client.OAuth2ClientAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +53,9 @@ public class ResourceServerTokenServicesConfigurationTests {
 	private ConfigurableApplicationContext context;
 
 	private ConfigurableEnvironment environment = new StandardEnvironment();
+	
+	@Rule
+	public ExpectedException expected = ExpectedException.none();
 
 	@After
 	public void close() {
@@ -60,6 +66,7 @@ public class ResourceServerTokenServicesConfigurationTests {
 
 	@Test
 	public void defaultIsRemoteTokenServices() {
+		expected.expectMessage("Field error in object 'spring.oauth2.resource'");
 		context = new SpringApplicationBuilder(ResourceConfiguration.class).web(false)
 				.run();
 		RemoteTokenServices services = context.getBean(RemoteTokenServices.class);
@@ -69,10 +76,9 @@ public class ResourceServerTokenServicesConfigurationTests {
 	@Test
 	public void useRemoteTokenServices() {
 		EnvironmentTestUtils.addEnvironment(environment,
-				"spring.oauth2.resource.tokenInfoUri=http://example.com",
-				"spring.oauth2.resource.clientId=acme");
-		context = new SpringApplicationBuilder(ResourceConfiguration.class).web(false)
-				.run();
+				"spring.oauth2.resource.tokenInfoUri:http://example.com");
+		context = new SpringApplicationBuilder(ResourceConfiguration.class)
+				.environment(environment).web(false).run();
 		RemoteTokenServices services = context.getBean(RemoteTokenServices.class);
 		assertNotNull(services);
 	}
@@ -80,6 +86,16 @@ public class ResourceServerTokenServicesConfigurationTests {
 	@Test
 	public void switchToUserInfo() {
 		EnvironmentTestUtils.addEnvironment(environment,
+				"spring.oauth2.resource.userInfoUri:http://example.com");
+		context = new SpringApplicationBuilder(ResourceConfiguration.class)
+				.environment(environment).web(false).run();
+		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
+		assertNotNull(services);
+	}
+
+	@Test
+	public void userInfoDoesNotRequireClient() {
+		EnvironmentTestUtils.addEnvironment(environment,"spring.oauth2.client.clientId:",
 				"spring.oauth2.resource.userInfoUri:http://example.com");
 		context = new SpringApplicationBuilder(ResourceConfiguration.class)
 				.environment(environment).web(false).run();
@@ -149,7 +165,8 @@ public class ResourceServerTokenServicesConfigurationTests {
 
 	@Configuration
 	@Import({ ResourceServerTokenServicesConfiguration.class,
-			RefreshAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class })
+			RefreshAutoConfiguration.class, OAuth2ClientAutoConfiguration.class,
+			PropertyPlaceholderAutoConfiguration.class })
 	protected static class ResourceConfiguration {
 	}
 

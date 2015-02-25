@@ -28,16 +28,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
-import org.springframework.cloud.security.oauth2.client.ClientConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
@@ -56,19 +55,19 @@ import org.springframework.web.client.RestTemplate;
  *
  */
 @Configuration
-@Import(ClientConfiguration.class)
 public class ResourceServerTokenServicesConfiguration {
-	
+
 	@Configuration
 	protected static class ResourceServerPropertiesConfiguration {
 
-		@Autowired
-		private AuthorizationCodeResourceDetails client;
+		@Autowired(required = false)
+		private OAuth2ProtectedResourceDetails client;
 
 		@Bean
 		public ResourceServerProperties resourceServerProperties() {
-			return new ResourceServerProperties(client.getClientId(),
-					client.getClientSecret());
+			String clientId = client == null ? null : client.getClientId();
+			String clientSecret = client == null ? null : client.getClientSecret();
+			return new ResourceServerProperties(clientId, clientSecret);
 		}
 	}
 
@@ -105,9 +104,6 @@ public class ResourceServerTokenServicesConfiguration {
 			@Autowired
 			private ResourceServerProperties sso;
 
-			@Autowired
-			private AuthorizationCodeResourceDetails client;
-
 			@Autowired(required = false)
 			private OAuth2ConnectionFactory<?> connectionFactory;
 
@@ -118,8 +114,7 @@ public class ResourceServerTokenServicesConfiguration {
 			@ConditionalOnBean(ConnectionFactoryLocator.class)
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
 			public SpringSocialTokenServices socialTokenServices() {
-				return new SpringSocialTokenServices(connectionFactory,
-						client.getClientId());
+				return new SpringSocialTokenServices(connectionFactory, sso.getClientId());
 			}
 
 			@Bean
@@ -127,7 +122,7 @@ public class ResourceServerTokenServicesConfiguration {
 					ResourceServerTokenServices.class })
 			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
-						sso.getUserInfoUri(), client.getClientId());
+						sso.getUserInfoUri(), sso.getClientId());
 				services.setResources(resources);
 				return services;
 			}
@@ -142,9 +137,6 @@ public class ResourceServerTokenServicesConfiguration {
 			@Autowired
 			private ResourceServerProperties sso;
 
-			@Autowired
-			private AuthorizationCodeResourceDetails client;
-
 			@Autowired(required = false)
 			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
 
@@ -152,7 +144,7 @@ public class ResourceServerTokenServicesConfiguration {
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
 			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
-						sso.getUserInfoUri(), client.getClientId());
+						sso.getUserInfoUri(), sso.getClientId());
 				services.setResources(resources);
 				return services;
 			}
@@ -169,8 +161,9 @@ public class ResourceServerTokenServicesConfiguration {
 		@Autowired
 		private ResourceServerProperties resource;
 
-		@Autowired(required=false)
-		private List<JwtAccessTokenConverterConfigurer> configurers = Collections.emptyList();
+		@Autowired(required = false)
+		private List<JwtAccessTokenConverterConfigurer> configurers = Collections
+				.emptyList();
 
 		@Bean
 		@ConditionalOnMissingBean(ResourceServerTokenServices.class)

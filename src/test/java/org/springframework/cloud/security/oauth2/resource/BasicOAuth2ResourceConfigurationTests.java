@@ -34,11 +34,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.security.oauth2.resource.BasicOAuth2ResourceConfigurationTests.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -48,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestConfiguration.class)
 @WebAppConfiguration
-@TestPropertySource(properties = { "debug:true", "spring.oauth2.resource.userInfoUri=http://example.com/me" })
+@TestPropertySource(properties = { "debug:true", "spring.oauth2.resource.userInfoUri=http://start.spring.io" })
 public class BasicOAuth2ResourceConfigurationTests {
 
 	@Autowired
@@ -80,11 +84,33 @@ public class BasicOAuth2ResourceConfigurationTests {
 								Matchers.containsString("Bearer")));
 	}
 
+	@Test
+	public void homePageAccessible() throws Exception {
+		// Random JSON comes back from user info
+		mvc.perform(get("/").header("Authorization", "Bearer FOO"))
+				.andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void accessTokenRelay() throws Exception {
+		mvc.perform(get("/relay").header("Authorization", "Bearer FOO"))
+				.andExpect(status().isOk());
+	}
+
 	@Configuration
 	@EnableOAuth2Resource
 	@EnableAutoConfiguration
+	@RestController
 	protected static class TestConfiguration {
+		
+		@Autowired
+		private OAuth2RestOperations restTemplate;
 
+		@RequestMapping("/relay")
+		public String relay() {
+			Assert.state(restTemplate.getAccessToken()!=null, "Access token not relayed");
+			return "success!";
+		}
 	}
 
 }
