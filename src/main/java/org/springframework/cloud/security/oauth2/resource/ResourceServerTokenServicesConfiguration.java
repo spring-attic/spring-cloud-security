@@ -37,7 +37,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -82,15 +81,12 @@ public class ResourceServerTokenServicesConfiguration {
 			@Autowired
 			private ResourceServerProperties resource;
 
-			@Autowired
-			private AuthorizationCodeResourceDetails client;
-
 			@Bean
 			protected ResourceServerTokenServices remoteTokenServices() {
 				RemoteTokenServices services = new RemoteTokenServices();
 				services.setCheckTokenEndpointUrl(resource.getTokenInfoUri());
-				services.setClientId(client.getClientId());
-				services.setClientSecret(client.getClientSecret());
+				services.setClientId(resource.getClientId());
+				services.setClientSecret(resource.getClientSecret());
 				return services;
 			}
 

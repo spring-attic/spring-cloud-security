@@ -17,6 +17,7 @@ package org.springframework.cloud.security.oauth2.client;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -25,11 +26,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.security.oauth2.resource.ResourceServerTokenServicesConfiguration;
 import org.springframework.cloud.security.oauth2.sso.OAuth2SsoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,14 +47,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
-import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+import org.springframework.security.oauth2.client.token.AccessTokenProvider;
+import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
+import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
+import org.springframework.security.oauth2.client.token.OAuth2AccessTokenSupport;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -62,15 +70,13 @@ import org.springframework.util.MultiValueMap;
 
 @Configuration
 @ConditionalOnClass(OAuth2ClientContext.class)
-@ConditionalOnBean(ResourceServerTokenServicesConfiguration.class)
 @ConditionalOnExpression("'${spring.oauth2.client.clientId:}'!=''")
 @EnableConfigurationProperties
 public class OAuth2ClientAutoConfiguration {
 
 	@Bean
 	@Primary
-	public OAuth2RestOperations oauth2RestTemplate(
-			OAuth2ClientContext oauth2ClientContext,
+	public OAuth2RestTemplate oauth2RestTemplate(OAuth2ClientContext oauth2ClientContext,
 			OAuth2ProtectedResourceDetails details) {
 		OAuth2RestTemplate template = new OAuth2RestTemplate(details, oauth2ClientContext);
 		template.setInterceptors(Arrays
@@ -83,15 +89,25 @@ public class OAuth2ClientAutoConfiguration {
 						return execution.execute(request, body);
 					}
 				}));
-		AuthorizationCodeAccessTokenProvider accessTokenProvider = new AuthorizationCodeAccessTokenProvider();
-		accessTokenProvider.setTokenRequestEnhancer(new RequestEnhancer() {
-			@Override
-			public void enhance(AccessTokenRequest request,
-					OAuth2ProtectedResourceDetails resource,
-					MultiValueMap<String, String> form, HttpHeaders headers) {
-				headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		List<AccessTokenProvider> list = Arrays.<AccessTokenProvider> asList(
+				new AuthorizationCodeAccessTokenProvider(),
+				new ImplicitAccessTokenProvider(),
+				new ResourceOwnerPasswordAccessTokenProvider(),
+				new ClientCredentialsAccessTokenProvider());
+		for (AccessTokenProvider item : list) {
+			if (item instanceof OAuth2AccessTokenSupport) {
+				OAuth2AccessTokenSupport support = (OAuth2AccessTokenSupport) item;
+				support.setTokenRequestEnhancer(new RequestEnhancer() {
+					@Override
+					public void enhance(AccessTokenRequest request,
+							OAuth2ProtectedResourceDetails resource,
+							MultiValueMap<String, String> form, HttpHeaders headers) {
+						headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+					}
+				});
 			}
-		});
+		}
+		AccessTokenProvider accessTokenProvider = new AccessTokenProviderChain(list);
 		template.setAccessTokenProvider(accessTokenProvider);
 		return template;
 	}
@@ -124,6 +140,25 @@ public class OAuth2ClientAutoConfiguration {
 	}
 
 	@Configuration
+	@ConditionalOnNotWebApplication
+	protected abstract static class SingletonScopedConfiguration {
+
+		@Bean
+		@ConfigurationProperties("spring.oauth2.client")
+		@Primary
+		public ClientCredentialsResourceDetails oauth2RemoteResource() {
+			ClientCredentialsResourceDetails details = new ClientCredentialsResourceDetails();
+			return details;
+		}
+
+		@Bean
+		public OAuth2ClientContext oauth2ClientContext() {
+			return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
+		}
+
+	}
+
+	@Configuration
 	@ConditionalOnBean(OAuth2SsoConfiguration.class)
 	@ConditionalOnWebApplication
 	protected abstract static class SessionScopedConfiguration extends BaseConfiguration {
@@ -146,7 +181,8 @@ public class OAuth2ClientAutoConfiguration {
 		public OAuth2ClientContext oauth2ClientContext() {
 			DefaultOAuth2ClientContext context = new DefaultOAuth2ClientContext(
 					accessTokenRequest);
-			Authentication principal = SecurityContextHolder.getContext().getAuthentication();
+			Authentication principal = SecurityContextHolder.getContext()
+					.getAuthentication();
 			if (principal instanceof OAuth2Authentication) {
 				OAuth2Authentication authentication = (OAuth2Authentication) principal;
 				Object details = authentication.getDetails();

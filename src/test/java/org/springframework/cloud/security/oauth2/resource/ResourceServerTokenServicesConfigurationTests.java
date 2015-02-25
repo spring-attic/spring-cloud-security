@@ -53,7 +53,7 @@ public class ResourceServerTokenServicesConfigurationTests {
 	private ConfigurableApplicationContext context;
 
 	private ConfigurableEnvironment environment = new StandardEnvironment();
-	
+
 	@Rule
 	public ExpectedException expected = ExpectedException.none();
 
@@ -95,7 +95,8 @@ public class ResourceServerTokenServicesConfigurationTests {
 
 	@Test
 	public void userInfoDoesNotRequireClient() {
-		EnvironmentTestUtils.addEnvironment(environment,"spring.oauth2.client.clientId:",
+		EnvironmentTestUtils.addEnvironment(environment,
+				"spring.oauth2.client.clientId:",
 				"spring.oauth2.resource.userInfoUri:http://example.com");
 		context = new SpringApplicationBuilder(ResourceConfiguration.class)
 				.environment(environment).web(false).run();
