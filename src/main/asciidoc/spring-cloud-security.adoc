@@ -278,7 +278,7 @@ public String relay() {
 }
 ----
 
-## Configuring Downstream Authentication
+== Configuring Authentication Downstream of a Zuul Proxy
 
 You can control the authorization behaviour downstream of an
 `@EnableZuulProxy` through the `proxy.auth.*` settings. Example:
