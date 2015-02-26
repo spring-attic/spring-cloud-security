@@ -23,7 +23,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.context.annotation.Configuration;
@@ -35,23 +34,24 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
  *
  */
 @Configuration
-@ConditionalOnClass(LoadBalancerInterceptor.class)
-@ConditionalOnBean(LoadBalancerInterceptor.class)
+@ConditionalOnClass({ LoadBalancerInterceptor.class, OAuth2RestTemplate.class })
 @AutoConfigureBefore(OAuth2ClientAutoConfiguration.class)
 public class OAuth2LoadBalancerClientAutoConfiguration {
 
-	@Autowired
+	@Autowired(required = false)
 	private LoadBalancerInterceptor loadBalancerInterceptor;
 
-	@Autowired
+	@Autowired(required = false)
 	private OAuth2RestTemplate restTemplate;
 
 	@PostConstruct
 	public void addInterceptor() {
-		List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>(
-				restTemplate.getInterceptors());
-		interceptors.add(loadBalancerInterceptor);
-		restTemplate.setInterceptors(interceptors);
+		if (restTemplate != null && loadBalancerInterceptor != null) {
+			List<ClientHttpRequestInterceptor> interceptors = new ArrayList<ClientHttpRequestInterceptor>(
+					restTemplate.getInterceptors());
+			interceptors.add(loadBalancerInterceptor);
+			restTemplate.setInterceptors(interceptors);
+		}
 	}
 
 }
