@@ -133,7 +133,7 @@ public class OAuth2ClientAutoConfiguration {
 				OAuth2ClientContextFilter filter) {
 			FilterRegistrationBean registration = new FilterRegistrationBean();
 			registration.setFilter(filter);
-			registration.setOrder(0);
+			registration.setOrder(-100);
 			return registration;
 		}
 
