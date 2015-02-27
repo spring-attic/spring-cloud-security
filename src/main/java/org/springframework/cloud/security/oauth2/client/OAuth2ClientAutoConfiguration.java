@@ -55,12 +55,19 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 @EnableConfigurationProperties
 public class OAuth2ClientAutoConfiguration {
 
-	@Bean
-	@Primary
-	public OAuth2RestTemplate oauth2RestTemplate(OAuth2ClientContext oauth2ClientContext,
-			OAuth2ProtectedResourceDetails details) {
-		OAuth2RestTemplate template = new OAuth2RestTemplate(details, oauth2ClientContext);
-		return template;
+	@Configuration
+	protected abstract static class OAuth2RestTemplateConfiguration {
+
+		@Bean
+		@Primary
+		public OAuth2RestTemplate oauth2RestTemplate(
+				OAuth2ClientContext oauth2ClientContext,
+				OAuth2ProtectedResourceDetails details) {
+			OAuth2RestTemplate template = new OAuth2RestTemplate(details,
+					oauth2ClientContext);
+			return template;
+		}
+
 	}
 
 	@Configuration
