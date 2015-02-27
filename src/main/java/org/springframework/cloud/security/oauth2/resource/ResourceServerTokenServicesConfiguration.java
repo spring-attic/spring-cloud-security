@@ -15,6 +15,8 @@
  */
 package org.springframework.cloud.security.oauth2.resource;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +24,11 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
@@ -32,11 +36,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.OrderComparator;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
+import org.springframework.security.oauth2.client.token.AccessTokenRequest;
+import org.springframework.security.oauth2.client.token.RequestEnhancer;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -45,6 +61,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -55,6 +72,50 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 public class ResourceServerTokenServicesConfiguration {
+
+	@Configuration
+	@ConditionalOnExpression("'${spring.oauth2.client.clientId:}'!=''")
+	protected static class UserInfoRestTemplateConfiguration {
+
+		@Autowired(required = false)
+		private List<UserInfoRestTemplateCustomizer> customizers = Collections
+				.emptyList();
+
+		@Bean(name = "userInfoRestTemplate")
+		public OAuth2RestTemplate userInfoRestTemplate(
+				OAuth2ClientContext oauth2ClientContext,
+				OAuth2ProtectedResourceDetails details) {
+			OAuth2RestTemplate template = new OAuth2RestTemplate(details,
+					oauth2ClientContext);
+			template.setInterceptors(Arrays
+					.<ClientHttpRequestInterceptor> asList(new ClientHttpRequestInterceptor() {
+						@Override
+						public ClientHttpResponse intercept(HttpRequest request,
+								byte[] body, ClientHttpRequestExecution execution)
+								throws IOException {
+							request.getHeaders().setAccept(
+									Arrays.asList(MediaType.APPLICATION_JSON));
+							return execution.execute(request, body);
+						}
+					}));
+			AuthorizationCodeAccessTokenProvider accessTokenProvider = new AuthorizationCodeAccessTokenProvider();
+			accessTokenProvider.setTokenRequestEnhancer(new RequestEnhancer() {
+				@Override
+				public void enhance(AccessTokenRequest request,
+						OAuth2ProtectedResourceDetails resource,
+						MultiValueMap<String, String> form, HttpHeaders headers) {
+					headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+				}
+			});
+			template.setAccessTokenProvider(accessTokenProvider);
+			OrderComparator.sort(customizers);
+			for (UserInfoRestTemplateCustomizer customizer : customizers) {
+				customizer.customize(template);
+			}
+			return template;
+		}
+
+	}
 
 	@Configuration
 	protected static class ResourceServerPropertiesConfiguration {
@@ -104,7 +165,8 @@ public class ResourceServerTokenServicesConfiguration {
 			private OAuth2ConnectionFactory<?> connectionFactory;
 
 			@Autowired(required = false)
-			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
+			@Qualifier("userInfoRestTemplate")
+			private OAuth2RestOperations restTemplate;
 
 			@Bean
 			@ConditionalOnBean(ConnectionFactoryLocator.class)
@@ -119,7 +181,7 @@ public class ResourceServerTokenServicesConfiguration {
 			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), sso.getClientId());
-				services.setResources(resources);
+				services.setRestTemplate(restTemplate);
 				return services;
 			}
 
@@ -134,14 +196,16 @@ public class ResourceServerTokenServicesConfiguration {
 			private ResourceServerProperties sso;
 
 			@Autowired(required = false)
-			private Map<String, OAuth2RestOperations> resources = Collections.emptyMap();
+			@Qualifier("userInfoRestTemplate")
+			private OAuth2RestOperations restTemplate;
 
 			@Bean
 			@ConditionalOnMissingBean(ResourceServerTokenServices.class)
 			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), sso.getClientId());
-				services.setResources(resources);
+				services.setRestTemplate(restTemplate);
+				;
 				return services;
 			}
 

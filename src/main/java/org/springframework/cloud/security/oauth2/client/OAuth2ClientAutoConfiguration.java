@@ -15,10 +15,6 @@
  */
 package org.springframework.cloud.security.oauth2.client;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,12 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
@@ -50,23 +40,14 @@ import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.token.AccessTokenProvider;
-import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
-import org.springframework.security.oauth2.client.token.OAuth2AccessTokenSupport;
-import org.springframework.security.oauth2.client.token.RequestEnhancer;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
-import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.util.MultiValueMap;
 
 @Configuration
 @ConditionalOnClass(OAuth2ClientContext.class)
@@ -79,36 +60,6 @@ public class OAuth2ClientAutoConfiguration {
 	public OAuth2RestTemplate oauth2RestTemplate(OAuth2ClientContext oauth2ClientContext,
 			OAuth2ProtectedResourceDetails details) {
 		OAuth2RestTemplate template = new OAuth2RestTemplate(details, oauth2ClientContext);
-		template.setInterceptors(Arrays
-				.<ClientHttpRequestInterceptor> asList(new ClientHttpRequestInterceptor() {
-					@Override
-					public ClientHttpResponse intercept(HttpRequest request, byte[] body,
-							ClientHttpRequestExecution execution) throws IOException {
-						request.getHeaders().setAccept(
-								Arrays.asList(MediaType.APPLICATION_JSON));
-						return execution.execute(request, body);
-					}
-				}));
-		List<AccessTokenProvider> list = Arrays.<AccessTokenProvider> asList(
-				new AuthorizationCodeAccessTokenProvider(),
-				new ImplicitAccessTokenProvider(),
-				new ResourceOwnerPasswordAccessTokenProvider(),
-				new ClientCredentialsAccessTokenProvider());
-		for (AccessTokenProvider item : list) {
-			if (item instanceof OAuth2AccessTokenSupport) {
-				OAuth2AccessTokenSupport support = (OAuth2AccessTokenSupport) item;
-				support.setTokenRequestEnhancer(new RequestEnhancer() {
-					@Override
-					public void enhance(AccessTokenRequest request,
-							OAuth2ProtectedResourceDetails resource,
-							MultiValueMap<String, String> form, HttpHeaders headers) {
-						headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-					}
-				});
-			}
-		}
-		AccessTokenProvider accessTokenProvider = new AccessTokenProviderChain(list);
-		template.setAccessTokenProvider(accessTokenProvider);
 		return template;
 	}
 

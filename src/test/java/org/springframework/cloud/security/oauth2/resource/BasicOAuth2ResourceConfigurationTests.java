@@ -85,7 +85,7 @@ public class BasicOAuth2ResourceConfigurationTests {
 	}
 
 	@Test
-	public void homePageAccessible() throws Exception {
+	public void homePageAccessibleWithToken() throws Exception {
 		// Random JSON comes back from user info
 		mvc.perform(get("/").header("Authorization", "Bearer FOO"))
 				.andExpect(status().isNotFound());

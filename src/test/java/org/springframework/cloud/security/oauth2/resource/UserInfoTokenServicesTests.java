@@ -60,7 +60,7 @@ public class UserInfoTokenServicesTests {
 
 	@Test
 	public void sunnyDay() {
-		services.setResources(Collections.singletonMap("foo", template));
+		services.setRestTemplate(template);
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());
 	}
 
@@ -68,7 +68,7 @@ public class UserInfoTokenServicesTests {
 	public void noClientId() {
 		services = new UserInfoTokenServices("http://example.com", null);
 		resource.setClientId(null);
-		services.setResources(Collections.singletonMap("foo", template));
+		services.setRestTemplate(template);
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());
 	}
 
@@ -79,14 +79,14 @@ public class UserInfoTokenServicesTests {
 						.<String, String> emptyMap()));
 		services = new UserInfoTokenServices("http://example.com", null);
 		resource.setClientId(null);
-		services.setResources(Collections.singletonMap("foo", template));
+		services.setRestTemplate(template);
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());
 	}
 
 	@Test
 	public void userId() {
 		map.put("userid", "spencer");
-		services.setResources(Collections.singletonMap("foo", template));
+		services.setRestTemplate(template);
 		assertEquals("spencer", services.loadAuthentication("FOO").getName());
 	}
 

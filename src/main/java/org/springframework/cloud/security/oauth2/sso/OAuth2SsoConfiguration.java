@@ -77,7 +77,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 	private ResourceServerTokenServices tokenServices;
 
 	@Autowired
-	@Qualifier("oauth2RestTemplate")
+	@Qualifier("userInfoRestTemplate")
 	private OAuth2RestOperations restTemplate;
 
 	private List<OAuth2SsoConfigurer> configurers = Collections.emptyList();

@@ -15,11 +15,7 @@
  */
 package org.springframework.cloud.security.oauth2.resource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,14 +25,12 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
-import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
-import org.springframework.util.StringUtils;
 
 public class UserInfoTokenServices implements ResourceServerTokenServices {
 
@@ -46,30 +40,15 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	private String clientId;
 
-	private Collection<OAuth2RestOperations> resources = Collections.emptySet();
+	private OAuth2RestOperations restTemplate;
 
 	public UserInfoTokenServices(String userInfoEndpointUrl, String clientId) {
 		this.userInfoEndpointUrl = userInfoEndpointUrl;
 		this.clientId = clientId;
 	}
 
-	public void setResources(Map<String, OAuth2RestOperations> resources) {
-		this.resources = new ArrayList<OAuth2RestOperations>();
-		for (Entry<String, OAuth2RestOperations> key : resources.entrySet()) {
-			OAuth2RestOperations value = key.getValue();
-			if (clientMatches(value)) {
-				this.resources.add(value);
-			}
-		}
-	}
-
-	private boolean clientMatches(OAuth2RestOperations value) {
-		String clientIdForTemplate = value.getResource().getClientId();
-		boolean clientsEqual = clientIdForTemplate != null
-				&& clientIdForTemplate.equals(clientId);
-		boolean clientsBothEmpty = !StringUtils.hasText(clientIdForTemplate)
-				&& !StringUtils.hasText(clientId);
-		return clientsEqual || clientsBothEmpty;
+	public void setRestTemplate(OAuth2RestOperations restTemplate) {
+		this.restTemplate = restTemplate;
 	}
 
 	@Override
@@ -114,33 +93,14 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	private Map<String, Object> getMap(String path, String accessToken) {
 		logger.info("Getting user info from: " + path);
-		OAuth2RestOperations restTemplate = null;
-		for (OAuth2RestOperations candidate : resources) {
-			try {
-				if (accessToken.equals(candidate.getAccessToken().getValue())) {
-					restTemplate = candidate;
-					break;
-				}
-			}
-			catch (UserRedirectRequiredException e) {
-				// The template wasn't used yet, but we have an access token that matches
-				// the client
-				restTemplate = candidate;
-				restTemplate.getOAuth2ClientContext().setAccessToken(
-						new DefaultOAuth2AccessToken(accessToken));
-				restTemplate = candidate;
-				break;
-			}
-			catch (Exception e) {
-			}
-		}
+		OAuth2RestOperations restTemplate = this.restTemplate;
 		if (restTemplate == null) {
 			BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
 			resource.setClientId(clientId);
 			restTemplate = new OAuth2RestTemplate(resource);
-			restTemplate.getOAuth2ClientContext().setAccessToken(
-					new DefaultOAuth2AccessToken(accessToken));
 		}
+		restTemplate.getOAuth2ClientContext().setAccessToken(
+				new DefaultOAuth2AccessToken(accessToken));
 		@SuppressWarnings("rawtypes")
 		Map map = restTemplate.getForEntity(path, Map.class).getBody();
 		@SuppressWarnings("unchecked")

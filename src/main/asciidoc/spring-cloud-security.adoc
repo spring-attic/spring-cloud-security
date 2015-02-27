@@ -56,6 +56,26 @@ Github for instance, your OAuth2 provider doesn't like header
 authentication). The `spring.oauth2.client.*` properties are bound to an instance 
 of `AuthorizationCodeResourceDetails` so all its properties can be specified.
 
+=== Customizing the RestTemplate
+
+The SSO (and Resource Server) features use an `OAuth2RestTemplate`
+internally to fetch user details for authentication. This is provided
+as a qualified `@Bean` with id "userInfoRestTemplate", but you
+shouldn't need to know that to just use it. The default should be fine
+for most providers, but occasionally you might need to add additional
+interceptors, or change the request authenticator (which is how the
+token gets attached to outgoing requests). To add a customization just
+create a bean of type `UserInfoRestTemplateCustomizer` - it has a
+single method that will be called after the bean is created but before
+it is initialized. The rest template that is being customized here is
+_only_ used internally to carry out authentication (in the SSO or
+Resource Server use cases).
+
+A second {@link OAuth2RestTemplate} is available for autowiring if you
+want to use it for back channel calls, and if there is a
+token-authenticated user (in a web application) it will have the token
+injected for you.
+
 [TIP]
 ====
 To set an RSA key value in YAML use the "pipe" continuation
