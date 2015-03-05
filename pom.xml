@@ -24,6 +24,10 @@
 		<tag>HEAD</tag>
 	</scm>
 
+	<properties>
+      <bintray.package>security</bintray.package>
+    </properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
