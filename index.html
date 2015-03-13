@@ -66,16 +66,17 @@ yet. Add this to your configuration and you will be able to login with
 Github (as long as you run your app on localhost:8080):
 
 ```yaml
-oauth2:
-  client:
-    clientId: bd1c0a783ccdd1c9b9e4
-    clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
-    tokenUri: https://github.com/login/oauth/access_token
-    authorizationUri: https://github.com/login/oauth/authorize
-    authenticationScheme: form
-  resource:
-    userInfoUri: https://api.github.com/user
-    preferTokenInfo: false
+spring:
+  oauth2:
+    client:
+      clientId: bd1c0a783ccdd1c9b9e4
+      clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user
+      preferTokenInfo: false
 ```
 
 {% endcapture %}
@@ -85,8 +86,10 @@ oauth2:
 
 ### Sample Projects
 
-* [SSO](https://github.com/spring-cloud-samples/scripts/demo/sso.groovy)
-* [Resource server](https://github.com/spring-cloud-samples/scripts/demo/resource.groovy)
+* [SSO](https://github.com/spring-cloud-samples/sso)
+* [Auth Server](https://github.com/spring-cloud-samples/authserver)
+* [SSO Groovy](https://github.com/spring-cloud-samples/scripts/blob/master/demo/sso.groovy)
+* [Resource server](https://github.com/spring-cloud-samples/scripts/blob/master/demo/resource.groovy)
 
 {% endcapture %}
 
