@@ -108,7 +108,7 @@ public class OAuth2SsoConfiguration extends WebSecurityConfigurerAdapter impleme
 		private AuthorizationCodeResourceDetails client;
 
 		@Bean
-		@ConditionalOnMissingBean
+		@ConditionalOnMissingBean(OAuth2SsoProperties.class)
 		public OAuth2SsoProperties ssoProperties() {
 			return new OAuth2SsoProperties(client.getAccessTokenUri());
 		}
