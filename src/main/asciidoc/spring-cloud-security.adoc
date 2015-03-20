@@ -1,8 +1,11 @@
 = Spring Cloud Security
-:github-base: https://github.com/spring-cloud
-:security-base: https://github.com/spring-cloud/spring-cloud-security
+:github: https://github.com/spring-cloud/spring-cloud-security
+:githubmaster: {github}/tree/master
+:docslink: {githubmaster}/src/main/asciidoc
 
 include::intro.adoc[]
+
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing-docs.adoc[]
 
 == Quickstart
 
@@ -267,7 +270,7 @@ How does it work? The `@EnableOAuth2Sso` annotation pulls in
 traditional app), and that in turn triggers some autoconfiguration for
 a `ZuulFilter`, which itself is activated because Zuul is on the
 classpath (via `@EnableZuulProxy`). The
-{security-base}/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java[filter]
+{githubmaster}/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java[filter]
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.
 
@@ -321,5 +324,5 @@ authorization header removed. The default behaviour is to do a token
 relay if there is a token available, and passthru otherwise.
 
 See
-{security-base}/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties[
+{githubmaster}/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties[
 ProxyAuthenticationProperties] for full details.
