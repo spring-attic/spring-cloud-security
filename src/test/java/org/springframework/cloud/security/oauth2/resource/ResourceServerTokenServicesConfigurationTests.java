@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
@@ -101,6 +102,7 @@ public class ResourceServerTokenServicesConfigurationTests {
 		context = new SpringApplicationBuilder(ResourceConfiguration.class)
 				.environment(environment).web(false).run();
 		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
+		assertEquals(1, ResourceConfiguration.count);
 		assertNotNull(services);
 	}
 
@@ -169,6 +171,19 @@ public class ResourceServerTokenServicesConfigurationTests {
 			RefreshAutoConfiguration.class, OAuth2ClientAutoConfiguration.class,
 			PropertyPlaceholderAutoConfiguration.class })
 	protected static class ResourceConfiguration {
+		public static int count = 0;
+		public ResourceConfiguration() {
+			ResourceConfiguration.count = 0;
+		}
+		@Bean
+		public UserInfoRestTemplateCustomizer customizer() {
+			return new UserInfoRestTemplateCustomizer() {				
+				@Override
+				public void customize(OAuth2RestTemplate template) {
+					count++;
+				}
+			};
+		}
 	}
 
 	@Component

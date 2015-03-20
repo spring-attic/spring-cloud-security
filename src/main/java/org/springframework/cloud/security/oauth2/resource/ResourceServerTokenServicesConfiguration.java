@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
@@ -53,6 +52,7 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.RequestEnhancer;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -74,19 +74,40 @@ import org.springframework.web.client.RestTemplate;
 public class ResourceServerTokenServicesConfiguration {
 
 	@Configuration
-	@ConditionalOnExpression("'${spring.oauth2.client.clientId:}'!=''")
 	protected static class UserInfoRestTemplateConfiguration {
+
+		private static final AuthorizationCodeResourceDetails DEFAULT_RESOURCE_DETAILS = new AuthorizationCodeResourceDetails();
+
+		static {
+			DEFAULT_RESOURCE_DETAILS.setClientId("<N/A>");
+			DEFAULT_RESOURCE_DETAILS
+					.setUserAuthorizationUri("Not a URI because there is no client");
+			DEFAULT_RESOURCE_DETAILS
+					.setAccessTokenUri("Not a URI because there is no client");
+		}
 
 		@Autowired(required = false)
 		private List<UserInfoRestTemplateCustomizer> customizers = Collections
 				.emptyList();
+		
+		@Autowired(required = false)
+		private OAuth2ProtectedResourceDetails details;
+
+		@Autowired(required = false)
+		private OAuth2ClientContext oauth2ClientContext;
 
 		@Bean(name = "userInfoRestTemplate")
-		public OAuth2RestTemplate userInfoRestTemplate(
-				OAuth2ClientContext oauth2ClientContext,
-				OAuth2ProtectedResourceDetails details) {
-			OAuth2RestTemplate template = new OAuth2RestTemplate(details,
-					oauth2ClientContext);
+		public OAuth2RestTemplate userInfoRestTemplate() {
+			OAuth2RestTemplate template;
+			if (details == null) {
+				details = DEFAULT_RESOURCE_DETAILS;
+			}
+			if (oauth2ClientContext == null) {
+				template = new OAuth2RestTemplate(details);
+			}
+			else {
+				template = new OAuth2RestTemplate(details, oauth2ClientContext);
+			}
 			template.setInterceptors(Arrays
 					.<ClientHttpRequestInterceptor> asList(new ClientHttpRequestInterceptor() {
 						@Override
@@ -205,7 +226,6 @@ public class ResourceServerTokenServicesConfiguration {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), sso.getClientId());
 				services.setRestTemplate(restTemplate);
-				;
 				return services;
 			}
 
