@@ -24,6 +24,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 
 import com.netflix.zuul.ZuulFilter;
@@ -42,9 +43,17 @@ public class OAuth2ProxyAutoConfiguration {
 	@Autowired
 	private ProxyAuthenticationProperties properties;
 
+	// Inject the @Primary one because it knows how to refresh an expired token 
+	@Autowired(required = false)
+	private OAuth2RestTemplate restTemplate;
+
 	@Bean
 	public OAuth2TokenRelayFilter oauth2TokenRelayFilter() {
-		return new OAuth2TokenRelayFilter(properties);
+		OAuth2TokenRelayFilter filter = new OAuth2TokenRelayFilter(properties);
+		if (restTemplate!=null) {
+			filter.setRestTemplate(restTemplate);
+		}
+		return filter;
 	}
 
 	@ConditionalOnClass({ ProxyRequestHelper.class, TraceRepository.class })
