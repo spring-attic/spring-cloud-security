@@ -44,24 +44,25 @@ public class OAuth2ProxyAutoConfiguration {
 	@Autowired
 	private ProxyAuthenticationProperties properties;
 
-    // Inject the @Primary one because it knows how to refresh an expired token
-    @Autowired(required = false)
+	// Inject the @Primary one because it knows how to refresh an expired token
+	@Autowired(required = false)
 	private OAuth2RestTemplate restTemplate;
 
-    @Autowired(required = false)
-    @LoadBalanced
-    private OAuth2RestTemplate loadBalancedRestTemplate;
+	@Autowired(required = false)
+	@LoadBalanced
+	private OAuth2RestTemplate loadBalancedRestTemplate;
 
-    @Value("${spring.oauth2.userInfo.loadBalanced:false}")
-    private boolean useLoadBalancedRestTemplate;
+	@Value("${spring.oauth2.userInfo.loadBalanced:false}")
+	private boolean useLoadBalancedRestTemplate;
 
 	@Bean
 	public OAuth2TokenRelayFilter oauth2TokenRelayFilter() {
 		OAuth2TokenRelayFilter filter = new OAuth2TokenRelayFilter(properties);
-        if (loadBalancedRestTemplate != null && useLoadBalancedRestTemplate) {
-            filter.setRestTemplate(loadBalancedRestTemplate);
-        } else if (restTemplate != null) {
-            filter.setRestTemplate(restTemplate);
+		if (loadBalancedRestTemplate != null && useLoadBalancedRestTemplate) {
+			filter.setRestTemplate(loadBalancedRestTemplate);
+		}
+		else if (restTemplate != null) {
+			filter.setRestTemplate(restTemplate);
 		}
 		return filter;
 	}
