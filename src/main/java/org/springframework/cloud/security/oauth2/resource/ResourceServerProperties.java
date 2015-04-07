@@ -30,10 +30,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Dave Syer
  *
  */
-@ConfigurationProperties("spring.oauth2.resource")
+@ConfigurationProperties(ResourceServerProperties.PREFIX)
 @Data
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ResourceServerProperties implements Validator {
+
+	public static final String PREFIX = "spring.oauth2.resource";
 	
 	@JsonIgnore
 	private final String clientId;
@@ -64,6 +66,11 @@ public class ResourceServerProperties implements Validator {
 	private boolean preferTokenInfo = true;
 	
 	private Jwt jwt = new Jwt();
+
+	/**
+	 * Use a load balanced RestTemplate
+	 */
+	private boolean loadBalanced = false;
 
 	public String getResourceId() {
 		return id;
