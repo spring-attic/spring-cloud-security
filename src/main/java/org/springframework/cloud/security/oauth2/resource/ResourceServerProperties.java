@@ -35,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ResourceServerProperties implements Validator {
 
-    public static final String PREFIX = "spring.oauth2.resource";
+	public static final String PREFIX = "spring.oauth2.resource";
 	
 	@JsonIgnore
 	private final String clientId;
