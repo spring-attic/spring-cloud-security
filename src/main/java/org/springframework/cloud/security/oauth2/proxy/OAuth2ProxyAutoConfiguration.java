@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
+import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -52,13 +53,13 @@ public class OAuth2ProxyAutoConfiguration {
 	@LoadBalanced
 	private OAuth2RestTemplate loadBalancedRestTemplate;
 
-	@Value("${spring.oauth2.userInfo.loadBalanced:false}")
-	private boolean useLoadBalancedRestTemplate;
+    @Autowired
+	private ResourceServerProperties resourceServerProperties;
 
 	@Bean
 	public OAuth2TokenRelayFilter oauth2TokenRelayFilter() {
 		OAuth2TokenRelayFilter filter = new OAuth2TokenRelayFilter(properties);
-		if (loadBalancedRestTemplate != null && useLoadBalancedRestTemplate) {
+		if (loadBalancedRestTemplate != null && resourceServerProperties.isLoadBalanced()) {
 			filter.setRestTemplate(loadBalancedRestTemplate);
 		}
 		else if (restTemplate != null) {

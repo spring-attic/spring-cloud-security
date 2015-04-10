@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
+import org.springframework.cloud.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.cloud.security.oauth2.resource.UserInfoRestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,7 +66,7 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 	}
 
 	@Configuration
-	@ConditionalOnProperty(value = "spring.oauth2.userInfo.loadBalanced", matchIfMissing = false)
+	@ConditionalOnProperty(value = ResourceServerProperties.PREFIX + ".loadBalanced", matchIfMissing = false)
 	protected static class UserInfoLoadBalancerConfig {
 		@Bean
 		public UserInfoRestTemplateCustomizer loadBalancedUserInfoRestTemplateCustomizer(
