@@ -53,7 +53,7 @@ public class OAuth2ProxyAutoConfiguration {
 	@LoadBalanced
 	private OAuth2RestTemplate loadBalancedRestTemplate;
 
-    @Autowired
+	@Autowired
 	private ResourceServerProperties resourceServerProperties;
 
 	@Bean

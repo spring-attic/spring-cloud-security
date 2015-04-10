@@ -67,10 +67,10 @@ public class ResourceServerProperties implements Validator {
 	
 	private Jwt jwt = new Jwt();
 
-    /**
-     * Use a load balanced RestTemplate
-     */
-    private boolean loadBalanced = false;
+	/**
+	 * Use a load balanced RestTemplate
+	 */
+	private boolean loadBalanced = false;
 
 	public String getResourceId() {
 		return id;
