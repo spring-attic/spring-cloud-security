@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ public class ResourceServerProperties implements Validator {
 		private String keyValue;
 
 		/**
-		 * The URI of the JWT token. Can be set if the value is not available and the key is public.
+		 * The URI of the JWT token. Can be set if the value is not available.
 		 */
 		private String keyUri;
 

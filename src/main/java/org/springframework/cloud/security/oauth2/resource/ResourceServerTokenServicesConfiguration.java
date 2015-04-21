@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 the original author or authors.
+ * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,12 +39,15 @@ import org.springframework.core.OrderComparator;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
@@ -238,6 +241,8 @@ public class ResourceServerTokenServicesConfiguration {
 	@Slf4j
 	protected static class JwtTokenServicesConfiguration {
 
+		private RestTemplate keyUriRestTemplate = new RestTemplate();
+
 		@Autowired
 		private ResourceServerProperties resource;
 
@@ -264,18 +269,23 @@ public class ResourceServerTokenServicesConfiguration {
 			String keyValue = resource.getJwt().getKeyValue();
 			if (!StringUtils.hasText(keyValue)) {
 				try {
-					keyValue = (String) new RestTemplate().getForObject(
-							resource.getJwt().getKeyUri(), Map.class).get("value");
-				}
-				catch (ResourceAccessException e) {
+					HttpHeaders headers = new HttpHeaders();
+					if (resource.getClientId() != null && resource.getClientSecret() != null) {
+						byte[] token = Base64.encode((resource.getClientId() + ":" + resource.getClientSecret())
+								.getBytes());
+						headers.add("Authorization", "Basic " + new String(token));
+					}
+					HttpEntity<Void> requestEntity = new HttpEntity<Void>(headers);
+					keyValue = (String) keyUriRestTemplate.exchange(
+							resource.getJwt().getKeyUri(), HttpMethod.GET, requestEntity, Map.class).getBody()
+							.get("value");
+				} catch (ResourceAccessException e) {
 					// ignore
 					log.warn("Failed to fetch token key (you may need to refresh when the auth server is back)");
 				}
 			}
-			else {
-				if (StringUtils.hasText(keyValue) && !keyValue.startsWith("-----BEGIN")) {
-					converter.setSigningKey(keyValue);
-				}
+			if (StringUtils.hasText(keyValue) && !keyValue.startsWith("-----BEGIN")) {
+				converter.setSigningKey(keyValue);
 			}
 			if (keyValue != null) {
 				converter.setVerifierKey(keyValue);
