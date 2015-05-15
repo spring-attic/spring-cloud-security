@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 /**
  * @author Dave Syer
@@ -42,6 +44,7 @@ public class UserInfoTokenServicesTests {
 			"http://example.com", "foo");
 	private BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
 	private OAuth2RestOperations template = Mockito.mock(OAuth2RestOperations.class);
+	private OAuth2ClientContext clientContext = Mockito.mock(OAuth2ClientContext.class);
 	private Map<String, Object> map = new LinkedHashMap<String, Object>();
 
 	@Before
@@ -55,13 +58,23 @@ public class UserInfoTokenServicesTests {
 				new DefaultOAuth2AccessToken("FOO"));
 		Mockito.when(template.getResource()).thenReturn(resource);
 		Mockito.when(template.getOAuth2ClientContext()).thenReturn(
-				Mockito.mock(OAuth2ClientContext.class));
+				clientContext);
 	}
 
 	@Test
 	public void sunnyDay() {
 		services.setRestTemplate(template);
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());
+	}
+
+	@Test
+	public void tokenType() {
+		services.setRestTemplate(template);
+		services.setTokenType("access_token");
+		assertEquals("unknown", services.loadAuthentication("FOO").getName());
+		ArgumentCaptor<OAuth2AccessToken> argument = ArgumentCaptor.forClass(OAuth2AccessToken.class);
+		Mockito.verify(clientContext).setAccessToken(argument.capture());
+		assertEquals("access_token", argument.getValue().getTokenType());
 	}
 
 	@Test

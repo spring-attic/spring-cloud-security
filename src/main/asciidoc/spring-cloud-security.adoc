@@ -59,6 +59,14 @@ Github for instance, your OAuth2 provider doesn't like header
 authentication). The `spring.oauth2.client.*` properties are bound to an instance 
 of `AuthorizationCodeResourceDetails` so all its properties can be specified.
 
+=== Token Type in User Info
+
+Google (and certain other 3rd party identity providers) is more strict
+about the token type name that is sent in the headers to the user info
+endpoint. The default is "Bearer" which suits most providers and
+matches the spec, but if you need to change it you can set
+`spring.oauth2.resource.tokenType`.
+
 === Customizing the RestTemplate
 
 The SSO (and Resource Server) features use an `OAuth2RestTemplate`

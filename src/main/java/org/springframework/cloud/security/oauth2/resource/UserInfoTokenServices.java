@@ -42,9 +42,15 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 
 	private OAuth2RestOperations restTemplate;
 
+	private String tokenType = DefaultOAuth2AccessToken.BEARER_TYPE;
+
 	public UserInfoTokenServices(String userInfoEndpointUrl, String clientId) {
 		this.userInfoEndpointUrl = userInfoEndpointUrl;
 		this.clientId = clientId;
+	}
+	
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
 	}
 
 	public void setRestTemplate(OAuth2RestOperations restTemplate) {
@@ -99,8 +105,9 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 			resource.setClientId(clientId);
 			restTemplate = new OAuth2RestTemplate(resource);
 		}
-		restTemplate.getOAuth2ClientContext().setAccessToken(
-				new DefaultOAuth2AccessToken(accessToken));
+		DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(accessToken);
+		token.setTokenType(tokenType);
+		restTemplate.getOAuth2ClientContext().setAccessToken(token);
 		@SuppressWarnings("rawtypes")
 		Map map = restTemplate.getForEntity(path, Map.class).getBody();
 		@SuppressWarnings("unchecked")

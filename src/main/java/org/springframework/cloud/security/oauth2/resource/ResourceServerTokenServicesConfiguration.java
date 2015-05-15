@@ -205,6 +205,7 @@ public class ResourceServerTokenServicesConfiguration {
 			public UserInfoTokenServices userInfoTokenServices() {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), sso.getClientId());
+				services.setTokenType(sso.getTokenType());
 				services.setRestTemplate(restTemplate);
 				return services;
 			}
@@ -229,6 +230,7 @@ public class ResourceServerTokenServicesConfiguration {
 				UserInfoTokenServices services = new UserInfoTokenServices(
 						sso.getUserInfoUri(), sso.getClientId());
 				services.setRestTemplate(restTemplate);
+				services.setTokenType(sso.getTokenType());
 				return services;
 			}
 

@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -64,6 +65,11 @@ public class ResourceServerProperties implements Validator {
 	 * Use the token info, can be set to false to use the user info.
 	 */
 	private boolean preferTokenInfo = true;
+	
+	/**
+	 * The token type to send when using the userInfoUri.
+	 */
+	private String tokenType = DefaultOAuth2AccessToken.BEARER_TYPE;
 	
 	private Jwt jwt = new Jwt();
 
