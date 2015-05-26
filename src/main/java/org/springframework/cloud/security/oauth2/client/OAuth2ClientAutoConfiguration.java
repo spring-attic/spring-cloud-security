@@ -56,7 +56,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 public class OAuth2ClientAutoConfiguration {
 
 	@Configuration
-	protected abstract static class OAuth2RestTemplateConfiguration {
+	protected static class OAuth2RestTemplateConfiguration {
 
 		@Bean
 		@Primary
@@ -99,7 +99,7 @@ public class OAuth2ClientAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnNotWebApplication
-	protected abstract static class SingletonScopedConfiguration {
+	protected static class SingletonScopedConfiguration {
 
 		@Bean
 		@ConfigurationProperties("spring.oauth2.client")
@@ -119,7 +119,7 @@ public class OAuth2ClientAutoConfiguration {
 	@Configuration
 	@ConditionalOnBean(OAuth2SsoConfiguration.class)
 	@ConditionalOnWebApplication
-	protected abstract static class SessionScopedConfiguration extends BaseConfiguration {
+	protected static class SessionScopedConfiguration extends BaseConfiguration {
 
 		@Bean
 		@Scope(value = "session", proxyMode = ScopedProxyMode.INTERFACES)
@@ -132,7 +132,7 @@ public class OAuth2ClientAutoConfiguration {
 	@Configuration
 	@ConditionalOnMissingBean(OAuth2SsoConfiguration.class)
 	@ConditionalOnWebApplication
-	protected abstract static class RequestScopedConfiguration extends BaseConfiguration {
+	protected static class RequestScopedConfiguration extends BaseConfiguration {
 
 		@Bean
 		@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
