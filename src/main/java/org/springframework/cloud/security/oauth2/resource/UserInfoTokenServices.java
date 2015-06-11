@@ -15,6 +15,7 @@
  */
 package org.springframework.cloud.security.oauth2.resource;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -48,7 +49,7 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 		this.userInfoEndpointUrl = userInfoEndpointUrl;
 		this.clientId = clientId;
 	}
-	
+
 	public void setTokenType(String tokenType) {
 		this.tokenType = tokenType;
 	}
@@ -61,10 +62,10 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 	public OAuth2Authentication loadAuthentication(String accessToken)
 			throws AuthenticationException, InvalidTokenException {
 
-		Map<String, Object> map = getMap(userInfoEndpointUrl, accessToken);
+		Map<String, Object> map = getMap(this.userInfoEndpointUrl, accessToken);
 
 		if (map.containsKey("error")) {
-			logger.debug("userinfo returned error: " + map.get("error"));
+			this.logger.debug("userinfo returned error: " + map.get("error"));
 			throw new InvalidTokenException(accessToken);
 		}
 
@@ -76,13 +77,13 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 				getPrincipal(map), "N/A",
 				AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"));
 		user.setDetails(map);
-		OAuth2Request request = new OAuth2Request(null, clientId, null, true, null, null,
+		OAuth2Request request = new OAuth2Request(null, this.clientId, null, true, null, null,
 				null, null, null);
 		return new OAuth2Authentication(request, user);
 	}
 
 	private Object getPrincipal(Map<String, Object> map) {
-		String[] keys = new String[] { "user", "username", "userid", "user_id", "login", 
+		String[] keys = new String[] { "user", "username", "userid", "user_id", "login",
 				"id", "name" };
 		for (String key : keys) {
 			if (map.containsKey(key)) {
@@ -98,21 +99,29 @@ public class UserInfoTokenServices implements ResourceServerTokenServices {
 	}
 
 	private Map<String, Object> getMap(String path, String accessToken) {
-		logger.info("Getting user info from: " + path);
-		OAuth2RestOperations restTemplate = this.restTemplate;
-		if (restTemplate == null) {
-			BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
-			resource.setClientId(clientId);
-			restTemplate = new OAuth2RestTemplate(resource);
+		this.logger.info("Getting user info from: " + path);
+		try {
+			OAuth2RestOperations restTemplate = this.restTemplate;
+			if (restTemplate == null) {
+				BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
+				resource.setClientId(this.clientId);
+				restTemplate = new OAuth2RestTemplate(resource);
+			}
+			DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(accessToken);
+			token.setTokenType(this.tokenType);
+			restTemplate.getOAuth2ClientContext().setAccessToken(token);
+			@SuppressWarnings("rawtypes")
+			Map map = restTemplate.getForEntity(path, Map.class).getBody();
+			@SuppressWarnings("unchecked")
+			Map<String, Object> result = map;
+			return result;
 		}
-		DefaultOAuth2AccessToken token = new DefaultOAuth2AccessToken(accessToken);
-		token.setTokenType(tokenType);
-		restTemplate.getOAuth2ClientContext().setAccessToken(token);
-		@SuppressWarnings("rawtypes")
-		Map map = restTemplate.getForEntity(path, Map.class).getBody();
-		@SuppressWarnings("unchecked")
-		Map<String, Object> result = map;
-		return result;
+		catch (Exception e) {
+			this.logger.info("Could not fetch user details: " + e.getClass() + ", "
+					+ e.getMessage());
+			return Collections.<String, Object> singletonMap("error",
+					"Could not fetch user details");
+		}
 	}
 
 }
