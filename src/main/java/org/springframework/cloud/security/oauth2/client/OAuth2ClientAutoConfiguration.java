@@ -44,6 +44,7 @@ import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -63,11 +64,17 @@ public class OAuth2ClientAutoConfiguration {
 		public OAuth2RestTemplate oauth2RestTemplate(
 				OAuth2ClientContext oauth2ClientContext,
 				OAuth2ProtectedResourceDetails details) {
-			OAuth2RestTemplate template = new OAuth2RestTemplate(details,
-					oauth2ClientContext);
+			OAuth2RestTemplate template = new OAuth2RestTemplate(details, oauth2ClientContext);
 			return template;
 		}
 
+		@Bean
+		public OAuth2RestTemplate oauth2ClientCredentialsRestTemplate(
+				OAuth2ClientContext oauth2ClientContext,
+				@Qualifier("oauth2ClientCredentialsRemoteResource") OAuth2ProtectedResourceDetails details) {
+			OAuth2RestTemplate template = new OAuth2RestTemplate(details, oauth2ClientContext);
+			return template;
+		}
 	}
 
 	@Configuration
@@ -83,6 +90,13 @@ public class OAuth2ClientAutoConfiguration {
 		@Primary
 		public AuthorizationCodeResourceDetails oauth2RemoteResource() {
 			AuthorizationCodeResourceDetails details = new AuthorizationCodeResourceDetails();
+			return details;
+		}
+
+		@Bean
+		@ConfigurationProperties("spring.oauth2.client")
+		public AuthorizationCodeResourceDetails oauth2ClientCredentialsRemoteResource() {
+			AuthorizationCodeResourceDetails details = new ClientCredentialsResourceDetails();
 			return details;
 		}
 
