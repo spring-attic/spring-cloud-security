@@ -19,6 +19,7 @@ package org.springframework.cloud.security.oauth2.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -53,6 +54,22 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 				LoadBalancerInterceptor loadBalancerInterceptor,
 				OAuth2ClientContext oauth2ClientContext,
 				OAuth2ProtectedResourceDetails details) {
+
+			OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(details,
+					oauth2ClientContext);
+			List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(
+					restTemplate.getInterceptors());
+			interceptors.add(loadBalancerInterceptor);
+			restTemplate.setInterceptors(interceptors);
+
+			return restTemplate;
+		}
+
+		@Bean
+		public OAuth2RestTemplate loadBalancedClientCredentialsOAuth2RestTemplate(
+				LoadBalancerInterceptor loadBalancerInterceptor,
+				OAuth2ClientContext oauth2ClientContext,
+				@Qualifier("oauth2ClientCredentialsRemoteResource") OAuth2ProtectedResourceDetails details) {
 
 			OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(details,
 					oauth2ClientContext);
