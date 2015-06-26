@@ -27,6 +27,8 @@
     </properties>
 	<modules>
 	  <module>spring-cloud-security</module>
+		<module>spring-cloud-starter-oauth2</module>
+		<module>spring-cloud-starter-security</module>
 	  <module>docs</module>
 	</modules>
     <dependencyManagement>
