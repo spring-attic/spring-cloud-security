@@ -88,7 +88,7 @@ simple example (paired with the client above):
 ----
 @Grab('spring-cloud-starter-security')
 @RestController
-@EnableOAuth2Resource
+@EnableResourceServer
 class Application {
   
   @RequestMapping('/')
