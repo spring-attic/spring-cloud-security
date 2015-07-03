@@ -40,6 +40,10 @@ public class ProxyAuthenticationProperties {
 	@Getter
 	@Setter
 	private Map<String, Route> routes = new HashMap<String, Route>();
+	
+	@Getter
+	@Setter
+	private boolean loadBalanced;
 
 	@PostConstruct
 	public void init() {

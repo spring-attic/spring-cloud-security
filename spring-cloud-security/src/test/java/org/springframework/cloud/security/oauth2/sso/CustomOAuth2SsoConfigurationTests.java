@@ -29,10 +29,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.security.oauth2.sso.CustomOAuth2SsoConfigurationTests.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -91,18 +93,13 @@ public class CustomOAuth2SsoConfigurationTests {
 	@Configuration
 	@EnableOAuth2Sso
 	@EnableAutoConfiguration
-	protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
+	protected static class TestConfiguration extends WebSecurityConfigurerAdapter {
 
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests()
+			http.antMatcher("/ui/**").authorizeRequests()
 					.antMatchers("/ui/test").permitAll()
 					.anyRequest().authenticated();
-		}
-
-		@Override
-		public void match(RequestMatchers matchers) {
-			matchers.antMatchers("/ui/**");
 		}
 
 		@RestController
