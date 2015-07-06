@@ -24,7 +24,6 @@ import javax.servlet.Filter;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,6 @@ public class BasicOAuth2ResourceConfigurationTests {
 	}
 	
 	@Test
-	@Ignore // TODO: finish upgrade to Boot 1.3
 	public void oauth2ContextIsRequestScoped() {
 		BeanDefinition bean = ((BeanDefinitionRegistry) context).getBeanDefinition("scopedTarget.oauth2ClientContext");
 		assertEquals("request", bean.getScope());
