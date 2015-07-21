@@ -1,6 +1,7 @@
 # Autoconfig
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.springframework.cloud.security.oauth2.proxy.OAuth2ProxyAutoConfiguration
+org.springframework.cloud.security.oauth2.proxy.OAuth2ProxyAutoConfiguration,\
+org.springframework.cloud.security.oauth2.client.OAuth2LoadBalancerClientAutoConfiguration
 # Application Listeners
 org.springframework.context.ApplicationListener=\
 org.springframework.cloud.security.oauth2.environment.VcapServiceCredentialsListener
