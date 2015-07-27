@@ -3,7 +3,7 @@ proxy:
     routes:
       foo: oauth2
       bar: none
-spring:
+security:
   oauth2:
     client:
       clientId: acme

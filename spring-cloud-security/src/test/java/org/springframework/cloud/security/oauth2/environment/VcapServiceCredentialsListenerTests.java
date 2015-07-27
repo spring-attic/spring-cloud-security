@@ -43,7 +43,7 @@ public class VcapServiceCredentialsListenerTests {
 		listener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(
 				new SpringApplication(), null, environment));
 		Map<String, Object> properties = new RelaxedPropertyResolver(environment)
-				.getSubProperties("spring.oauth2");
+				.getSubProperties("security.oauth2");
 		assertTrue(properties == null || properties.isEmpty());
 	}
 
@@ -52,7 +52,7 @@ public class VcapServiceCredentialsListenerTests {
 		EnvironmentTestUtils.addEnvironment(environment, "vcap.services.sso.credentials.tokenUri:http://example.com");
 		listener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(
 				new SpringApplication(), null, environment));
-		assertEquals("http://example.com", environment.resolvePlaceholders("${spring.oauth2.client.accessTokenUri}"));
+		assertEquals("http://example.com", environment.resolvePlaceholders("${security.oauth2.client.accessTokenUri}"));
 	}
 
 	@Test
@@ -60,16 +60,16 @@ public class VcapServiceCredentialsListenerTests {
 		EnvironmentTestUtils.addEnvironment(environment, "vcap.services.sso.credentials.userInfoUri:http://example.com");
 		listener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(
 				new SpringApplication(), null, environment));
-		assertEquals("http://example.com", environment.resolvePlaceholders("${spring.oauth2.resource.userInfoUri}"));
+		assertEquals("http://example.com", environment.resolvePlaceholders("${security.oauth2.resource.userInfoUri}"));
 	}
 
 	@Test
 	public void addServiceId() {
 		EnvironmentTestUtils.addEnvironment(environment, "vcap.services.my.credentials.tokenUri:http://example.com",
-				"spring.oauth2.sso.serviceId:my");
+				"security.oauth2.sso.serviceId:my");
 		listener.onApplicationEvent(new ApplicationEnvironmentPreparedEvent(
 				new SpringApplication(), null, environment));
-		assertEquals("http://example.com", environment.resolvePlaceholders("${spring.oauth2.client.accessTokenUri}"));
+		assertEquals("http://example.com", environment.resolvePlaceholders("${security.oauth2.client.accessTokenUri}"));
 	}
 
 }
