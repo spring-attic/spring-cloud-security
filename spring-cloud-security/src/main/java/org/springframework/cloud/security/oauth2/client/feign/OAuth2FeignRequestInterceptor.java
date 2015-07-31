@@ -32,6 +32,7 @@ import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
     public static final String BEARER = "Bearer";
+
     public static final String AUTHORIZATION = "Authorization";
 
     private final Logger logger = LoggerFactory.getLogger(OAuth2FeignRequestInterceptor.class);

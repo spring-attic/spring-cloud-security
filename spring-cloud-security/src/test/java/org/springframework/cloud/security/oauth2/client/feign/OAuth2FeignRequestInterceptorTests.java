@@ -16,6 +16,7 @@ import static org.hamcrest.Matchers.contains;
 public class OAuth2FeignRequestInterceptorTests {
 
     private OAuth2FeignRequestInterceptor oAuth2FeignRequestInterceptor;
+
     private RequestTemplate requestTemplate;
 
     @Before
