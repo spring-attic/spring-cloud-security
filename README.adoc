@@ -13,41 +13,87 @@ Spring Boot and Spring Security OAuth2 we can quickly create systems that
 implement common patterns like single sign on, token relay and token
 exchange.
 
+== Upgrading to 1.1.0
+
+Most of the OAuth2 features moved from this project to Spring Boot 1.3, so from version 1.1 things are a little different here. Here
+is a guide to the available features as they were in 1.0, but with new names and slightly new APIs.
+
+As in 1.0, an app will activate `@EnableOAuth2Sso` if you bind provide some
+following properties in the `Environment`.
+
+You can still customize the access rules in an SSO application, but instead
+of a specific callback (the old `OAuth2SsoConfigurer`) all you do now is
+add `@EnableOAuth2Sso` to a `WebSecurityConfigurerAdapter`.
+For example if you want the resources under "/ui/**" to be protected with OAuth2:
+
+[source,java,indent=0]
+----
+	@Configuration
+	@EnableOAuth2Sso
+	@EnableAutoConfiguration
+	protected static class TestConfiguration extends WebSecurityConfigurerAdapter {
+		@Override
+		public void match(RequestMatchers matchers) {
+			matchers.antMatchers("/ui/**")
+                .authorizeRequests().anyRequest().authenticated();
+		}
+	}
+----
+
+In this case the rest of the application will default to the normal
+Spring Boot access control for other paths (Basic authentication, or
+whatever custom filters you put in place).
+
+There is no `@EnableOAuth2Resource` annotation in Spring Cloud 1.1.
+You just use the regular `@EnableResourecServer` from Spring OAuth.
+
 == Building
 
 :jdkversion: 1.7
 
 === Basic Compile and Test
 
-To build the source you will need to install
-http://maven.apache.org/run-maven/index.html[Apache Maven] v3.0.6 or above and JDK {jdkversion}.
+To build the source you will need to install JDK {jdkversion}.
 
 Spring Cloud uses Maven for most build-related activities, and you
 should be able to get off the ground quite quickly by cloning the
 project you are interested in and typing
 
 ----
-$ mvn install -s .settings.xml
+$ ./mvnw install
 ----
 
-NOTE: You may need to increase the amount of memory available to Maven by setting
-a `MAVEN_OPTS` environment variable with the value `-Xmx512m -XX:MaxPermSize=128m`
+NOTE: You can also install Maven (>=3.3.3) yourself and run the `mvn` command
+in place of `./mvnw` in the examples below. If you do that you also
+might need to add `-P spring` if your local Maven settings do not
+contain repository declarations for spring pre-release artifacts.
 
-The `.settings.xml` is only required the first time (or after updates
-to dependencies). It is there to provide repository declarations so
-that those do not need to be hard coded in the project poms.
+NOTE: Be aware that you might need to increase the amount of memory
+available to Maven by setting a `MAVEN_OPTS` environment variable with
+a value like `-Xmx512m -XX:MaxPermSize=128m`. We try to cover this in
+the `.mvn` configuration, so if you find you have to do it to make a
+build succeed, please raise a ticket to get the settings added to
+source control.
 
 For hints on how to build the project look in `.travis.yml` if there
 is one. There should be a "script" and maybe "install" command. Also
 look at the "services" section to see if any services need to be
 running locally (e.g. mongo or rabbit).  Ignore the git-related bits
-that you might find in "before_install" since they will be able git
+that you might find in "before_install" since they're related to setting git
 credentials and you already have those.
 
-If you need mongo, rabbit or redis, see the README in the https://github.com/spring-cloud-samples/scripts[scripts
-demo repository] for
-instructions. For example consider using the "fig.yml" with
-http://www.fig.sh/[Fig] to run them in Docker containers.
+The projects that require middleware generally include a
+`docker-compose.yml`, so consider using
+http://compose.docker.io/[Docker Compose] to run the middeware servers
+in Docker containers. See the README in the
+https://github.com/spring-cloud-samples/scripts[scripts demo
+repository] for specific instructions about the common cases of mongo,
+rabbit and redis.
+
+NOTE: migration to the Maven wrapper (`.mvnw`) is underway. If you
+find a project that doesn't have it yet, raise an issue to get it
+added, and build with the command from `.travis.yml` (usually
+`mvn install -s .settings.xml`).
 
 === Documentation
 
@@ -59,46 +105,6 @@ parsing or rendering it, just copying it to `${main.basedir}`
 (defaults to `${basedir}`, i.e. the root of the project). If there are
 any changes in the README it will then show up after a Maven build as
 a modified file in the correct place. Just commit it and push the change.
-
-=== Pull Requests
-
-Spring Cloud is released under the non-restrictive Apache 2.0 license,
-and follows a very standard Github development process, using Github
-tracker for issues and merging pull requests into master. If you want
-to contribute even something trivial please do not hesitate, but
-follow the guidelines below.
-
-==== Sign the Contributor License Agreement
-Before we accept a non-trivial patch or pull request we will need you
-to sign the
-https://support.springsource.com/spring_committer_signup[contributor's
-agreement].  Signing the contributor's agreement does not grant anyone
-commit rights to the main repository, but it does mean that we can
-accept your contributions, and you will get an author credit if we do.
-Active contributors might be asked to join the core team, and given
-the ability to merge pull requests.
-
-==== Code Conventions and Housekeeping
-None of these is essential for a pull request, but they will all help.  They can also be
-added after the original pull request but before a merge.
-
-* Use the Spring Framework code format conventions. If you use Eclipse and you follow
-  the ``Importing into eclipse'' instructions below you should get project specific
-  formatting automatically. You can also import formatter settings using the
-  `eclipse-code-formatter.xml` file from the `eclipse` folder. If using IntelliJ, you can
-  use the http://plugins.jetbrains.com/plugin/6546[Eclipse Code Formatter Plugin]
-  to import the same file.
-* Make sure all new `.java` files to have a simple Javadoc class comment with at least an
-  `@author` tag identifying you, and preferably at least a paragraph on what the class is
-  for.
-* Add the ASF license header comment to all new `.java` files (copy from existing files
-  in the project)
-* Add yourself as an `@author` to the .java files that you modify substantially (more
-  than cosmetic changes).
-* Add some Javadocs and, if you change the namespace, some XSD doc elements.
-* A few unit tests would help a lot as well -- someone has to do it.
-* If no-one else is using your branch, please rebase it against the current master (or
-  other target branch in the main project).
 
 === Working with the code
 If you don't have an IDE preference we would recommend that you use
@@ -112,13 +118,25 @@ We recommend the http://eclipse.org/m2e/[m2eclipe] eclipse plugin when working w
 eclipse. If you don't already have m2eclipse installed it is available from the "eclipse
 marketplace".
 
+Unfortunately m2e does not yet support Maven 3.3, so once the projects
+are imported into Eclipse you will also need to tell m2eclipse to use
+the `.settings.xml` file for the projects.  If you do not do this you
+may see errors many different errors related to the POMs in the
+projects.  Open your Eclipse preferences, expand the Maven
+preferences, and select User Settings.  In the User Settings field
+click Browse and navigate to the Spring Cloud project you imported
+selecting the `.settings.xml` file in that project.  Click Apply and
+then OK to save the preference changes.
+
+NOTE: Alternatively you can copy the repository settings from https://github.com/spring-cloud/spring-cloud-build/blob/master/.settings.xml[`.settings.xml`] into your own `~/.m2/settings.xml`.
+
 ==== Importing into eclipse without m2eclipse
 If you prefer not to use m2eclipse you can generate eclipse project metadata using the
 following command:
 
 [indent=0]
 ----
-	$ mvn eclipse:eclipse
+	$ ./mvnw eclipse:eclipse
 ----
 
 The generated eclipse projects can be imported by selecting `import existing projects`
@@ -126,9 +144,8 @@ from the `file` menu.
 
 ==== Adding Project Lombok Agent
 
-Spring Cloud uses [Project
-Lombok](http://projectlombok.org/features/index.html) to generate
-getters and setters etc. Compiling from the command line this
+Spring Cloud uses http://projectlombok.org/features/index.html[Project Lombok]
+to generate getters and setters etc. Compiling from the command line this
 shouldn't cause any problems, but in an IDE you need to add an agent
 to the JVM. Full instructions can be found in the Lombok website. The
 sign that you need to do this is a lot of compiler errors to do with
@@ -150,9 +167,11 @@ Maven is well supported by most Java IDEs. Refer to you vendor documentation.
 
 == Contributing
 
-Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like
-to contribute something, or simply want to hack on the code this document should help
-you get started.
+Spring Cloud is released under the non-restrictive Apache 2.0 license,
+and follows a very standard Github development process, using Github
+tracker for issues and merging pull requests into master. If you want
+to contribute even something trivial please do not hesitate, but
+follow the guidelines below.
 
 === Sign the Contributor License Agreement
 Before we accept a non-trivial patch or pull request we will need you to sign the
