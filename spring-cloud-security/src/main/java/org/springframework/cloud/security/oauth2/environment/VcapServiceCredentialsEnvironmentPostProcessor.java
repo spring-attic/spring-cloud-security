@@ -18,38 +18,40 @@ package org.springframework.cloud.security.oauth2.environment;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.boot.context.config.ConfigFileApplicationListener;
-import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.context.ApplicationListener;
+import org.springframework.boot.context.config.ConfigFileEnvironmentPostProcessor;
+import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 /**
  * @author Dave Syer
  *
  */
-public class VcapServiceCredentialsListener implements
-		ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+public class VcapServiceCredentialsEnvironmentPostProcessor implements
+EnvironmentPostProcessor, Ordered {
 
-	// After VcapApplicationListener and ConfigFileApplicationListener so values here can
+	// After VcapEnvironmentPostProcessor and ConfigFileEnvironmentPostProcessor so values here can
 	// use those ones
-	private int order = ConfigFileApplicationListener.DEFAULT_ORDER + 1;
+	private int order = ConfigFileEnvironmentPostProcessor.DEFAULT_ORDER + 1;
 
 	@Override
 	public int getOrder() {
-		return order;
+		return this.order;
 	}
 
 	@Override
-	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
+	public void postProcessEnvironment(ConfigurableEnvironment environment,
+			SpringApplication application) {
 		Map<String, Object> properties = new RelaxedPropertyResolver(
-				event.getEnvironment()).getSubProperties("vcap.services.");
+				environment).getSubProperties("vcap.services.");
 		if (properties == null || properties.isEmpty()) {
 			return;
 		}
 		Map<String, Object> source = new HashMap<String, Object>();
-		source.put("security.oauth.sso.logoutUri",
+		source.put("security.oauth2.sso.logoutUri",
 				"${vcap.services.${security.oauth2.sso.serviceId:sso}.credentials.logoutUri:}");
 		source.put("security.oauth2.resource.id",
 				"${vcap.services.${security.oauth2.resource.serviceId:resource}.credentials.id:}");
@@ -89,8 +91,8 @@ public class VcapServiceCredentialsListener implements
 				"security.oauth2.client.scope",
 				"${vcap.services.${security.oauth2.sso.serviceId:sso}.credentials.scope:"
 						+ "${vcap.services.${security.oauth2.resource.serviceId:resource}.credentials.scope:}}");
-		event.getEnvironment().getPropertySources()
-				.addLast(new MapPropertySource("cloudDefaultSecurityBindings", source));
+		environment.getPropertySources()
+		.addLast(new MapPropertySource("cloudDefaultSecurityBindings", source));
 	}
 
 }
