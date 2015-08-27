@@ -2,6 +2,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.cloud.security.oauth2.proxy.OAuth2ProxyAutoConfiguration,\
 org.springframework.cloud.security.oauth2.client.OAuth2LoadBalancerClientAutoConfiguration
-# Environment Post Processors
-org.springframework.boot.env.EnvironmentPostProcessor=\
-org.springframework.cloud.security.oauth2.environment.VcapServiceCredentialsEnvironmentPostProcessor
