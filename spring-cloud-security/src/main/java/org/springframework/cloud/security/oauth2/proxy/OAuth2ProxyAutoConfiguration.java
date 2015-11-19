@@ -25,7 +25,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 
 import com.netflix.zuul.ZuulFilter;
@@ -46,11 +46,11 @@ public class OAuth2ProxyAutoConfiguration {
 
 	// Inject the @Primary one because it knows how to refresh an expired token
 	@Autowired(required = false)
-	private OAuth2RestTemplate restTemplate;
+	private OAuth2RestOperations restTemplate;
 
 	@Autowired(required = false)
 	@LoadBalanced
-	private OAuth2RestTemplate loadBalancedRestTemplate;
+	private OAuth2RestOperations loadBalancedRestTemplate;
 
 	@Bean
 	public OAuth2TokenRelayFilter oauth2TokenRelayFilter() {
