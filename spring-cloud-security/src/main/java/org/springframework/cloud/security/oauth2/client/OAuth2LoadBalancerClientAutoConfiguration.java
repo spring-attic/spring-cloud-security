@@ -45,7 +45,7 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 public class OAuth2LoadBalancerClientAutoConfiguration {
 
 	@Configuration
-	@ConditionalOnBean(OAuth2ClientContext.class)
+	@ConditionalOnBean(OAuth2ProtectedResourceDetails.class)
 	protected static class LoadBalancedOauth2RestTemplateConfig {
 		@Bean
 		@LoadBalanced
