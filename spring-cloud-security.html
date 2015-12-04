@@ -544,7 +544,7 @@ simple example (paired with the client above):</p>
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">@Grab('spring-cloud-starter-security')
 @RestController
-@EnableOAuth2Resource
+@EnableResourceServer
 class Application {
 
   @RequestMapping('/')
@@ -576,284 +576,19 @@ class Application {
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_single_sign_on">Single Sign On</h3>
-<div class="paragraph">
-<p>An app will activate <code>@EnableOAuth2Sso</code> if you bind provide the
-following properties in the <code>Environment</code>:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>spring.oauth2.client.*</code> with <code>*</code> equal to <code>clientId</code>, <code>clientSecret</code>,
-<code>accessTokenUri</code>, <code>userAuthorizationUri</code> and one of:</p>
-<div class="ulist">
-<ul>
-<li>
-<p><code>spring.oauth2.resource.userInfoUri</code> to use the "/me" resource
-(e.g. "https://uaa.run.pivotal.io/userinfo" on PWS), or</p>
-</li>
-<li>
-<p><code>spring.oauth2.resource.tokenInfoUri</code> to use the token decoding endpoint
-(e.g. "https://uaa.run.pivotal.io/check_token" on PWS).</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>If you specify both the <code>userInfoUri</code> and the <code>tokenInfoUri</code> then
-you can set a flag to say that one is preferred over the other
-(<code>preferTokenInfo=true</code> is the default). Or</p>
-</div>
-</li>
-<li>
-<p><code>spring.oauth2.resource.jwt.keyValue</code> to
-decode a JWT token locally, where the key is a verification key. The
-verification key value is either a symmetric secret or PEM-encoded
-RSA public key. If you don&#8217;t have the key and it&#8217;s public you can
-provide a URI where it can be downloaded (as a JSON object with a
-"value" field) with <code>spring.oauth2.resource.jwt.keyUri</code>. E.g. on PWS:</p>
-<div class="listingblock">
-<div class="content">
-<pre>$ curl https://uaa.run.pivotal.io/token_key
-{"alg":"SHA256withRSA","value":"-----BEGIN PUBLIC KEY-----\nMIIBI...\n-----END PUBLIC KEY-----\n"}</pre>
-</div>
-</div>
-</li>
-</ul>
-</div>
-<div class="admonitionblock warning">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<div class="title">Warning</div>
+<div class="title">Note</div>
 </td>
 <td class="content">
-If you use the <code>spring.oauth2.resource.jwt.keyUri</code> the authorization
-server needs to be running when your application starts up. It will
-log a warning if it can&#8217;t find the key, and tell you what to do to fix
-it.
+All of the OAuth2 SSO and resource server features moved to Spring Boot
+in version 1.3. You can find documentation in the
+<a href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/">Spring Boot user guide</a>.
 </td>
 </tr>
 </table>
-</div>
-<div class="paragraph">
-<p>You can set the preferred scope (as a comma-separated list or YAML
-array) in <code>spring.oauth2.client.scope</code>. It defaults to empty, in which case
-most Authorization Servers will ask the user for approval for the
-maximum allowed scope for the client.</p>
-</div>
-<div class="paragraph">
-<p>There is also a setting for <code>spring.oauth2.client.clientAuthenticationScheme</code> which
-defaults to "header" (but you might need to set it to "form" if, like
-Github for instance, your OAuth2 provider doesn&#8217;t like header
-authentication). The <code>spring.oauth2.client.*</code> properties are bound to an instance
-of <code>AuthorizationCodeResourceDetails</code> so all its properties can be specified.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_token_type_in_user_info">Token Type in User Info</h3>
-<div class="paragraph">
-<p>Google (and certain other 3rd party identity providers) is more strict
-about the token type name that is sent in the headers to the user info
-endpoint. The default is "Bearer" which suits most providers and
-matches the spec, but if you need to change it you can set
-<code>spring.oauth2.resource.tokenType</code>.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_customizing_the_resttemplate">Customizing the RestTemplate</h3>
-<div class="paragraph">
-<p>The SSO (and Resource Server) features use an <code>OAuth2RestTemplate</code>
-internally to fetch user details for authentication. This is provided
-as a qualified <code>@Bean</code> with id "userInfoRestTemplate", but you
-shouldn&#8217;t need to know that to just use it. The default should be fine
-for most providers, but occasionally you might need to add additional
-interceptors, or change the request authenticator (which is how the
-token gets attached to outgoing requests). To add a customization just
-create a bean of type <code>UserInfoRestTemplateCustomizer</code> - it has a
-single method that will be called after the bean is created but before
-it is initialized. The rest template that is being customized here is
-<em>only</em> used internally to carry out authentication (in the SSO or
-Resource Server use cases).</p>
-</div>
-<div class="paragraph">
-<p>A second {@link OAuth2RestTemplate} is available for autowiring if you
-want to use it for back channel calls, and if there is a
-token-authenticated user (in a web application) it will have the token
-injected for you.</p>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Tip</div>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>To set an RSA key value in YAML use the "pipe" continuation
-marker to split it over multiple lines ("|") and remember to indent
-the key value (it&#8217;s a standard YAML language feature). Example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">oauth2:
-  resource:
-    jwt:
-      keyValue: |
-        -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC...
-        -----END PUBLIC KEY-----</code></pre>
-</div>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_access_decision_rules">Access Decision Rules</h4>
-<div class="paragraph">
-<p>By default the whole application will be secured with OAuth2 with the
-same access rule ("authenticated"). This includes the Actuator
-endpoints, which you might prefer to be secured differently, so Spring
-Cloud Security provides a configurer callback that lets you change the
-matching and access rules for OAuth2 authentication. Any bean of type
-<code>OAuth2SsoConfigurer</code> (there is a convenient empty base class) will
-get 2 callbacks, one to set the request matchers for the OAuth2
-filter, and one with the full <code>HttpSecurity</code> builder (so you can set
-up all sorts of behaviour, but the main application is to control
-access rules).</p>
-</div>
-<div class="paragraph">
-<p>The default login path, i.e. the one that triggers the redirect to the
-OAuth2 Authorization Server, is "/login". It will always be added to
-the matching patterns for the OAuth2 SSO, even if you have
-<code>OAuth2SsoConfigurer</code> beans as well. The default logout path is
-"/logout" and it gets similar treatment, as does the "home" page
-(which is the logout success page, defaults to "/"). Those paths can
-be overriden by setting <code>spring.oauth2.sso.*' (`loginPath</code>, <code>logoutPath</code> and
-<code>home.path</code>).</p>
-</div>
-<div class="paragraph">
-<p>For example if you want the resources under "/ui/**" to be protected with OAuth2:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Configuration
-@EnableOAuth2Sso
-@EnableAutoConfiguration
-protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
-    @Override
-    public void match(RequestMatchers matchers) {
-        matchers.antMatchers("/ui/**");
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>In this case the rest of the application will default to the normal
-Spring Boot access control (Basic authentication, or whatever custom
-filters you put in place).</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_integrating_with_the_actuator_endpoints">Integrating with the Actuator Endpoints</h4>
-<div class="paragraph">
-<p>The Spring Boot Actuator endpoints ("/env", "/metrics", etc.) if
-present will, by default, be protected by the standard Spring Boot
-basic authentication. The SSO authentication filter is added in a
-position directly behind the filter that intercepts requests to the
-Actuator endpoints by default (i.e.
-<code>ManagementProperties.BASIC_AUTH_ORDER + 1</code> which is
-<code>Ordered.LOWEST_PRECEDENCE-9</code> or <code>2147483636</code>). If you want to change
-the order you can set <code>spring.oauth2.sso.filterOrder</code>. If you do that
-and the value is less than the default, then you will need to consider
-setting the access rules for the Actuator, since they will become
-accessible to all authenticated users who sign on with the external
-provider. One way to do that would be to set
-<code>management.contextPath=/admin</code> (for instance) and use an
-<code>OAuth2SsoConfigurer</code> to set the access rules, e.g.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">	@Configuration
-	@EnableOAuth2Sso
-	@EnableAutoConfiguration
-	protected static class TestConfiguration extends OAuth2SsoConfigurerAdapter {
-		@Override
-		public void configure(HttpSecurity http) {
-	         http.authorizeRequests()
-                 .antMatchers("/admin/**").role("ADMIN")
-                 .anyRequest().authenticated();
-		}
-	}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_resource_server">Resource Server</h3>
-<div class="paragraph">
-<p>The <code>@EnableOAuth2Resource</code> annotation will protect your API endpoints
-if you have the same environment settings as the SSO client, except
-that it doesn&#8217;t need a <code>tokenUri</code> or <code>authorizationUri</code>, and it also
-doesn&#8217;t need a <code>clientId</code> and <code>clientSecret</code> if it isn&#8217;t using the
-<code>tokenInfoUri</code> (i.e. if it has <code>jwt.*</code> or <code>userInfoUri</code>).</p>
-</div>
-<div class="paragraph">
-<p>By default <strong>all</strong> your endpoints are protected (i.e. "/**") but you can
-pick and choose by adding a <code>ResourceServerConfigurerAdapter</code> (standard
-Spring OAuth feature), e.g. to protect only the "/api/**" resources</p>
-</div>
-<div class="listingblock">
-<div class="title">Application.java</div>
-<div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@RestController
-@EnableOAuth2Resource
-class Application extends ResourceServerConfigurerAdapter {
-
-  @Override
-  public void configure(HttpSecurity http) throws Exception {
-    http.requestMatchers()
-      .antMatchers("/api/**")
-   .and()
-     .authorizeRequests()
-       .anyRequest().authenticated();
-  }
-
-  @RequestMapping("/api")
-  public String home() {
-    return "Hello World";
-  }
-
-}</code></pre>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_customizing_the_jwt_token_converter">Customizing the JWT Token Converter</h4>
-<div class="paragraph">
-<p>When a resource server accepts an access token as a JWT, it has to
-convert it to an <code>Authentication</code> so that Spring Security can do its
-access decisions. Different token providers might support JWT tokens
-with different contents, so Spring OAuth2 has an abstraction for
-converting the token into security domain objects
-(<code>AccessTokenConverter</code>). You can modify the default behaviour easily
-by providing a <code>@Bean</code> of type <code>JwtAccessTokenConverterConfigurer</code>,
-e.g.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Component
-public class JwtCustomization extends DefaultAccessTokenConverter implements
-        JwtAccessTokenConverterConfigurer {
-
-    @Override
-    public void configure(JwtAccessTokenConverter converter) {
-        converter.setAccessTokenConverter(this);
-    }
-
-    ... // implement custom AccessTokenConverter here
-
-}</code></pre>
-</div>
-</div>
 </div>
 </div>
 <div class="sect2">
@@ -969,7 +704,7 @@ ProxyAuthenticationProperties</a> for full details.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-11-24 09:10:50 UTC
+Last updated 2015-12-04 17:47:17 UTC
 </div>
 </div>
 </body>
