@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-security-dependencies</artifactId>
-	<version>1.0.3.BUILD-SNAPSHOT</version>
+	<version>1.0.3.RELEASE</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud security Parent</name>
 	<description>Spring Cloud Security Parent</description>
@@ -11,13 +11,13 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-dependencies-parent</artifactId>
-		<version>1.0.4.BUILD-SNAPSHOT</version>
+		<version>1.0.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
     <properties>
         <bintray.package>security</bintray.package>
-        <spring-cloud-commons.version>1.0.4.BUILD-SNAPSHOT</spring-cloud-commons.version>
-        <spring-cloud-netflix.version>1.0.6.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+        <spring-cloud-commons.version>1.0.4.RELEASE</spring-cloud-commons.version>
+        <spring-cloud-netflix.version>1.0.6.RELEASE</spring-cloud-netflix.version>
     </properties>
     <dependencyManagement>
       <dependencies>
@@ -38,17 +38,17 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-security</artifactId>
-	        <version>1.0.4.BUILD-SNAPSHOT</version>
+	        <version>1.0.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-oauth2</artifactId>
-	        <version>1.0.4.BUILD-SNAPSHOT</version>
+	        <version>1.0.4.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-security</artifactId>
-	        <version>1.0.3.BUILD-SNAPSHOT</version>
+	        <version>1.0.3.RELEASE</version>
 		</dependency>
      </dependencies>
     </dependencyManagement>
