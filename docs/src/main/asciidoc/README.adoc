@@ -35,7 +35,7 @@ Spring Boot access control for other paths (Basic authentication, or
 whatever custom filters you put in place).
 
 There is no `@EnableOAuth2Resource` annotation in Spring Cloud 1.1.
-You just use the regular `@EnableResourecServer` from Spring OAuth.
+You just use the regular `@EnableResourceServer` from Spring OAuth.
 
 == Building
 
