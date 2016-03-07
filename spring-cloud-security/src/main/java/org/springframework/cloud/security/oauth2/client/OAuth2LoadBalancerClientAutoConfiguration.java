@@ -25,14 +25,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.OAuth2AutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateCustomizer;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
 /**
  * @author Dave Syer
@@ -43,27 +40,6 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 @ConditionalOnBean(LoadBalancerInterceptor.class)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
 public class OAuth2LoadBalancerClientAutoConfiguration {
-
-	@Configuration
-	@ConditionalOnBean(OAuth2ProtectedResourceDetails.class)
-	protected static class LoadBalancedOauth2RestTemplateConfig {
-		@Bean
-		@LoadBalanced
-		public OAuth2RestTemplate loadBalancedOauth2RestTemplate(
-				LoadBalancerInterceptor loadBalancerInterceptor,
-				OAuth2ClientContext oauth2ClientContext,
-				OAuth2ProtectedResourceDetails details) {
-
-			OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(details,
-					oauth2ClientContext);
-			List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(
-					restTemplate.getInterceptors());
-			interceptors.add(loadBalancerInterceptor);
-			restTemplate.setInterceptors(interceptors);
-
-			return restTemplate;
-		}
-	}
 
 	@Configuration
 	@ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced", matchIfMissing = false)

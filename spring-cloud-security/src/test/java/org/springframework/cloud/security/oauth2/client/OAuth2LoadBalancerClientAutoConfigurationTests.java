@@ -27,11 +27,15 @@ import org.junit.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 
 /**
  * @author Dave Syer
@@ -50,7 +54,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 
 	@Test
 	public void clientNotConfigured() {
-		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
+		this.context = new SpringApplicationBuilder(NoClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
@@ -65,7 +69,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 						"security.oauth2.client.clientId=foo")
 				.run();
 		List<ClientHttpRequestInterceptor> interceptors = this.context
-				.getBean("loadBalancedOauth2RestTemplate", OAuth2RestTemplate.class)
+				.getBean("oauth2RestTemplate", OAuth2RestTemplate.class)
 				.getInterceptors();
 		assertThat(interceptors,
 				CoreMatchers.hasItem(CoreMatchers.isA(LoadBalancerInterceptor.class)));
@@ -75,8 +79,21 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 
 	@EnableAutoConfiguration
 	@Configuration
+	protected static class NoClientConfiguration {
+	}
+
+	@EnableAutoConfiguration
+	@Configuration
 	@EnableOAuth2Sso
 	protected static class ClientConfiguration {
+
+		@LoadBalanced
+		@Bean
+		public OAuth2RestTemplate oauth2RestTemplate(
+				OAuth2ProtectedResourceDetails resource,
+				OAuth2ClientContext oauth2Context) {
+			return new OAuth2RestTemplate(resource, oauth2Context);
+		}
 
 	}
 }
