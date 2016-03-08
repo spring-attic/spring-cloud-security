@@ -17,22 +17,22 @@
 package org.springframework.cloud.security.oauth2.client;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
-import java.util.List;
+import java.net.URI;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
@@ -44,6 +44,9 @@ import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResour
 public class OAuth2LoadBalancerClientAutoConfigurationTests {
 
 	private ConfigurableApplicationContext context;
+
+	@Rule
+	public ExpectedException expected = ExpectedException.none();
 
 	@After
 	public void close() {
@@ -62,19 +65,18 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	}
 
 	@Test
-	public void clientConfigured() {
+	public void clientConfigured() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
 						"security.oauth2.resource.userInfoUri:http://example.com",
 						"security.oauth2.client.clientId=foo")
 				.run();
-		List<ClientHttpRequestInterceptor> interceptors = this.context
-				.getBean("oauth2RestTemplate", OAuth2RestTemplate.class)
-				.getInterceptors();
-		assertThat(interceptors,
-				CoreMatchers.hasItem(CoreMatchers.isA(LoadBalancerInterceptor.class)));
-		assertFalse(this.context.getBean(OAuth2RestTemplate.class).getInterceptors()
-				.isEmpty());
+		OAuth2RestTemplate template = this.context
+				.getBean("loadBalancedOauth2RestTemplate", OAuth2RestTemplate.class);
+		ClientHttpRequest request = template.getRequestFactory()
+				.createRequest(new URI("http://nosuchservice"), HttpMethod.GET);
+		expected.expectMessage("No instances available for nosuchservice");
+		request.execute();
 	}
 
 	@EnableAutoConfiguration
@@ -89,7 +91,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 
 		@LoadBalanced
 		@Bean
-		public OAuth2RestTemplate oauth2RestTemplate(
+		public OAuth2RestTemplate loadBalancedOauth2RestTemplate(
 				OAuth2ProtectedResourceDetails resource,
 				OAuth2ClientContext oauth2Context) {
 			return new OAuth2RestTemplate(resource, oauth2Context);
