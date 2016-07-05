@@ -16,7 +16,6 @@
 package org.springframework.cloud.security.oauth2.proxy;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.trace.TraceRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -64,7 +63,7 @@ public class OAuth2ProxyAutoConfiguration {
 		return filter;
 	}
 
-	@ConditionalOnClass({ ProxyRequestHelper.class, TraceRepository.class })
+	@ConditionalOnClass({ ProxyRequestHelper.class })
 	@Configuration
 	protected static class AuthenticationHeaderFilterConfiguration {
 
