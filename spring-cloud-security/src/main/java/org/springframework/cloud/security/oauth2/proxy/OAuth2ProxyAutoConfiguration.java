@@ -54,12 +54,12 @@ public class OAuth2ProxyAutoConfiguration {
 
 	@Bean
 	public OAuth2TokenRelayFilter oauth2TokenRelayFilter() {
-		OAuth2TokenRelayFilter filter = new OAuth2TokenRelayFilter(properties);
-		if (loadBalancedRestTemplate != null && properties.isLoadBalanced()) {
-			filter.setRestTemplate(loadBalancedRestTemplate);
+		OAuth2TokenRelayFilter filter = new OAuth2TokenRelayFilter(this.properties);
+		if (this.loadBalancedRestTemplate != null && this.properties.isLoadBalanced()) {
+			filter.setRestTemplate(this.loadBalancedRestTemplate);
 		}
-		else if (restTemplate != null) {
-			filter.setRestTemplate(restTemplate);
+		else if (this.restTemplate != null) {
+			filter.setRestTemplate(this.restTemplate);
 		}
 		return filter;
 	}
@@ -68,16 +68,10 @@ public class OAuth2ProxyAutoConfiguration {
 	@Configuration
 	protected static class AuthenticationHeaderFilterConfiguration {
 
-		@Autowired(required = false)
-		private TraceRepository traces;
-
 		@Bean
 		public AuthenticationHeaderFilter authenticationHeaderFilter(
 				ProxyAuthenticationProperties properties) {
 			ProxyRequestHelper helper = new ProxyRequestHelper();
-			if (traces != null) {
-				helper.setTraces(traces);
-			}
 			return new AuthenticationHeaderFilter(helper, properties);
 		}
 
