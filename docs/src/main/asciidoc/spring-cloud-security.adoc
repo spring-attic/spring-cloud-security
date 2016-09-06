@@ -28,11 +28,23 @@ Server.
 
 ==== Client Token Relay
 
-If your app has a
+If your app is a user facing OAuth2 client (i.e. has declared
+`@EnableOAuth2Sso` or `@EnableOAuth2Client`) then it has an
+`OAuth2ClientContext` in request scope from Spring Boot. You can
+create your own `OAuth2RestTemplate` from this context and an
+autowired `OAuth2ProtectedResourceDetails`, and then the context will
+always forward the access token downstream, also refreshing the access
+token automatically if it expires. (These are features of Spring
+Security and Spring Boot.)
+
+==== Client Token Relay in Zuul Proxy
+
+If your app also has a
 http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy[Spring
 Cloud Zuul] embedded reverse proxy (using `@EnableZuulProxy`) then you
 can ask it to forward OAuth2 access tokens downstream to the services
-it is proxying. Thus the SSO app above can be enhanced simply like this:
+it is proxying. Thus the SSO app above can be enhanced simply like
+this:
 
 .app.groovy
 [source,java]
@@ -45,7 +57,7 @@ class Application {
 }
 ----
 
-and it will (in addition to loggin the user in and grabbing a token)
+and it will (in addition to logging the user in and grabbing a token)
 pass the authentication token downstream to the `/proxy/*`
 services. If those services are implemented with
 `@EnableOAuth2Resource` then they will get a valid token in the
@@ -62,16 +74,43 @@ and puts it in a request header for the downstream requests.
 
 ==== Resource Server Token Relay
 
-If your app has `@EnableOAuth2Resource` and also is a Client (i.e. it
-has a `spring.oauth2.client.clientId`, even if it doesn't use it),
-then the `OAuth2RestOperations` that is provided for `@Autowired`
-users by Spring Cloud (it is declared as `@Primary`) will also forward
-tokens. If you don't want to forward tokens (and that is a valid
-choice, since you might want to act as yourself, rather than the
-client that sent you the token), then you only need to create your own
-`OAuth2RestOperations` instead of autowiring the default one. Here's
-a basic example showing the use of the autowired rest template ("foo.com"
-is a Resource Server accepting the same tokens as the surrounding app):
+If your app has `@EnableOAuth2Resource` you might want to relay the
+incoming token downstream to other services. If you use a
+`RestTemplate` to contact the downstream services then this is just a
+matter of how to create the template with the right context.
+
+If your service uses `UserInfoTokenServices` to authenticate incoming
+tokens (i.e. it is using the `security.oauth2.user-info-uri`
+configuration), then you can simply create an `OAuth2RestTemplate`
+using an autowired `OAuth2ClientContext` (it will be populated by the
+authentication process before it hits the backend code). Equivalently
+(with Spring Boot 1.4), you could inject a
+`UserInfoRestTemplateFactory` and grab its `OAuth2RestTemplate` in
+your configuration. For example:
+
+.MyConfiguration.java
+[source,java]
+----
+@Bean
+public OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
+    return factory.getUserInfoRestTemplate();
+}
+----
+
+This rest template will then have the same `OAuth2ClientContext`
+(request-scoped) that is used by the authentication filter, so you can
+use it to send requests with the same access token.
+
+If your app is not using `UserInfoTokenServices` but is still a client
+(i.e. it declares `@EnableOAuth2Client` or `@EnableOAuth2Sso`), then
+with Spring Security Cloud any `OAuth2RestOperations` that the user
+creates from an `@Autowired` `@OAuth2Context` will also forward
+tokens.
+
+Here's a basic
+example showing the use of an autowired rest template created
+elsewhere ("foo.com" is a Resource Server accepting the same tokens as
+the surrounding app):
 
 .MyController.java
 [source,java]
@@ -86,6 +125,11 @@ public String relay() {
     return "Success! (" + response.getBody() + ")";
 }
 ----
+
+If you don't want to forward tokens (and that is a valid
+choice, since you might want to act as yourself, rather than the
+client that sent you the token), then you only need to create your own
+`OAuth2Context` instead of autowiring the default one. 
 
 == Configuring Authentication Downstream of a Zuul Proxy
 
