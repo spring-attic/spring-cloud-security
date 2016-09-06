@@ -654,7 +654,7 @@ class Application {
 <p>and it will (in addition to logging the user in and grabbing a token)
 pass the authentication token downstream to the <code>/proxy/*</code>
 services. If those services are implemented with
-<code>@EnableOAuth2Resource</code> then they will get a valid token in the
+<code>@EnableResourceServer</code> then they will get a valid token in the
 correct header.</p>
 </div>
 <div class="paragraph">
@@ -671,7 +671,7 @@ and puts it in a request header for the downstream requests.</p>
 <div class="sect3">
 <h4 id="_resource_server_token_relay">Resource Server Token Relay</h4>
 <div class="paragraph">
-<p>If your app has <code>@EnableOAuth2Resource</code> you might want to relay the
+<p>If your app has <code>@EnableResourceServer</code> you might want to relay the
 incoming token downstream to other services. If you use a
 <code>RestTemplate</code> to contact the downstream services then this is just a
 matter of how to create the template with the right context.</p>
@@ -780,7 +780,7 @@ ProxyAuthenticationProperties</a> for full details.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-06 13:49:40 UTC
+Last updated 2016-09-06 15:05:53 UTC
 </div>
 </div>
 </body>
