@@ -619,11 +619,25 @@ Server.</p>
 <div class="sect3">
 <h4 id="_client_token_relay">Client Token Relay</h4>
 <div class="paragraph">
-<p>If your app has a
+<p>If your app is a user facing OAuth2 client (i.e. has declared
+<code>@EnableOAuth2Sso</code> or <code>@EnableOAuth2Client</code>) then it has an
+<code>OAuth2ClientContext</code> in request scope from Spring Boot. You can
+create your own <code>OAuth2RestTemplate</code> from this context and an
+autowired <code>OAuth2ProtectedResourceDetails</code>, and then the context will
+always forward the access token downstream, also refreshing the access
+token automatically if it expires. (These are features of Spring
+Security and Spring Boot.)</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_client_token_relay_in_zuul_proxy">Client Token Relay in Zuul Proxy</h4>
+<div class="paragraph">
+<p>If your app also has a
 <a href="http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy">Spring
 Cloud Zuul</a> embedded reverse proxy (using <code>@EnableZuulProxy</code>) then you
 can ask it to forward OAuth2 access tokens downstream to the services
-it is proxying. Thus the SSO app above can be enhanced simply like this:</p>
+it is proxying. Thus the SSO app above can be enhanced simply like
+this:</p>
 </div>
 <div class="listingblock">
 <div class="title">app.groovy</div>
@@ -637,7 +651,7 @@ class Application {
 </div>
 </div>
 <div class="paragraph">
-<p>and it will (in addition to loggin the user in and grabbing a token)
+<p>and it will (in addition to logging the user in and grabbing a token)
 pass the authentication token downstream to the <code>/proxy/*</code>
 services. If those services are implemented with
 <code>@EnableOAuth2Resource</code> then they will get a valid token in the
@@ -657,16 +671,47 @@ and puts it in a request header for the downstream requests.</p>
 <div class="sect3">
 <h4 id="_resource_server_token_relay">Resource Server Token Relay</h4>
 <div class="paragraph">
-<p>If your app has <code>@EnableOAuth2Resource</code> and also is a Client (i.e. it
-has a <code>spring.oauth2.client.clientId</code>, even if it doesn&#8217;t use it),
-then the <code>OAuth2RestOperations</code> that is provided for <code>@Autowired</code>
-users by Spring Cloud (it is declared as <code>@Primary</code>) will also forward
-tokens. If you don&#8217;t want to forward tokens (and that is a valid
-choice, since you might want to act as yourself, rather than the
-client that sent you the token), then you only need to create your own
-<code>OAuth2RestOperations</code> instead of autowiring the default one. Here&#8217;s
-a basic example showing the use of the autowired rest template ("foo.com"
-is a Resource Server accepting the same tokens as the surrounding app):</p>
+<p>If your app has <code>@EnableOAuth2Resource</code> you might want to relay the
+incoming token downstream to other services. If you use a
+<code>RestTemplate</code> to contact the downstream services then this is just a
+matter of how to create the template with the right context.</p>
+</div>
+<div class="paragraph">
+<p>If your service uses <code>UserInfoTokenServices</code> to authenticate incoming
+tokens (i.e. it is using the <code>security.oauth2.user-info-uri</code>
+configuration), then you can simply create an <code>OAuth2RestTemplate</code>
+using an autowired <code>OAuth2ClientContext</code> (it will be populated by the
+authentication process before it hits the backend code). Equivalently
+(with Spring Boot 1.4), you could inject a
+<code>UserInfoRestTemplateFactory</code> and grab its <code>OAuth2RestTemplate</code> in
+your configuration. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">MyConfiguration.java</div>
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">@Bean
+public OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
+    return factory.getUserInfoRestTemplate();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This rest template will then have the same <code>OAuth2ClientContext</code>
+(request-scoped) that is used by the authentication filter, so you can
+use it to send requests with the same access token.</p>
+</div>
+<div class="paragraph">
+<p>If your app is not using <code>UserInfoTokenServices</code> but is still a client
+(i.e. it declares <code>@EnableOAuth2Client</code> or <code>@EnableOAuth2Sso</code>), then
+with Spring Security Cloud any <code>OAuth2RestOperations</code> that the user
+creates from an <code>@Autowired</code> <code>@OAuth2Context</code> will also forward
+tokens.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a basic
+example showing the use of an autowired rest template created
+elsewhere ("foo.com" is a Resource Server accepting the same tokens as
+the surrounding app):</p>
 </div>
 <div class="listingblock">
 <div class="title">MyController.java</div>
@@ -681,6 +726,12 @@ public String relay() {
     return "Success! (" + response.getBody() + ")";
 }</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t want to forward tokens (and that is a valid
+choice, since you might want to act as yourself, rather than the
+client that sent you the token), then you only need to create your own
+<code>OAuth2Context</code> instead of autowiring the default one.</p>
 </div>
 </div>
 </div>
@@ -721,7 +772,7 @@ ProxyAuthenticationProperties</a> for full details.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-06 11:29:46 UTC
+Last updated 2016-09-06 11:32:13 UTC
 </div>
 </div>
 </body>
