@@ -705,7 +705,10 @@ use it to send requests with the same access token.</p>
 (i.e. it declares <code>@EnableOAuth2Client</code> or <code>@EnableOAuth2Sso</code>), then
 with Spring Security Cloud any <code>OAuth2RestOperations</code> that the user
 creates from an <code>@Autowired</code> <code>@OAuth2Context</code> will also forward
-tokens.</p>
+tokens. This feature is implemented by default as an MVC handler
+interceptor, so it only works in Spring MVC. If you are not using MVC
+you could use a custom filter or AOP interceptor wrapping an
+<code>AccessTokenContextRelay</code> to provide the same feature.</p>
 </div>
 <div class="paragraph">
 <p>Here&#8217;s a basic
@@ -732,6 +735,11 @@ public String relay() {
 choice, since you might want to act as yourself, rather than the
 client that sent you the token), then you only need to create your own
 <code>OAuth2Context</code> instead of autowiring the default one.</p>
+</div>
+<div class="paragraph">
+<p>Feign clients will also pick up an interceptor that uses the
+<code>OAuth2ClientContext</code> if it is available, so they should also do a
+token relay anywhere where a <code>RestTemplate</code> would.</p>
 </div>
 </div>
 </div>
@@ -772,7 +780,7 @@ ProxyAuthenticationProperties</a> for full details.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-06 12:41:05 UTC
+Last updated 2016-09-06 13:34:13 UTC
 </div>
 </div>
 </body>
