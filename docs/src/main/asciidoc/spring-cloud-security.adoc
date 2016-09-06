@@ -60,7 +60,7 @@ class Application {
 and it will (in addition to logging the user in and grabbing a token)
 pass the authentication token downstream to the `/proxy/*`
 services. If those services are implemented with
-`@EnableOAuth2Resource` then they will get a valid token in the
+`@EnableResourceServer` then they will get a valid token in the
 correct header.
 
 How does it work? The `@EnableOAuth2Sso` annotation pulls in
@@ -74,7 +74,7 @@ and puts it in a request header for the downstream requests.
 
 ==== Resource Server Token Relay
 
-If your app has `@EnableOAuth2Resource` you might want to relay the
+If your app has `@EnableResourceServer` you might want to relay the
 incoming token downstream to other services. If you use a
 `RestTemplate` to contact the downstream services then this is just a
 matter of how to create the template with the right context.
