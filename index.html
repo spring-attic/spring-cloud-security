@@ -36,9 +36,10 @@ Spring Cloud Security offers a set of primitives for building secure application
 
 Spring Cloud Security features:
 
-* Single sign on for OAuth2 with a single annotation
-* Protect an application or service with OAuth2 bearer tokens with a single annotation
-* Relay SSO tokens from a front end to a back end service (e.g. with a Zuul proxy)
+* Relay SSO tokens from a front end to a back end service in a Zuul proxy
+* Relay tokens between resource servers
+* An interceptor to make a Feign client behave like `OAuth2RestTemplate` (fetching tokens etc.)
+* Configure downstream authentication in a Zuul proxy
 
 <span id="quick-start"></span>
 
@@ -46,39 +47,18 @@ Spring Cloud Security features:
 
 {% include download_widget.md %}
 
-Here's a Spring Cloud app with OAuth2 SSO:
+If your app also has a Spring Cloud Zuul embedded reverse proxy (using `@EnableZuulProxy`) then you can ask it to forward OAuth2 access tokens downstream to the services it is proxying. Thus the SSO app above can be enhanced simply like this:
 
-```groovy
-@Controller
+```
+@SpringBootApplication
 @EnableOAuth2Sso
+@EnableZuulProxy
 class Application {
-  
-  @RequestMapping('/'
-  String home() {
-    'Hello World'
-  }
 
 }
 ```
 
-This app will actually behave exactly the same as any Spring Boot app
-with basic Security, because it doesn't know it's OAuth2 credentals
-yet. Add this to your configuration and you will be able to login with
-Github (as long as you run your app on localhost:8080):
-
-```yaml
-spring:
-  oauth2:
-    client:
-      clientId: bd1c0a783ccdd1c9b9e4
-      clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
-      accessTokenUri: https://github.com/login/oauth/access_token
-      userAuthorizationUri: https://github.com/login/oauth/authorize
-      clientAuthenticationScheme: form
-    resource:
-      userInfoUri: https://api.github.com/user
-      preferTokenInfo: false
-```
+and it will (in addition to logging the user in and grabbing a token) pass the authentication token downstream to the /proxy/* services. If those services are implemented with `@EnableResourceServer` then they will get a valid token in the correct header.
 
 {% endcapture %}
 
