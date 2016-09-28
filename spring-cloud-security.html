@@ -628,6 +628,22 @@ always forward the access token downstream, also refreshing the access
 token automatically if it expires. (These are features of Spring
 Security and Spring Boot.)</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Spring Boot (1.4.1) does not create an
+<code>OAuth2ProtectedResourceDetails</code> automatically if you are using
+<code>client_credentials</code> tokens. In that case you need to create your own
+<code>ClientCredentialsResourceDetails</code> and configure it with
+<code>@ConfigurationProperties("security.oauth2.client")</code>.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_client_token_relay_in_zuul_proxy">Client Token Relay in Zuul Proxy</h4>
