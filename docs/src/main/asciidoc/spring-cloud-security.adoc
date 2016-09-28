@@ -38,6 +38,13 @@ always forward the access token downstream, also refreshing the access
 token automatically if it expires. (These are features of Spring
 Security and Spring Boot.)
 
+NOTE: Spring Boot (1.4.1) does not create an
+`OAuth2ProtectedResourceDetails` automatically if you are using
+`client_credentials` tokens. In that case you need to create your own
+`ClientCredentialsResourceDetails` and configure it with
+`@ConfigurationProperties("security.oauth2.client")`.
+
+
 ==== Client Token Relay in Zuul Proxy
 
 If your app also has a
