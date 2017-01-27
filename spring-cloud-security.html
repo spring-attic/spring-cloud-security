@@ -508,7 +508,7 @@ configuration:</p>
 <div class="listingblock">
 <div class="title">application.yml</div>
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">spring:
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">security:
   oauth2:
     client:
       clientId: bd1c0a783ccdd1c9b9e4
@@ -529,7 +529,7 @@ running on port 8080.</p>
 </div>
 <div class="paragraph">
 <p>To limit the scope that the client asks for when it obtains an access token
-you can set <code>spring.oauth2.client.scope</code> (comma separated or an array in YAML). By
+you can set <code>security.oauth2.client.scope</code> (comma separated or an array in YAML). By
 default the scope is empty and it is up to to Authorization Server to
 decide what the defaults should be, usually depending on the settings in
 the client registration that it holds.</p>
@@ -578,7 +578,7 @@ class Application {
 <div class="listingblock">
 <div class="title">application.yml</div>
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">spring:
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">security:
   oauth2:
     resource:
       userInfoUri: https://api.github.com/user
