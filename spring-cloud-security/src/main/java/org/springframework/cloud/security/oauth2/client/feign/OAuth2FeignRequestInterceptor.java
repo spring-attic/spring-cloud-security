@@ -177,4 +177,8 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 		oAuth2ClientContext.setAccessToken(obtainableAccessToken);
 		return obtainableAccessToken;
 	}
+
+	public void setAccessTokenProvider(AccessTokenProvider accessTokenProvider) {
+		this.accessTokenProvider = accessTokenProvider;
+	}
 }

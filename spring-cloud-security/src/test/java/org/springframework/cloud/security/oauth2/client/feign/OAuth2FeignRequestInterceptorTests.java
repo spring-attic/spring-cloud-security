@@ -61,4 +61,11 @@ public class OAuth2FeignRequestInterceptorTests {
 		OAuth2AccessToken oAuth2AccessToken = oAuth2FeignRequestInterceptor.getToken();
 		Assert.assertTrue(oAuth2AccessToken.getValue() + " Must be null", oAuth2AccessToken.getValue() == null);
 	}
+
+	@Test
+	public void configureAccessTokenProvider() {
+		OAuth2AccessToken mockedToken = new MockOAuth2AccessToken("MOCKED_TOKEN");
+		oAuth2FeignRequestInterceptor.setAccessTokenProvider(new MockAccessTokenProvider(mockedToken));
+		Assert.assertEquals("Should return same mocked token instance", mockedToken, oAuth2FeignRequestInterceptor.acquireAccessToken());
+	}
 }
