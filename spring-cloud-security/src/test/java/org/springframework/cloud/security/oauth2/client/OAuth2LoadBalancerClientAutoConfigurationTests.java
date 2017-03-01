@@ -17,6 +17,7 @@
 package org.springframework.cloud.security.oauth2.client;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
@@ -26,6 +27,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -56,23 +58,29 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	}
 
 	@Test
-	public void clientNotConfigured() {
-		this.context = new SpringApplicationBuilder(NoClientConfiguration.class)
+	public void userInfoNotLoadBalanced() {
+		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
-		assertFalse(this.context.containsBean("loadBalancedOauth2RestTemplate"));
+
+		assertFalse(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
+		assertFalse(this.context.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
 	}
 
 	@Test
-	public void clientConfigured() throws Exception {
+	public void userInfoLoadBalancedNoRetry() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.userInfoUri:http://example.com",
-						"security.oauth2.client.clientId=foo")
+						"security.oauth2.resource.userInfoUri:http://nosuchservice",
+						"security.oauth2.resource.loadBalanced=true")
 				.run();
+
+		assertTrue(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
+		assertFalse(this.context.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
+
 		OAuth2RestTemplate template = this.context
-				.getBean("loadBalancedOauth2RestTemplate", OAuth2RestTemplate.class);
+				.getBean(UserInfoRestTemplateFactory.class).getUserInfoRestTemplate();
 		ClientHttpRequest request = template.getRequestFactory()
 				.createRequest(new URI("http://nosuchservice"), HttpMethod.GET);
 		expected.expectMessage("No instances available for nosuchservice");
@@ -81,21 +89,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 
 	@EnableAutoConfiguration
 	@Configuration
-	protected static class NoClientConfiguration {
-	}
-
-	@EnableAutoConfiguration
-	@Configuration
 	@EnableOAuth2Sso
 	protected static class ClientConfiguration {
-
-		@LoadBalanced
-		@Bean
-		public OAuth2RestTemplate loadBalancedOauth2RestTemplate(
-				OAuth2ProtectedResourceDetails resource,
-				OAuth2ClientContext oauth2Context) {
-			return new OAuth2RestTemplate(resource, oauth2Context);
-		}
-
 	}
 }
