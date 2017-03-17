@@ -20,12 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -97,15 +99,38 @@ public class OAuth2TokenRelayFilterTests {
 		AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
 		resource.setClientId("client");
 		Mockito.when(restTemplate.getResource()).thenReturn(resource);
-		Mockito.when(restTemplate.getAccessToken()).thenReturn(new DefaultOAuth2AccessToken("BAR"));
+		Mockito.when(restTemplate.getAccessToken())
+				.thenReturn(new DefaultOAuth2AccessToken("BAR"));
 		filter.setRestTemplate(restTemplate);
 		assertNotNull(RequestContext.getCurrentContext());
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		assertTrue(filter.shouldFilter());
 		assertEquals("FOO", RequestContext.getCurrentContext().get("ACCESS_TOKEN"));
 		filter.run();
-		assertEquals("bearer BAR", RequestContext.getCurrentContext().getZuulRequestHeaders()
-				.get("authorization"));
+		assertEquals("bearer BAR", RequestContext.getCurrentContext()
+				.getZuulRequestHeaders().get("authorization"));
+	}
+
+	@Test
+	public void unauthorizedWithRestTemplate() {
+		OAuth2RestOperations restTemplate = Mockito.mock(OAuth2RestOperations.class);
+		AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
+		resource.setClientId("client");
+		Mockito.when(restTemplate.getResource()).thenReturn(resource);
+		Mockito.when(restTemplate.getAccessToken()).thenThrow(new RuntimeException());
+		filter.setRestTemplate(restTemplate);
+		assertNotNull(RequestContext.getCurrentContext());
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		assertTrue(filter.shouldFilter());
+		try {
+			filter.run();
+			fail("Expected BadCredentialsException");
+		}
+		catch (BadCredentialsException e) {
+			assertEquals(401,
+					RequestContext.getCurrentContext().get("error.status_code"));
+
+		}
 	}
 
 }

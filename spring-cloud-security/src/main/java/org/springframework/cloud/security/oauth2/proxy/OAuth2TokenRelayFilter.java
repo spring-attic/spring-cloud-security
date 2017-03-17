@@ -3,6 +3,8 @@ package org.springframework.cloud.security.oauth2.proxy;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProperties.Route;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -93,6 +95,7 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
 					// Quite possibly a UserRedirectRequiredException, but the caller
 					// probably doesn't know how to handle it, otherwise they wouldn't be
 					// using this filter, so we rethrow as an authentication exception
+					ctx.set("error.status_code", HttpServletResponse.SC_UNAUTHORIZED);
 					throw new BadCredentialsException("Cannot obtain valid access token");
 				}
 			}
