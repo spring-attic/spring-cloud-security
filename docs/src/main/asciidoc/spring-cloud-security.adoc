@@ -171,3 +171,95 @@ relay if there is a token available, and passthru otherwise.
 See
 {githubmaster}/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties[
 ProxyAuthenticationProperties] for full details.
+
+
+=== Configuring Access Level of Downstream Endpoints on Zuul Proxy
+To increase performance, you can choose to implement a configuration security mechanism for making less network hops,
+a mechanism implemented on Zuul where you can configure which route needs private, public or partial authentication. +
+Every route in Zuul to a downstream service will have security configured based on how secure the endpoints has to be.
+
+.Secure Access Level Configuration
+|===
+| Property name |Description |Possible values |Default value
+
+| secure-access-level.routes.<route>.access
+
+| Extra security mechanism to secure the endpoints in a downstream service on Zuul level
+
+| private, partial-exposed, partial-private and public
+
+| public
+
+|===
+
+
+[NOTE]
+====
+The configuration only works if the route and path name are the same.
+====
+
+
+[source, yaml]
+.application.yml
+----
+secure-access-level:
+  routes:
+    stores:
+      access: public
+    machine:
+      access: partial-exposed
+    book:
+      access: partial-private
+    reservation:
+      access: private
+----
+
+==== Public secure access level route
+When your route is at public security level, the in- and out coming requests are exposed and won't need full authentication. +
+The secure access level is by default public, when you add a service route, all the endpoints will be exposed.
+
+==== Full secure access level route
+When your route is at full security level, the in- and out coming requests need full authentication of the client.
+The gateway will use a filter to check if there is an authorization header.
+If there is none, the gateway will block the request and returns a 403 forbidden.
+
+==== Partial exposed secure access level route
+When your route is at partial-expose level,
+all endpoints you configure in your yml will be public and won't need full authentication.
+The endpoints you don't configure are private and will need full authentication.
+
+[source, yaml]
+.application.yml
+----
+partial-exposed: # <1>
+    paths:
+        machine: # <2>
+            - /machine/api # <3>
+            - /machine/example
+        booking:
+            - /booking/api
+----
+
+<1> The secure access level you want to configure
+<2> The route you want to configure (only works if the route has secure-access-level: partial-exposed!)
+<3> List of endpoints in your route downstream that you want to expose
+
+==== Partial private secure access level route
+When your route is at partial-private level,
+all endpoints you configure in your yml will be private and will need full authentication.
+The endpoint you don't configure will be public and won't need full authentication
+
+[source, yaml]
+.application.yml
+----
+partial-private: # <1>
+    paths:
+        book: # <2>
+            - /book/api # <3>
+            - /book/example
+----
+
+<1> The secure access level you want to configure
+<2> The route you want to configure (only works if the route has secure-access-level: partial-private!)
+<3> List of endpoints in your route downstream that you want to privatise and need full authentication
+

@@ -3,6 +3,29 @@ proxy:
     routes:
       foo: oauth2
       bar: none
+      stores: none
+secure-access-level:
+  routes:
+    stores:
+      access: public
+    machine:
+      access: partial-exposed
+    machine-without-config:
+      access: partial-exposed
+    book:
+      access: partial-private
+    book-without-config:
+      access: partial-private
+    reservation:
+      access: private
+partial-exposed:
+  paths:
+    machine:
+      - /machine/api
+partial-private:
+  paths:
+    book:
+        - /book/api
 security:
   oauth2:
     client:
