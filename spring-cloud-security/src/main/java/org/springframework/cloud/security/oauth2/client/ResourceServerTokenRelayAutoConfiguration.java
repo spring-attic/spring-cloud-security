@@ -25,6 +25,8 @@ import java.lang.annotation.Target;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -40,6 +42,8 @@ import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.config.annotation.web.configuration.OAuth2ClientConfiguration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfiguration;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
@@ -65,18 +69,35 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 @ConditionalOnWebApplication
 public class ResourceServerTokenRelayAutoConfiguration {
 
+	protected static final String TOKEN_RELAY_REQUEST_INTERCEPTOR = "tokenRelayRequestInterceptor";
+
 	@Bean
+	@Qualifier(TOKEN_RELAY_REQUEST_INTERCEPTOR)
 	public HandlerInterceptor tokenRelayRequestInterceptor(
 			final OAuth2ClientContext context) {
 		final AccessTokenContextRelay relay = new AccessTokenContextRelay(context);
 		return new HandlerInterceptorAdapter() {
 			@Override
 			public boolean preHandle(HttpServletRequest request,
-					HttpServletResponse response, Object handler) throws Exception {
+									 HttpServletResponse response, Object handler) throws Exception {
 				relay.copyToken();
 				return true;
 			}
 		};
+	}
+
+	@Configuration
+	public static class ResourceServerTokenRelayRegistrationAutoConfiguration extends WebMvcConfigurerAdapter {
+
+		@Autowired
+		@Qualifier(TOKEN_RELAY_REQUEST_INTERCEPTOR)
+		HandlerInterceptor tokenRelayRequestInterceptor;
+
+		@Override
+		public void addInterceptors(InterceptorRegistry registry) {
+			registry.addInterceptor(tokenRelayRequestInterceptor);
+		}
+
 	}
 
 	@Target({ ElementType.TYPE, ElementType.METHOD })
