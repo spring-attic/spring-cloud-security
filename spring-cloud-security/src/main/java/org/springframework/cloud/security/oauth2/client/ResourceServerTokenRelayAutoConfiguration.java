@@ -69,10 +69,9 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 @ConditionalOnWebApplication
 public class ResourceServerTokenRelayAutoConfiguration {
 
-	protected static final String TOKEN_RELAY_REQUEST_INTERCEPTOR = "tokenRelayRequestInterceptor";
+	protected static final String TOKEN_RELAY_REQUEST_INTERCEPTOR = "tokenRelayRequestInterceptors";
 
-	@Bean
-	@Qualifier(TOKEN_RELAY_REQUEST_INTERCEPTOR)
+	@Bean(name = TOKEN_RELAY_REQUEST_INTERCEPTOR)
 	public HandlerInterceptor tokenRelayRequestInterceptor(
 			final OAuth2ClientContext context) {
 		final AccessTokenContextRelay relay = new AccessTokenContextRelay(context);
