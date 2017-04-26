@@ -67,24 +67,35 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 @ConditionalOnOAuth2ClientInResourceServer
 @ConditionalOnClass(ResourceServerConfiguration.class)
 @ConditionalOnWebApplication
-public class ResourceServerTokenRelayAutoConfiguration extends WebMvcConfigurerAdapter {
+public class ResourceServerTokenRelayAutoConfiguration {
 
-	@Autowired
-	private OAuth2ClientContext context;
+	protected static final String TOKEN_RELAY_REQUEST_INTERCEPTOR = "tokenRelayRequestInterceptor";
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-
+	@Bean(name = TOKEN_RELAY_REQUEST_INTERCEPTOR)
+	public HandlerInterceptor tokenRelayRequestInterceptor(
+			final OAuth2ClientContext context) {
 		final AccessTokenContextRelay relay = new AccessTokenContextRelay(context);
-
-		registry.addInterceptor(new HandlerInterceptorAdapter() {
+		return new HandlerInterceptorAdapter() {
 			@Override
 			public boolean preHandle(HttpServletRequest request,
 									 HttpServletResponse response, Object handler) throws Exception {
 				relay.copyToken();
 				return true;
 			}
-		});
+		};
+	}
+
+	@Configuration
+	public static class ResourceServerTokenRelayRegistrationAutoConfiguration extends WebMvcConfigurerAdapter {
+
+		@Autowired
+		@Qualifier(TOKEN_RELAY_REQUEST_INTERCEPTOR)
+		HandlerInterceptor tokenRelayRequestInterceptor;
+
+		@Override
+		public void addInterceptors(InterceptorRegistry registry) {
+			registry.addInterceptor(tokenRelayRequestInterceptor);
+		}
 
 	}
 
