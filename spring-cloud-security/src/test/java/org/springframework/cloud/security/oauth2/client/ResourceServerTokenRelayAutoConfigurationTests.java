@@ -90,18 +90,6 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 		server.verify();
 	}
 
-	@Test
-	public void noUserInfo() throws Exception {
-		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
-				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.tokenInfoUri:http://example.com",
-						"security.oauth2.client.clientId=foo")
-				.run();
-		HandlerInterceptor interceptor = this.context
-				.getBean("tokenRelayRequestInterceptor", HandlerInterceptor.class);
-		assertNotNull(interceptor);
-	}
-
 	@EnableAutoConfiguration
 	@Configuration
 	@EnableResourceServer
