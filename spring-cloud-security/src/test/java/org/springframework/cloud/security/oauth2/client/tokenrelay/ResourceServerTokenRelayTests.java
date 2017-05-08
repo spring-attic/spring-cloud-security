@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.cloud.security.oauth2.client.AccessTokenContextRelay;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.*;
@@ -66,8 +67,8 @@ public class ResourceServerTokenRelayTests {
 	@Autowired
 	private MockRestServiceServer mockServerToReceiveRelay;
 
-	@SpyBean(name = "tokenRelayRequestInterceptor")
-	HandlerInterceptor tokenRelayRequestInterceptor;
+	@SpyBean
+	AccessTokenContextRelay accessTokenContextRelay;
 
 	@Test
 	public void tokenRelayJWT() throws Exception {
@@ -84,7 +85,7 @@ public class ResourceServerTokenRelayTests {
 		assertEquals(TEST_RESPONSE, exchange.getBody());
 
 		mockServerToReceiveRelay.verify();
-		verify(tokenRelayRequestInterceptor).preHandle(any(HttpServletRequest.class), any(HttpServletResponse.class), any(Object.class));
+		verify(accessTokenContextRelay).copyToken(any(OAuth2ClientContext.class));
 	}
 
 	private HttpEntity<String> createAuthorizationHeader() {
