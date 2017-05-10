@@ -21,10 +21,6 @@ import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -37,12 +33,8 @@ public class ProxyAuthenticationProperties {
 	/**
 	 * Authentication strategy per route. 
 	 */
-	@Getter
-	@Setter
 	private Map<String, Route> routes = new HashMap<String, Route>();
 	
-	@Getter
-	@Setter
 	private boolean loadBalanced;
 
 	@PostConstruct
@@ -54,7 +46,18 @@ public class ProxyAuthenticationProperties {
 		}
 	}
 
-	@Data
+	public Map<String, Route> getRoutes() {
+		return routes;
+	}
+
+	public boolean isLoadBalanced() {
+		return loadBalanced;
+	}
+
+	public void setLoadBalanced(boolean loadBalanced) {
+		this.loadBalanced = loadBalanced;
+	}
+
 	public static class Route {
 		/**
 		 * The id of the route (e.g. discovery virtual hostname).
@@ -66,6 +69,22 @@ public class ProxyAuthenticationProperties {
 		private String scheme;
 
 		public Route(String scheme) {
+			this.scheme = scheme;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public void setId(String id) {
+			this.id = id;
+		}
+
+		public String getScheme() {
+			return scheme;
+		}
+
+		public void setScheme(String scheme) {
 			this.scheme = scheme;
 		}
 
