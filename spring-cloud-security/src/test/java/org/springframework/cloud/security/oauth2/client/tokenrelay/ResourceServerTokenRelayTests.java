@@ -18,9 +18,11 @@ package org.springframework.cloud.security.oauth2.client.tokenrelay;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -28,7 +30,12 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.security.oauth2.client.AccessTokenContextRelay;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
@@ -38,13 +45,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.HandlerInterceptor;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
-import static org.springframework.boot.test.context.SpringBootTest.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -85,7 +88,7 @@ public class ResourceServerTokenRelayTests {
 		assertEquals(TEST_RESPONSE, exchange.getBody());
 
 		mockServerToReceiveRelay.verify();
-		verify(accessTokenContextRelay).copyToken(any(OAuth2ClientContext.class));
+		verify(accessTokenContextRelay).copyToken();
 	}
 
 	private HttpEntity<String> createAuthorizationHeader() {

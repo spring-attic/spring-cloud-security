@@ -38,12 +38,18 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
  */
 public class AccessTokenContextRelay {
 
+	private OAuth2ClientContext context;
+
+	public AccessTokenContextRelay(OAuth2ClientContext context) {
+		this.context = context;
+	}
+
 	/**
 	 * Attempt to copy an access token from the security context into the oauth2 context.
 	 * 
 	 * @return true if the token was copied
 	 */
-	public boolean copyToken(OAuth2ClientContext context) {
+	public boolean copyToken() {
 		if (context.getAccessToken() == null) {
 			Authentication authentication = SecurityContextHolder.getContext()
 					.getAuthentication();
