@@ -461,7 +461,7 @@ authentication and a single user account:</p>
 <div class="listingblock">
 <div class="title">app.groovy</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Grab('spring-boot-starter-security')
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Grab('spring-boot-starter-security')
 @Controller
 class Application {
 
@@ -482,7 +482,7 @@ class Application {
 <div class="listingblock">
 <div class="title">app.groovy</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Controller
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Controller
 @EnableOAuth2Sso
 class Application {
 
@@ -508,7 +508,7 @@ configuration:</p>
 <div class="listingblock">
 <div class="title">application.yml</div>
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">security:
+<pre class="prettyprint highlight"><code class="language-yaml" data-lang="yaml">security:
   oauth2:
     client:
       clientId: bd1c0a783ccdd1c9b9e4
@@ -559,7 +559,7 @@ simple example (paired with the client above):</p>
 <div class="listingblock">
 <div class="title">app.groovy</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Grab('spring-cloud-starter-security')
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Grab('spring-cloud-starter-security')
 @RestController
 @EnableResourceServer
 class Application {
@@ -578,7 +578,7 @@ class Application {
 <div class="listingblock">
 <div class="title">application.yml</div>
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">security:
+<pre class="prettyprint highlight"><code class="language-yaml" data-lang="yaml">security:
   oauth2:
     resource:
       userInfoUri: https://api.github.com/user
@@ -658,7 +658,7 @@ this:</p>
 <div class="listingblock">
 <div class="title">app.groovy</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Controller
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Controller
 @EnableOAuth2Sso
 @EnableZuulProxy
 class Application {
@@ -705,7 +705,7 @@ your configuration. For example:</p>
 <div class="listingblock">
 <div class="title">MyConfiguration.java</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Bean
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Bean
 public OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
     return factory.getUserInfoRestTemplate();
 }</code></pre>
@@ -735,7 +735,7 @@ the surrounding app):</p>
 <div class="listingblock">
 <div class="title">MyController.java</div>
 <div class="content">
-<pre class="highlight"><code class="language-java" data-lang="java">@Autowired
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Autowired
 private OAuth2RestOperations restTemplate;
 
 @RequestMapping("/relay")
@@ -771,7 +771,7 @@ token relay anywhere where a <code>RestTemplate</code> would.</p>
 <div class="listingblock">
 <div class="title">application.yml</div>
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">proxy:
+<pre class="prettyprint highlight"><code class="language-yaml" data-lang="yaml">proxy:
   auth:
     routes:
       customers: oauth2
@@ -794,5 +794,8 @@ ProxyAuthenticationProperties</a> for full details.</p>
 </div>
 </div>
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>prettyPrint()</script>
 </body>
 </html>
