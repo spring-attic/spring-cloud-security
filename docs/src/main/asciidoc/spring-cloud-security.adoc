@@ -80,6 +80,9 @@ classpath (via `@EnableZuulProxy`). The
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.
 
+NOTE: Spring Boot does not create an `OAuth2RestOperations` automatically which is needed for `refresh_token`. In that case you need to create your own
+`OAuth2RestOperations` so `OAuth2TokenRelayFilter` can refresh the token if needed.
+
 ==== Resource Server Token Relay
 
 If your app has `@EnableResourceServer` you might want to relay the
