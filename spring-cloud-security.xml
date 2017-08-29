@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title>Spring Cloud Security</title>
+<date>2017-08-29</date>
+</info>
+<preface>
+<title></title>
+<simpara>Spring Cloud Security offers a set of primitives for building secure
+applications and services with minimum fuss. A declarative model which
+can be heavily configured externally (or centrally) lends itself to
+the implementation of large systems of co-operating, remote components,
+usually with a central indentity management service. It is also extremely
+easy to use in a service platform like Cloud Foundry. Building on
+Spring Boot and Spring Security OAuth2 we can quickly create systems that
+implement common patterns like single sign on, token relay and token
+exchange.</simpara>
+<note>
+<simpara>Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <link xl:href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/asciidoc">github</link>.</simpara>
+</note>
+</preface>
+<chapter xml:id="_quickstart">
+<title>Quickstart</title>
+<section xml:id="_oauth2_single_sign_on">
+<title>OAuth2 Single Sign On</title>
+<simpara>Here&#8217;s a Spring Cloud "Hello World" app with HTTP Basic
+authentication and a single user account:</simpara>
+<formalpara>
+<title>app.groovy</title>
+<para>
+<programlisting language="java" linenumbering="unnumbered">@Grab('spring-boot-starter-security')
+@Controller
+class Application {
+
+  @RequestMapping('/')
+  String home() {
+    'Hello World'
+  }
+
+}</programlisting>
+</para>
+</formalpara>
+<simpara>You can run it with <literal>spring run app.groovy</literal> and watch the logs for the password (username is "user"). So far this is just the default for a Spring Boot app.</simpara>
+<simpara>Here&#8217;s a Spring Cloud app with OAuth2 SSO:</simpara>
+<formalpara>
+<title>app.groovy</title>
+<para>
+<programlisting language="java" linenumbering="unnumbered">@Controller
+@EnableOAuth2Sso
+class Application {
+
+  @RequestMapping('/')
+  String home() {
+    'Hello World'
+  }
+
+}</programlisting>
+</para>
+</formalpara>
+<simpara>Spot the difference? This app will actually behave exactly the same as
+the previous one, because it doesn&#8217;t know it&#8217;s OAuth2 credentals
+yet.</simpara>
+<simpara>You can register an app in github quite easily, so try that if you
+want a production app on your own domain. If you are happy to test on
+localhost:8080, then set up these properties in your application
+configuration:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<programlisting language="yaml" linenumbering="unnumbered">security:
+  oauth2:
+    client:
+      clientId: bd1c0a783ccdd1c9b9e4
+      clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user
+      preferTokenInfo: false</programlisting>
+</para>
+</formalpara>
+<simpara>run the app above and it will redirect to github for authorization. If
+you are already signed into github you won&#8217;t even notice that it has
+authenticated.  These credentials will only work if your app is
+running on port 8080.</simpara>
+<simpara>To limit the scope that the client asks for when it obtains an access token
+you can set <literal>security.oauth2.client.scope</literal> (comma separated or an array in YAML). By
+default the scope is empty and it is up to to Authorization Server to
+decide what the defaults should be, usually depending on the settings in
+the client registration that it holds.</simpara>
+<note>
+<simpara>The examples above are all Groovy scripts. If you want to write the
+same code in Java (or Groovy) you need to add Spring Security OAuth2
+to the classpath (e.g. see the
+<link xl:href="https://github.com/spring-cloud-samples/sso">sample here</link>).</simpara>
+</note>
+</section>
+<section xml:id="_oauth2_protected_resource">
+<title>OAuth2 Protected Resource</title>
+<simpara>You want to protect an API resource with an OAuth2 token? Here&#8217;s a
+simple example (paired with the client above):</simpara>
+<formalpara>
+<title>app.groovy</title>
+<para>
+<programlisting language="java" linenumbering="unnumbered">@Grab('spring-cloud-starter-security')
+@RestController
+@EnableResourceServer
+class Application {
+
+  @RequestMapping('/')
+  def home() {
+    [message: 'Hello World']
+  }
+
+}</programlisting>
+</para>
+</formalpara>
+<simpara>and</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<programlisting language="yaml" linenumbering="unnumbered">security:
+  oauth2:
+    resource:
+      userInfoUri: https://api.github.com/user
+      preferTokenInfo: false</programlisting>
+</para>
+</formalpara>
+</section>
+</chapter>
+<chapter xml:id="_more_detail">
+<title>More Detail</title>
+<section xml:id="_single_sign_on">
+<title>Single Sign On</title>
+<note>
+<simpara>All of the OAuth2 SSO and resource server features moved to Spring Boot
+in version 1.3. You can find documentation in the
+<link xl:href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/">Spring Boot user guide</link>.</simpara>
+</note>
+</section>
+<section xml:id="_token_relay">
+<title>Token Relay</title>
+<simpara>A Token Relay is where an OAuth2 consumer acts as a Client and
+forwards the incoming token to outgoing resource requests. The
+consumer can be a pure Client (like an SSO application) or a Resource
+Server.</simpara>
+<section xml:id="_client_token_relay">
+<title>Client Token Relay</title>
+<simpara>If your app is a user facing OAuth2 client (i.e. has declared
+<literal>@EnableOAuth2Sso</literal> or <literal>@EnableOAuth2Client</literal>) then it has an
+<literal>OAuth2ClientContext</literal> in request scope from Spring Boot. You can
+create your own <literal>OAuth2RestTemplate</literal> from this context and an
+autowired <literal>OAuth2ProtectedResourceDetails</literal>, and then the context will
+always forward the access token downstream, also refreshing the access
+token automatically if it expires. (These are features of Spring
+Security and Spring Boot.)</simpara>
+<note>
+<simpara>Spring Boot (1.4.1) does not create an
+<literal>OAuth2ProtectedResourceDetails</literal> automatically if you are using
+<literal>client_credentials</literal> tokens. In that case you need to create your own
+<literal>ClientCredentialsResourceDetails</literal> and configure it with
+<literal>@ConfigurationProperties("security.oauth2.client")</literal>.</simpara>
+</note>
+</section>
+<section xml:id="_client_token_relay_in_zuul_proxy">
+<title>Client Token Relay in Zuul Proxy</title>
+<simpara>If your app also has a
+<link xl:href="http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy">Spring
+Cloud Zuul</link> embedded reverse proxy (using <literal>@EnableZuulProxy</literal>) then you
+can ask it to forward OAuth2 access tokens downstream to the services
+it is proxying. Thus the SSO app above can be enhanced simply like
+this:</simpara>
+<formalpara>
+<title>app.groovy</title>
+<para>
+<programlisting language="java" linenumbering="unnumbered">@Controller
+@EnableOAuth2Sso
+@EnableZuulProxy
+class Application {
+
+}</programlisting>
+</para>
+</formalpara>
+<simpara>and it will (in addition to logging the user in and grabbing a token)
+pass the authentication token downstream to the <literal>/proxy/*</literal>
+services. If those services are implemented with
+<literal>@EnableResourceServer</literal> then they will get a valid token in the
+correct header.</simpara>
+<simpara>How does it work? The <literal>@EnableOAuth2Sso</literal> annotation pulls in
+<literal>spring-cloud-starter-security</literal> (which you could do manually in a
+traditional app), and that in turn triggers some autoconfiguration for
+a <literal>ZuulFilter</literal>, which itself is activated because Zuul is on the
+classpath (via <literal>@EnableZuulProxy</literal>). The
+<link xl:href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java">filter</link>
+just extracts an access token from the currently authenticated user,
+and puts it in a request header for the downstream requests.</simpara>
+</section>
+<section xml:id="_resource_server_token_relay">
+<title>Resource Server Token Relay</title>
+<simpara>If your app has <literal>@EnableResourceServer</literal> you might want to relay the
+incoming token downstream to other services. If you use a
+<literal>RestTemplate</literal> to contact the downstream services then this is just a
+matter of how to create the template with the right context.</simpara>
+<simpara>If your service uses <literal>UserInfoTokenServices</literal> to authenticate incoming
+tokens (i.e. it is using the <literal>security.oauth2.user-info-uri</literal>
+configuration), then you can simply create an <literal>OAuth2RestTemplate</literal>
+using an autowired <literal>OAuth2ClientContext</literal> (it will be populated by the
+authentication process before it hits the backend code). Equivalently
+(with Spring Boot 1.4), you could inject a
+<literal>UserInfoRestTemplateFactory</literal> and grab its <literal>OAuth2RestTemplate</literal> in
+your configuration. For example:</simpara>
+<formalpara>
+<title>MyConfiguration.java</title>
+<para>
+<programlisting language="java" linenumbering="unnumbered">@Bean
+public OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
+    return factory.getUserInfoRestTemplate();
+}</programlisting>
+</para>
+</formalpara>
+<simpara>This rest template will then have the same <literal>OAuth2ClientContext</literal>
+(request-scoped) that is used by the authentication filter, so you can
+use it to send requests with the same access token.</simpara>
+<simpara>If your app is not using <literal>UserInfoTokenServices</literal> but is still a client
+(i.e. it declares <literal>@EnableOAuth2Client</literal> or <literal>@EnableOAuth2Sso</literal>), then
+with Spring Security Cloud any <literal>OAuth2RestOperations</literal> that the user
+creates from an <literal>@Autowired</literal> <literal>@OAuth2Context</literal> will also forward
+tokens. This feature is implemented by default as an MVC handler
+interceptor, so it only works in Spring MVC. If you are not using MVC
+you could use a custom filter or AOP interceptor wrapping an
+<literal>AccessTokenContextRelay</literal> to provide the same feature.</simpara>
+<simpara>Here&#8217;s a basic
+example showing the use of an autowired rest template created
+elsewhere ("foo.com" is a Resource Server accepting the same tokens as
+the surrounding app):</simpara>
+<formalpara>
+<title>MyController.java</title>
+<para>
+<programlisting language="java" linenumbering="unnumbered">@Autowired
+private OAuth2RestOperations restTemplate;
+
+@RequestMapping("/relay")
+public String relay() {
+    ResponseEntity&lt;String&gt; response =
+      restTemplate.getForEntity("https://foo.com/bar", String.class);
+    return "Success! (" + response.getBody() + ")";
+}</programlisting>
+</para>
+</formalpara>
+<simpara>If you don&#8217;t want to forward tokens (and that is a valid
+choice, since you might want to act as yourself, rather than the
+client that sent you the token), then you only need to create your own
+<literal>OAuth2Context</literal> instead of autowiring the default one.</simpara>
+<simpara>Feign clients will also pick up an interceptor that uses the
+<literal>OAuth2ClientContext</literal> if it is available, so they should also do a
+token relay anywhere where a <literal>RestTemplate</literal> would.</simpara>
+</section>
+</section>
+</chapter>
+<chapter xml:id="_configuring_authentication_downstream_of_a_zuul_proxy">
+<title>Configuring Authentication Downstream of a Zuul Proxy</title>
+<simpara>You can control the authorization behaviour downstream of an
+<literal>@EnableZuulProxy</literal> through the <literal>proxy.auth.*</literal> settings. Example:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<programlisting language="yaml" linenumbering="unnumbered">proxy:
+  auth:
+    routes:
+      customers: oauth2
+      stores: passthru
+      recommendations: none</programlisting>
+</para>
+</formalpara>
+<simpara>In this example the "customers" service gets an OAuth2 token relay,
+the "stores" service gets a passthrough (the authorization header is
+just passed downstream), and the "recommendations" service has its
+authorization header removed. The default behaviour is to do a token
+relay if there is a token available, and passthru otherwise.</simpara>
+<simpara>See
+<link xl:href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties">
+ProxyAuthenticationProperties</link> for full details.</simpara>
+</chapter>
+</book>
