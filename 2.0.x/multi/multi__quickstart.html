@@ -1,0 +1,72 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>1.&nbsp;Quickstart</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.78.1"><link rel="home" href="multi_spring-cloud-security.html" title="Spring Cloud Security"><link rel="up" href="multi_spring-cloud-security.html" title="Spring Cloud Security"><link rel="prev" href="multi_pr01.html" title=""><link rel="next" href="multi__more_detail.html" title="2.&nbsp;More Detail"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.&nbsp;Quickstart</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="multi_pr01.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;<a accesskey="n" href="multi__more_detail.html">Next</a></td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="_quickstart" href="#_quickstart"></a>1.&nbsp;Quickstart</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_oauth2_single_sign_on" href="#_oauth2_single_sign_on"></a>1.1&nbsp;OAuth2 Single Sign On</h2></div></div></div><p>Here&#8217;s a Spring Cloud "Hello World" app with HTTP Basic
+authentication and a single user account:</p><p><b>app.groovy.&nbsp;</b>
+</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Grab('spring-boot-starter-security')</span></em>
+<em><span class="hl-annotation" style="color: gray">@Controller</span></em>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
+
+  <em><span class="hl-annotation" style="color: gray">@RequestMapping('/')</span></em>
+  String home() {
+    <span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">'Hello World'</span>
+  }
+
+}</pre><p>
+</p><p>You can run it with <code class="literal">spring run app.groovy</code> and watch the logs for the password (username is "user"). So far this is just the default for a Spring Boot app.</p><p>Here&#8217;s a Spring Cloud app with OAuth2 SSO:</p><p><b>app.groovy.&nbsp;</b>
+</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Controller</span></em>
+<em><span class="hl-annotation" style="color: gray">@EnableOAuth2Sso</span></em>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
+
+  <em><span class="hl-annotation" style="color: gray">@RequestMapping('/')</span></em>
+  String home() {
+    <span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">'Hello World'</span>
+  }
+
+}</pre><p>
+</p><p>Spot the difference? This app will actually behave exactly the same as
+the previous one, because it doesn&#8217;t know it&#8217;s OAuth2 credentals
+yet.</p><p>You can register an app in github quite easily, so try that if you
+want a production app on your own domain. If you are happy to test on
+localhost:8080, then set up these properties in your application
+configuration:</p><p><b>application.yml.&nbsp;</b>
+</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">security</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">  oauth2</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    client</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientId</span>: bd1c0a783ccdd1c9b9e4
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientSecret</span>: <span class="hl-number">1</span>a9030fbca47a5b2c28e92f19050bb77824b5ad1
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      accessTokenUri</span>: https://github.com/login/oauth/access_token
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      userAuthorizationUri</span>: https://github.com/login/oauth/authorize
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientAuthenticationScheme</span>: form
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    resource</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      userInfoUri</span>: https://api.github.com/user
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      preferTokenInfo</span>: <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">false</span></pre><p>
+</p><p>run the app above and it will redirect to github for authorization. If
+you are already signed into github you won&#8217;t even notice that it has
+authenticated.  These credentials will only work if your app is
+running on port 8080.</p><p>To limit the scope that the client asks for when it obtains an access token
+you can set <code class="literal">security.oauth2.client.scope</code> (comma separated or an array in YAML). By
+default the scope is empty and it is up to to Authorization Server to
+decide what the defaults should be, usually depending on the settings in
+the client registration that it holds.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>The examples above are all Groovy scripts. If you want to write the
+same code in Java (or Groovy) you need to add Spring Security OAuth2
+to the classpath (e.g. see the
+<a class="link" href="https://github.com/spring-cloud-samples/sso" target="_top">sample here</a>).</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_oauth2_protected_resource" href="#_oauth2_protected_resource"></a>1.2&nbsp;OAuth2 Protected Resource</h2></div></div></div><p>You want to protect an API resource with an OAuth2 token? Here&#8217;s a
+simple example (paired with the client above):</p><p><b>app.groovy.&nbsp;</b>
+</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Grab('spring-cloud-starter-security')</span></em>
+<em><span class="hl-annotation" style="color: gray">@RestController</span></em>
+<em><span class="hl-annotation" style="color: gray">@EnableResourceServer</span></em>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
+
+  <em><span class="hl-annotation" style="color: gray">@RequestMapping('/')</span></em>
+  def home() {
+    [message: <span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">'Hello World'</span>]
+  }
+
+}</pre><p>
+</p><p>and</p><p><b>application.yml.&nbsp;</b>
+</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">security</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">  oauth2</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    resource</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      userInfoUri</span>: https://api.github.com/user
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      preferTokenInfo</span>: <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">false</span></pre><p>
+</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="multi_pr01.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;<a accesskey="n" href="multi__more_detail.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="multi_spring-cloud-security.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;2.&nbsp;More Detail</td></tr></table></div></body></html>
