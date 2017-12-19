@@ -37,7 +37,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-zuul</artifactId>
+			<artifactId>spring-cloud-starter-netflix-zuul</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -50,7 +50,7 @@
 			<artifactId>feign-core</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
 			<optional>true</optional>
@@ -60,15 +60,14 @@
 					<artifactId>spring-core</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency>-->
 		<dependency>
-			<groupId>com.netflix.zuul</groupId>
-			<artifactId>zuul-core</artifactId>
-			<optional>true</optional>
+			<groupId>org.springframework.security.oauth.boot</groupId>
+			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-ribbon</artifactId>
+			<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -76,11 +75,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-jwt</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 	</dependencies>
 
 </project>
