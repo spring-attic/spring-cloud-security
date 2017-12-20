@@ -41,7 +41,7 @@ import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.config.annotation.web.configuration.OAuth2ClientConfiguration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfiguration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
@@ -73,7 +73,7 @@ public class ResourceServerTokenRelayAutoConfiguration {
 	}
 	
 	@Configuration
-	public static class ResourceServerTokenRelayRegistrationAutoConfiguration extends WebMvcConfigurerAdapter {
+	public static class ResourceServerTokenRelayRegistrationAutoConfiguration implements WebMvcConfigurer {
 
 		@Autowired
 		AccessTokenContextRelay accessTokenContextRelay;
