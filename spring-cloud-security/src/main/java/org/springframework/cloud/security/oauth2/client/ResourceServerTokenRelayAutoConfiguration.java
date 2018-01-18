@@ -49,12 +49,12 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * <code>OAuth2RestTemplate</code>. An MVC interceptor is used so as to have a minimal
  * impact on the call stack. If you are not using MVC you could use a custom filter or AOP
  * interceptor wrapping the same call to an {@link AccessTokenContextRelay}.
- * 
- * <br/>
- * 
+ *
+ * <p>
  * N.B. an app that is using {@link UserInfoTokenServices} generally doesn't need this
  * interceptor, but it doesn't hurt to include it.
- * 
+ * </p>
+ *
  * @author Dave Syer
  *
  */
