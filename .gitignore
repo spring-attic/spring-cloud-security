@@ -6,6 +6,8 @@
 .project
 .settings
 .springBeans
+.sts4-cache/
+.attach_pid*
 .gradle
 build
 bin
