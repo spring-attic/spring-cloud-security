@@ -23,7 +23,7 @@
 	<properties>
 		<spring-cloud-commons.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
-		<spring-cloud-feign.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-feign.version>
+		<spring-cloud-openfeign.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<bintray.package>security</bintray.package>
 	</properties>
 	<modules>
@@ -58,7 +58,7 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-openfeign-dependencies</artifactId>
-				<version>${spring-cloud-feign.version}</version>
+				<version>${spring-cloud-openfeign.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
