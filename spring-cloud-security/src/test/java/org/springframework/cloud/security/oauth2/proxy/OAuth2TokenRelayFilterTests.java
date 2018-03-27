@@ -20,18 +20,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
@@ -62,6 +66,9 @@ public class OAuth2TokenRelayFilterTests {
 		httpRequest.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_TYPE, "bearer");
 		httpRequest.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_VALUE, "FOO");
 		auth.setDetails(new OAuth2AuthenticationDetails(httpRequest));
+
+		RequestContext.testSetCurrentContext(new RequestContext());
+		RequestContext.getCurrentContext().setResponse(new MockHttpServletResponse());
 	}
 
 	@After
@@ -117,20 +124,13 @@ public class OAuth2TokenRelayFilterTests {
 		AuthorizationCodeResourceDetails resource = new AuthorizationCodeResourceDetails();
 		resource.setClientId("client");
 		Mockito.when(restTemplate.getResource()).thenReturn(resource);
-		Mockito.when(restTemplate.getAccessToken()).thenThrow(new RuntimeException());
+		Mockito.when(restTemplate.getAccessToken()).thenThrow(new UserRedirectRequiredException("http://login", new HashMap<String, String>()));
 		filter.setRestTemplate(restTemplate);
 		assertNotNull(RequestContext.getCurrentContext());
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		assertTrue(filter.shouldFilter());
-		try {
-			filter.run();
-			fail("Expected BadCredentialsException");
-		}
-		catch (BadCredentialsException e) {
-			assertEquals(401,
-					RequestContext.getCurrentContext().get("error.status_code"));
-
-		}
+		filter.run();
+		assertEquals(RequestContext.getCurrentContext().getResponse().getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
 	}
 
 }
