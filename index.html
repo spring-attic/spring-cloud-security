@@ -1,78 +1,11 @@
----
-# The name of your project
-title: Spring Cloud Security
-
-badges:
-
-  # Customize your project's badges. Delete any entries that do not apply.
-  custom:
-    - name: Source (GitHub)
-      url:  https://github.com/spring-cloud/spring-cloud-security
-      icon: github
-
-    - name: StackOverflow
-      url:  http://stackoverflow.com/questions/tagged/spring-cloud
-      icon: stackoverflow
-
----
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en-US">
-
-<!-- Specify the parent of this project (or delete if none) to influence the rendering of the breadcrumb -->
-{% capture parent_link %}
-[Spring Cloud]({{ site.projects_site_url }}/spring-cloud)
-{% endcapture %}
-
-
-{% capture billboard_description %}
-
-Spring Cloud Security offers a set of primitives for building secure applications and services with minimum fuss. A declarative model which can be heavily configured externally (or centrally) lends itself to the implementation of large systems of co-operating, remote components, usually with a central indentity management service. It is also extremely easy to use in a service platform like Cloud Foundry. Building on Spring Boot and Spring Security OAuth2 we can quickly create systems that implement common patterns like single sign on, token relay and token exchange.
-
-{% endcapture %}
-
-{% capture main_content %}
-
-## Features
-
-Spring Cloud Security features:
-
-* Relay SSO tokens from a front end to a back end service in a Zuul proxy
-* Relay tokens between resource servers
-* An interceptor to make a Feign client behave like `OAuth2RestTemplate` (fetching tokens etc.)
-* Configure downstream authentication in a Zuul proxy
-
-<span id="quick-start"></span>
-
-## Quick Start
-
-{% include download_widget.md %}
-
-If your app also has a Spring Cloud Zuul embedded reverse proxy (using `@EnableZuulProxy`) then you can ask it to forward OAuth2 access tokens downstream to the services it is proxying. Thus the SSO app above can be enhanced simply like this:
-
-```
-@SpringBootApplication
-@EnableOAuth2Sso
-@EnableZuulProxy
-class Application {
-
-}
-```
-
-and it will (in addition to logging the user in and grabbing a token) pass the authentication token downstream to the /proxy/* services. If those services are implemented with `@EnableResourceServer` then they will get a valid token in the correct header.
-
-{% endcapture %}
-
-
-{% capture related_resources %}
-
-### Sample Projects
-
-* [SSO](https://github.com/spring-cloud-samples/sso)
-* [Auth Server](https://github.com/spring-cloud-samples/authserver)
-* [SSO Groovy](https://github.com/spring-cloud-samples/scripts/blob/master/demo/sso.groovy)
-* [Resource server](https://github.com/spring-cloud-samples/scripts/blob/master/demo/resource.groovy)
-
-{% endcapture %}
-
-{% include project_page.html %}
+  <meta charset="utf-8">
+  <title>Redirecting&hellip;</title>
+  <link rel="canonical" href="http://spring.io/projects/spring-cloud-security">
+  <meta http-equiv="refresh" content="0; url=http://spring.io/projects/spring-cloud-security">
+  <meta name="robots" content="noindex">
+  <h1>Redirecting&hellip;</h1>
+  <a href="http://spring.io/projects/spring-cloud-security">Click here if you are not redirected.</a>
+  <script>location="http://spring.io/projects/spring-cloud-security"</script>
 </html>
