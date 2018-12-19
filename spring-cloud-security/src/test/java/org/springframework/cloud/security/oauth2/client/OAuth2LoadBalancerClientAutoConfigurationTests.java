@@ -57,6 +57,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	public void userInfoNotLoadBalanced() {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
+						"spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
 
@@ -68,6 +69,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	public void userInfoLoadBalancedNoRetry() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
+						"spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:http://nosuchservice",
 						"security.oauth2.resource.loadBalanced=true")
 				.run();

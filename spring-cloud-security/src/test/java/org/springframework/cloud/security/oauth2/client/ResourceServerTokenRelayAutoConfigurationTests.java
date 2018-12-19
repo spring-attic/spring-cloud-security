@@ -62,6 +62,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	public void clientNotConfigured() {
 		this.context = new SpringApplicationBuilder(NoClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
+						"spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
 		assertFalse(this.context.containsBean("loadBalancedOauth2RestTemplate"));
@@ -71,6 +72,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	public void clientConfigured() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
+						"spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:http://example.com",
 						"security.oauth2.client.clientId=foo")
 				.run();

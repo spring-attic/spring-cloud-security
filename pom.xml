@@ -22,6 +22,7 @@
 	</scm>
 	<properties>
 		<spring-cloud-commons.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-gateway.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-gateway.version>
 		<spring-cloud-netflix.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<spring-cloud-openfeign.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<bintray.package>security</bintray.package>
@@ -48,6 +49,13 @@
 	</build>
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-gateway-dependencies</artifactId>
+				<version>${spring-cloud-gateway.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-netflix-dependencies</artifactId>
