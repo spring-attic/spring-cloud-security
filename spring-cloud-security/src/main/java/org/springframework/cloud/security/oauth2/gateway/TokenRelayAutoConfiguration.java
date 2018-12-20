@@ -16,6 +16,7 @@
 package org.springframework.cloud.security.oauth2.gateway;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,6 +33,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  *
  */
 @Configuration
+@ConditionalOnProperty("spring.cloud.gateway.enabled")
 @ConditionalOnClass({ GatewayFilter.class, OAuth2AuthorizedClient.class,
 		SecurityWebFilterChain.class, SecurityProperties.class })
 @ConditionalOnWebApplication

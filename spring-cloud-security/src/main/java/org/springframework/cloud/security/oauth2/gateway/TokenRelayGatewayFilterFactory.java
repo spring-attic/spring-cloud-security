@@ -45,7 +45,8 @@ public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory
 	@Override
 	public GatewayFilter apply(Object config) {
 		return (exchange, chain) -> exchange.getPrincipal()
-				// TODO: guard for type
+				// .log("token-relay-filter")
+				.filter(principal -> principal instanceof OAuth2AuthenticationToken)
 				.cast(OAuth2AuthenticationToken.class)
 				.flatMap(authentication -> authorizedClient(exchange, authentication))
 				.map(OAuth2AuthorizedClient::getAccessToken)
