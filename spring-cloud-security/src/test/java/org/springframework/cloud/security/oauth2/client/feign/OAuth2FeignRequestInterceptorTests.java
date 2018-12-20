@@ -16,20 +16,20 @@
 
 package org.springframework.cloud.security.oauth2.client.feign;
 
-import static org.hamcrest.Matchers.*;
-
-import java.util.Collection;
-import java.util.Map;
-
+import feign.Request.HttpMethod;
 import feign.RequestTemplate;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+
+import java.util.Collection;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.contains;
 
 /**
  * @author João Pedro Evangelista
@@ -41,15 +41,14 @@ public class OAuth2FeignRequestInterceptorTests {
 	private RequestTemplate requestTemplate;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		oAuth2FeignRequestInterceptor = new OAuth2FeignRequestInterceptor(new MockOAuth2ClientContext("Fancy"), new BaseOAuth2ProtectedResourceDetails());
-		requestTemplate = new RequestTemplate().method("GET");
+		requestTemplate = new RequestTemplate().method(HttpMethod.GET);
 	}
 
 	@Test
-	public void applyAuthorizationHeader() throws Exception {
+	public void applyAuthorizationHeader() {
 		oAuth2FeignRequestInterceptor.apply(requestTemplate);
-		System.out.println(requestTemplate);
 		Map<String, Collection<String>> headers = requestTemplate.headers();
 		Assert.assertTrue("RequestTemplate must have a Authorization header", headers.containsKey("Authorization"));
 		Assert.assertThat("Authorization must have a extract of Fancy", headers.get("Authorization"), contains("Bearer Fancy"));
