@@ -25,6 +25,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author Joe Grandja
+ */
 @Component
 public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
