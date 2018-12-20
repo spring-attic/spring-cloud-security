@@ -27,6 +27,64 @@ forwards the incoming token to outgoing resource requests. The
 consumer can be a pure Client (like an SSO application) or a Resource
 Server.
 
+==== Client Token Relay in Spring Cloud Gateway
+
+If your app also has a
+https://cloud.spring.io/spring-cloud-static/current/single/spring-cloud.html#_spring_cloud_gateway[Spring
+Cloud Gateway] embedded reverse proxy then you
+can ask it to forward OAuth2 access tokens downstream to the services
+it is proxying. Thus the SSO app above can be enhanced simply like
+this:
+
+.App.java
+[source,java]
+----
+@Autowired
+private TokenRelayGatewayFilterFactory filterFactory;
+
+@Bean
+public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+    return builder.routes()
+            .route("resource", r -> r.path("/resource")
+                    .filters(f -> f.filter(filterFactory.apply()))
+                    .uri("http://localhost:9000"))
+            .build();
+}
+----
+
+or this
+
+.application.yaml
+[source,yaml]
+----
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: resource
+        uri: http://localhost:9000
+        predicates:
+        - Path=/resource
+        filters:
+        - TokenRelay=
+----
+
+and it will (in addition to logging the user in and grabbing a token)
+pass the authentication token downstream to the services (in this case
+`/resource`).
+
+To enable this for Spring Cloud Gateway add the following dependencies
+
+- `org.springframework.boot:spring-boot-starter-oauth2-client`
+- `org.springframework.cloud:spring-cloud-starter-security`
+
+How does it work?  The
+{githubmaster}/src/main/java/org/springframework/cloud/security/oauth2/gateway/TokenRelayGatewayFilterFactory.java[filter]
+extracts an access token from the currently authenticated user,
+and puts it in a request header for the downstream requests.
+
+For a full working sample see https://github.com/spring-cloud-samples/sample-gateway-oauth2login[this project].
+
 ==== Client Token Relay
 
 If your app is a user facing OAuth2 client (i.e. has declared
