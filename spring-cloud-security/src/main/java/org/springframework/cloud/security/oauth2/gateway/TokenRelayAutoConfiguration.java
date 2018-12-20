@@ -33,7 +33,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  *
  */
 @Configuration
-@ConditionalOnProperty("spring.cloud.gateway.enabled")
+@ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
 @ConditionalOnClass({ GatewayFilter.class, OAuth2AuthorizedClient.class,
 		SecurityWebFilterChain.class, SecurityProperties.class })
 @ConditionalOnWebApplication
