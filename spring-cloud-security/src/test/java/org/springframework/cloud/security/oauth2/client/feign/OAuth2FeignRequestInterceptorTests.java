@@ -49,7 +49,6 @@ public class OAuth2FeignRequestInterceptorTests {
 	@Test
 	public void applyAuthorizationHeader() throws Exception {
 		oAuth2FeignRequestInterceptor.apply(requestTemplate);
-		System.out.println(requestTemplate);
 		Map<String, Collection<String>> headers = requestTemplate.headers();
 		Assert.assertTrue("RequestTemplate must have a Authorization header", headers.containsKey("Authorization"));
 		Assert.assertThat("Authorization must have a extract of Fancy", headers.get("Authorization"), contains("Bearer Fancy"));
