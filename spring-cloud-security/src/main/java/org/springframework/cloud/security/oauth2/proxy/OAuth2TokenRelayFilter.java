@@ -1,15 +1,16 @@
 package org.springframework.cloud.security.oauth2.proxy;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProperties.Route;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 
@@ -21,6 +22,7 @@ import com.netflix.zuul.context.RequestContext;
  * can detect the token as part of the currently authenticated principal.
  * 
  * @author Dave Syer
+ * @author Davy Steegen
  *
  */
 public class OAuth2TokenRelayFilter extends ZuulFilter {
@@ -91,12 +93,12 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
 				try {
 					value = restTemplate.getAccessToken().getValue();
 				}
-				catch (Exception e) {
-					// Quite possibly a UserRedirectRequiredException, but the caller
-					// probably doesn't know how to handle it, otherwise they wouldn't be
-					// using this filter, so we rethrow as an authentication exception
-					ctx.set("error.status_code", HttpServletResponse.SC_UNAUTHORIZED);
-					throw new BadCredentialsException("Cannot obtain valid access token");
+				catch (UserRedirectRequiredException urre) {
+					try {
+						ctx.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
+					} catch (IOException e) {
+						throw new RuntimeException("Unable to send error to the response", e);
+					}
 				}
 			}
 		}
