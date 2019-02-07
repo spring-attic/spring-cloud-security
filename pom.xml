@@ -26,6 +26,9 @@
 		<spring-cloud-netflix.version>2.1.1.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<spring-cloud-openfeign.version>2.1.1.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<bintray.package>security</bintray.package>
+		<maven-checkstyle-plugin.failsOnError>true</maven-checkstyle-plugin.failsOnError>
+        <maven-checkstyle-plugin.failsOnViolation>true</maven-checkstyle-plugin.failsOnViolation>
+        <maven-checkstyle-plugin.includeTestSourceDirectory>true</maven-checkstyle-plugin.includeTestSourceDirectory>
 	</properties>
 	<modules>
 		<module>spring-cloud-security-dependencies</module>
@@ -45,8 +48,24 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
+            </plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

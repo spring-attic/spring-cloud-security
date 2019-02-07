@@ -45,6 +45,7 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 	@Configuration
 	@ConditionalOnBean(LoadBalancerInterceptor.class)
 	protected static class UserInfoLoadBalancerConfig {
+
 		@Bean
 		public UserInfoRestTemplateCustomizer loadBalancedUserInfoRestTemplateCustomizer(
 				final LoadBalancerInterceptor loadBalancerInterceptor) {
@@ -58,24 +59,27 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 				}
 			};
 		}
+
 	}
 
-        @Configuration
-        @ConditionalOnBean(RetryLoadBalancerInterceptor.class)
-        protected static class UserInfoRetryLoadBalancerConfig {
-                @Bean
-                public UserInfoRestTemplateCustomizer retryLoadBalancedUserInfoRestTemplateCustomizer(
-                                final RetryLoadBalancerInterceptor loadBalancerInterceptor) {
-                        return new UserInfoRestTemplateCustomizer() {
-                                @Override
-                                public void customize(OAuth2RestTemplate restTemplate) {
-                                        List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(
-                                                        restTemplate.getInterceptors());
-                                        interceptors.add(loadBalancerInterceptor);
-                                        restTemplate.setInterceptors(interceptors);
-                                }
-                        };
-                }
-        }
+	@Configuration
+	@ConditionalOnBean(RetryLoadBalancerInterceptor.class)
+	protected static class UserInfoRetryLoadBalancerConfig {
+
+		@Bean
+		public UserInfoRestTemplateCustomizer retryLoadBalancedUserInfoRestTemplateCustomizer(
+				final RetryLoadBalancerInterceptor loadBalancerInterceptor) {
+			return new UserInfoRestTemplateCustomizer() {
+				@Override
+				public void customize(OAuth2RestTemplate restTemplate) {
+					List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(
+							restTemplate.getInterceptors());
+					interceptors.add(loadBalancerInterceptor);
+					restTemplate.setInterceptors(interceptors);
+				}
+			};
+		}
+
+	}
 
 }

@@ -41,7 +41,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class TokenRelayAutoConfiguration {
 
 	@Bean
-	public TokenRelayGatewayFilterFactory tokenRelayGatewayFilterFactory(ServerOAuth2AuthorizedClientRepository repository) {
+	public TokenRelayGatewayFilterFactory tokenRelayGatewayFilterFactory(
+			ServerOAuth2AuthorizedClientRepository repository) {
 		return new TokenRelayGatewayFilterFactory(repository);
 	}
 

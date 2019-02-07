@@ -31,10 +31,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ProxyAuthenticationProperties {
 
 	/**
-	 * Authentication strategy per route. 
+	 * Authentication strategy per route.
 	 */
 	private Map<String, Route> routes = new HashMap<String, Route>();
-	
+
 	private boolean loadBalanced;
 
 	@PostConstruct
@@ -59,10 +59,12 @@ public class ProxyAuthenticationProperties {
 	}
 
 	public static class Route {
+
 		/**
 		 * The id of the route (e.g. discovery virtual hostname).
 		 */
 		private String id;
+
 		/**
 		 * The authentication scheme to use (e.g. "oauth2", "none").
 		 */
@@ -91,8 +93,11 @@ public class ProxyAuthenticationProperties {
 		public static class Scheme {
 
 			public static final Scheme OAUTH2 = new Scheme("oauth2");
+
 			public static final Scheme PASSTHRU = new Scheme("passthru");
+
 			public static final Scheme NONE = new Scheme("none");
+
 			private final String value;
 
 			private Scheme(String value) {
@@ -100,9 +105,11 @@ public class ProxyAuthenticationProperties {
 			}
 
 			public boolean matches(String value) {
-				return value!=null && value.equals(this.value);
+				return value != null && value.equals(this.value);
 			}
+
 		}
+
 	}
 
 }

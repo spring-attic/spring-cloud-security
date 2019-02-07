@@ -12,13 +12,14 @@ import com.netflix.zuul.context.RequestContext;
 /**
  * Pre-filter that can look for requests that are being proxied and cause the
  * authorization header not to be forwarded.
- * 
+ *
  * @author Dave Syer
  *
  */
 public class AuthenticationHeaderFilter extends ZuulFilter {
 
 	private Map<String, Route> routes = new HashMap<String, Route>();
+
 	private ProxyRequestHelper helper;
 
 	public AuthenticationHeaderFilter(ProxyRequestHelper helper,

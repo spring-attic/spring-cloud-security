@@ -32,7 +32,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
  * other resource servers. If the access token expires there is no way to refresh it, so
  * expect an exception from downstream (propagating it to the caller is the best strategy,
  * so they can refresh it and try again).
- * 
+ *
  * @author Dave Syer
  *
  */
@@ -46,7 +46,6 @@ public class AccessTokenContextRelay {
 
 	/**
 	 * Attempt to copy an access token from the security context into the oauth2 context.
-	 * 
 	 * @return true if the token was copied
 	 */
 	public boolean copyToken() {

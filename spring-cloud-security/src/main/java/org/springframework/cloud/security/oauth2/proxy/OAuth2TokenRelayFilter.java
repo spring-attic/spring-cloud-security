@@ -19,14 +19,16 @@ import com.netflix.zuul.context.RequestContext;
 /**
  * Pre-filter that adds an OAuth2 access token as a downstream authorization header if it
  * can detect the token as part of the currently authenticated principal.
- * 
+ *
  * @author Dave Syer
  *
  */
 public class OAuth2TokenRelayFilter extends ZuulFilter {
 
 	private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+
 	private static final String TOKEN_TYPE = "TOKEN_TYPE";
+
 	private Map<String, Route> routes = new HashMap<String, Route>();
 
 	private OAuth2RestOperations restTemplate;
@@ -66,7 +68,8 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
 					}
 				}
 				ctx.set(ACCESS_TOKEN, oauth.getTokenValue());
-				ctx.set(TOKEN_TYPE, oauth.getTokenType()==null ? "Bearer" : oauth.getTokenType());
+				ctx.set(TOKEN_TYPE,
+						oauth.getTokenType() == null ? "Bearer" : oauth.getTokenType());
 				return true;
 			}
 		}
@@ -76,7 +79,8 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
 	@Override
 	public Object run() {
 		RequestContext ctx = RequestContext.getCurrentContext();
-		ctx.addZuulRequestHeader("authorization", ctx.get(TOKEN_TYPE) + " " + getAccessToken(ctx));
+		ctx.addZuulRequestHeader("authorization",
+				ctx.get(TOKEN_TYPE) + " " + getAccessToken(ctx));
 		return null;
 	}
 

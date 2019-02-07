@@ -95,6 +95,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	@Configuration
 	@EnableResourceServer
 	protected static class NoClientConfiguration {
+
 	}
 
 	@EnableAutoConfiguration
@@ -111,4 +112,5 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 		}
 
 	}
+
 }

@@ -31,36 +31,38 @@ import java.util.HashMap;
  */
 final class MockOAuth2ClientContext implements OAuth2ClientContext {
 
-    private final String value;
+	private final String value;
 
-    public MockOAuth2ClientContext(String value) {
-        this.value = value;
-    }
+	public MockOAuth2ClientContext(String value) {
+		this.value = value;
+	}
 
-    @Override
-    public OAuth2AccessToken getAccessToken() {
-        return new DefaultOAuth2AccessToken(value);
-    }
+	@Override
+	public OAuth2AccessToken getAccessToken() {
+		return new DefaultOAuth2AccessToken(value);
+	}
 
-    @Override
-    public void setAccessToken(OAuth2AccessToken accessToken) {
+	@Override
+	public void setAccessToken(OAuth2AccessToken accessToken) {
 
-    }
+	}
 
-    @Override
-    public AccessTokenRequest getAccessTokenRequest() {
-        DefaultAccessTokenRequest tokenRequest = new DefaultAccessTokenRequest(new HashMap<String, String[]>());
-        tokenRequest.setExistingToken(new DefaultOAuth2AccessToken(value));
-        return tokenRequest;
-    }
+	@Override
+	public AccessTokenRequest getAccessTokenRequest() {
+		DefaultAccessTokenRequest tokenRequest = new DefaultAccessTokenRequest(
+				new HashMap<String, String[]>());
+		tokenRequest.setExistingToken(new DefaultOAuth2AccessToken(value));
+		return tokenRequest;
+	}
 
-    @Override
-    public void setPreservedState(String stateKey, Object preservedState) {
+	@Override
+	public void setPreservedState(String stateKey, Object preservedState) {
 
-    }
+	}
 
-    @Override
-    public Object removePreservedState(String stateKey) {
-        return null;
-    }
+	@Override
+	public Object removePreservedState(String stateKey) {
+		return null;
+	}
+
 }

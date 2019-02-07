@@ -48,8 +48,11 @@ import com.netflix.zuul.context.RequestContext;
 public class OAuth2TokenRelayFilterTests {
 
 	private ProxyAuthenticationProperties properties = new ProxyAuthenticationProperties();
+
 	private OAuth2TokenRelayFilter filter = new OAuth2TokenRelayFilter(properties);
+
 	private OAuth2Authentication auth;
+
 	private MockHttpServletRequest httpRequest = new MockHttpServletRequest();
 
 	@Before

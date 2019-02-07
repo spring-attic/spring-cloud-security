@@ -51,12 +51,12 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * <code>OAuth2RestTemplate</code>. An MVC interceptor is used so as to have a minimal
  * impact on the call stack. If you are not using MVC you could use a custom filter or AOP
  * interceptor wrapping the same call to an {@link AccessTokenContextRelay}.
- * 
+ *
  * <br/>
- * 
+ *
  * N.B. an app that is using {@link UserInfoTokenServices} generally doesn't need this
  * interceptor, but it doesn't hurt to include it.
- * 
+ *
  * @author Dave Syer
  *
  */
@@ -71,9 +71,10 @@ public class ResourceServerTokenRelayAutoConfiguration {
 	public AccessTokenContextRelay accessTokenContextRelay(OAuth2ClientContext context) {
 		return new AccessTokenContextRelay(context);
 	}
-	
+
 	@Configuration
-	public static class ResourceServerTokenRelayRegistrationAutoConfiguration implements WebMvcConfigurer {
+	public static class ResourceServerTokenRelayRegistrationAutoConfiguration
+			implements WebMvcConfigurer {
 
 		@Autowired
 		AccessTokenContextRelay accessTokenContextRelay;
@@ -85,7 +86,8 @@ public class ResourceServerTokenRelayAutoConfiguration {
 					new HandlerInterceptorAdapter() {
 						@Override
 						public boolean preHandle(HttpServletRequest request,
-												 HttpServletResponse response, Object handler) throws Exception {
+								HttpServletResponse response, Object handler)
+								throws Exception {
 							accessTokenContextRelay.copyToken();
 							return true;
 						}
@@ -113,10 +115,12 @@ public class ResourceServerTokenRelayAutoConfiguration {
 
 		@ConditionalOnBean(ResourceServerConfiguration.class)
 		static class Server {
+
 		}
 
 		@ConditionalOnBean(OAuth2ClientConfiguration.class)
 		static class Client {
+
 		}
 
 	}

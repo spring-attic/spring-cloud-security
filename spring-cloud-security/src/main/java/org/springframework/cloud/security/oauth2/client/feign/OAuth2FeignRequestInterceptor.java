@@ -55,8 +55,8 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	private final String header;
 
-	private AccessTokenProvider accessTokenProvider = new AccessTokenProviderChain(Arrays
-			.<AccessTokenProvider> asList(new AuthorizationCodeAccessTokenProvider(),
+	private AccessTokenProvider accessTokenProvider = new AccessTokenProviderChain(
+			Arrays.<AccessTokenProvider>asList(new AuthorizationCodeAccessTokenProvider(),
 					new ImplicitAccessTokenProvider(),
 					new ResourceOwnerPasswordAccessTokenProvider(),
 					new ClientCredentialsAccessTokenProvider()));
@@ -64,7 +64,6 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	/**
 	 * Default constructor which uses the provided OAuth2ClientContext and Bearer tokens
 	 * within Authorization header
-	 *
 	 * @param oAuth2ClientContext provided context
 	 * @param resource type of resource to be accessed
 	 */
@@ -76,7 +75,6 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	/**
 	 * Fully customizable constructor for changing token type and header name, in cases of
 	 * Bearer and Authorization is not the default such as "bearer", "authorization"
-	 *
 	 * @param oAuth2ClientContext current oAuth2 Context
 	 * @param resource type of resource to be accessed
 	 * @param tokenType type of token e.g. "token", "Bearer"
@@ -104,7 +102,6 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	 * Extracts the token extract id the access token exists or returning an empty extract
 	 * if there is no one on the context it may occasionally causes Unauthorized response
 	 * since the token extract is empty
-	 *
 	 * @param tokenType type name of token
 	 * @return token value from context if it exists otherwise empty String
 	 */
@@ -116,7 +113,6 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	/**
 	 * Extract the access token within the request or try to acquire a new one by
 	 * delegating it to {@link #acquireAccessToken()}
-	 *
 	 * @return valid token
 	 */
 	public OAuth2AccessToken getToken() {
@@ -144,7 +140,6 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	/**
 	 * Try to acquire the token using a access token provider
-	 *
 	 * @throws UserRedirectRequiredException in case the user needs to be redirected to an
 	 * approval page or login page
 	 * @return valid access token
@@ -181,4 +176,5 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	public void setAccessTokenProvider(AccessTokenProvider accessTokenProvider) {
 		this.accessTokenProvider = accessTokenProvider;
 	}
+
 }

@@ -61,8 +61,10 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
 
-		assertFalse(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
-		assertFalse(this.context.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
+		assertFalse(
+				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
+		assertFalse(this.context
+				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
 	}
 
 	@Test
@@ -74,8 +76,10 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 						"security.oauth2.resource.loadBalanced=true")
 				.run();
 
-		assertTrue(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
-		assertFalse(this.context.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
+		assertTrue(
+				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
+		assertFalse(this.context
+				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
 
 		OAuth2RestTemplate template = this.context
 				.getBean(UserInfoRestTemplateFactory.class).getUserInfoRestTemplate();
@@ -89,5 +93,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	@Configuration
 	@EnableOAuth2Sso
 	protected static class ClientConfiguration {
+
 	}
+
 }

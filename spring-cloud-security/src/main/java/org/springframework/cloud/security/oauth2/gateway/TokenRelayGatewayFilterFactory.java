@@ -33,13 +33,14 @@ public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory
 
 	private ServerOAuth2AuthorizedClientRepository authorizedClientRepository;
 
-	public TokenRelayGatewayFilterFactory(ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
+	public TokenRelayGatewayFilterFactory(
+			ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
 		super(Object.class);
 		this.authorizedClientRepository = authorizedClientRepository;
 	}
 
 	public GatewayFilter apply() {
-		return apply((Object)null);
+		return apply((Object) null);
 	}
 
 	@Override
@@ -52,20 +53,22 @@ public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory
 				.map(OAuth2AuthorizedClient::getAccessToken)
 				.map(token -> withBearerAuth(exchange, token))
 				// TODO: adjustable behavior if empty
-				.defaultIfEmpty(exchange)
-				.flatMap(chain::filter);
+				.defaultIfEmpty(exchange).flatMap(chain::filter);
 	}
 
-	private Mono<OAuth2AuthorizedClient> authorizedClient(ServerWebExchange exchange, OAuth2AuthenticationToken oauth2Authentication) {
+	private Mono<OAuth2AuthorizedClient> authorizedClient(ServerWebExchange exchange,
+			OAuth2AuthenticationToken oauth2Authentication) {
 		return this.authorizedClientRepository.loadAuthorizedClient(
-				oauth2Authentication.getAuthorizedClientRegistrationId(), oauth2Authentication, exchange);
+				oauth2Authentication.getAuthorizedClientRegistrationId(),
+				oauth2Authentication, exchange);
 	}
 
-	private ServerWebExchange withBearerAuth(ServerWebExchange exchange, OAuth2AccessToken accessToken) {
+	private ServerWebExchange withBearerAuth(ServerWebExchange exchange,
+			OAuth2AccessToken accessToken) {
 		return exchange.mutate()
-				.request(r -> r.headers(headers -> headers.setBearerAuth(accessToken.getTokenValue())))
+				.request(r -> r.headers(
+						headers -> headers.setBearerAuth(accessToken.getTokenValue())))
 				.build();
 	}
-
 
 }

@@ -16,30 +16,38 @@ import org.springframework.security.oauth2.common.OAuth2RefreshToken;
  */
 public class MockAccessTokenProvider implements AccessTokenProvider {
 
-    private OAuth2AccessToken token;
+	private OAuth2AccessToken token;
 
-    public MockAccessTokenProvider(OAuth2AccessToken token) {
-        this.token = token;
-    }
+	public MockAccessTokenProvider(OAuth2AccessToken token) {
+		this.token = token;
+	}
 
-    @Override
-    public OAuth2AccessToken obtainAccessToken(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails, AccessTokenRequest accessTokenRequest) throws UserRedirectRequiredException, UserApprovalRequiredException, AccessDeniedException {
-        return token;
-    }
+	@Override
+	public OAuth2AccessToken obtainAccessToken(
+			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
+			AccessTokenRequest accessTokenRequest) throws UserRedirectRequiredException,
+			UserApprovalRequiredException, AccessDeniedException {
+		return token;
+	}
 
-    @Override
-    public boolean supportsResource(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
-        return true;
-    }
+	@Override
+	public boolean supportsResource(
+			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
+		return true;
+	}
 
-    @Override
-    public OAuth2AccessToken refreshAccessToken(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails, OAuth2RefreshToken oAuth2RefreshToken, AccessTokenRequest accessTokenRequest) throws UserRedirectRequiredException {
-        return null;
-    }
+	@Override
+	public OAuth2AccessToken refreshAccessToken(
+			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
+			OAuth2RefreshToken oAuth2RefreshToken, AccessTokenRequest accessTokenRequest)
+			throws UserRedirectRequiredException {
+		return null;
+	}
 
-    @Override
-    public boolean supportsRefresh(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
-        return false;
-    }
+	@Override
+	public boolean supportsRefresh(
+			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
+		return false;
+	}
 
 }
