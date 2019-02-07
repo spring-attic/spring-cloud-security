@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -65,7 +63,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 						"spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
-		assertFalse(this.context.containsBean("loadBalancedOauth2RestTemplate"));
+		assertThat(this.context.containsBean("loadBalancedOauth2RestTemplate")).isFalse();
 	}
 
 	@Test
@@ -79,7 +77,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 		RequestContextHolder.setRequestAttributes(
 				new ServletRequestAttributes(new MockHttpServletRequest()));
 		OAuth2ClientContext client = this.context.getBean(OAuth2ClientContext.class);
-		assertNull(client.getAccessToken());
+		assertThat(client.getAccessToken()).isNull();
 		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
 		OAuth2RestTemplate template = (OAuth2RestTemplate) ReflectionTestUtils
 				.getField(services, "restTemplate");
@@ -87,7 +85,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 		server.expect(requestTo("http://example.com"))
 				.andRespond(withSuccess("{\"id\":\"user\"}", MediaType.APPLICATION_JSON));
 		services.loadAuthentication("FOO");
-		assertEquals("FOO", client.getAccessToken().getValue());
+		assertThat(client.getAccessToken().getValue()).isEqualTo("FOO");
 		server.verify();
 	}
 

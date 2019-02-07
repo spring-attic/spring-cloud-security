@@ -1,9 +1,28 @@
+/*
+ * Copyright 2013-2014 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.cloud.security.oauth2.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 
 import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProperties.Route;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,9 +31,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
 
 /**
  * Pre-filter that adds an OAuth2 access token as a downstream authorization header if it
@@ -59,13 +75,8 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
 			if (details instanceof OAuth2AuthenticationDetails) {
 				OAuth2AuthenticationDetails oauth = (OAuth2AuthenticationDetails) details;
 				RequestContext ctx = RequestContext.getCurrentContext();
-				if (ctx.containsKey("proxy")) {
-					String id = (String) ctx.get("proxy");
-					if (routes.containsKey(id)) {
-						if (!Route.Scheme.OAUTH2.matches(routes.get(id).getScheme())) {
-							return false;
-						}
-					}
+				if (!isOauth2Route(ctx)) {
+					return false;
 				}
 				ctx.set(ACCESS_TOKEN, oauth.getTokenValue());
 				ctx.set(TOKEN_TYPE,
@@ -74,6 +85,18 @@ public class OAuth2TokenRelayFilter extends ZuulFilter {
 			}
 		}
 		return false;
+	}
+
+	private boolean isOauth2Route(RequestContext ctx) {
+		if (ctx.containsKey("proxy")) {
+			String id = (String) ctx.get("proxy");
+			if (routes.containsKey(id)) {
+				if (!Route.Scheme.OAUTH2.matches(routes.get(id).getScheme())) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override

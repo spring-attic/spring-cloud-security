@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,22 @@
 
 package org.springframework.cloud.security.oauth2.client.feign;
 
-import feign.Request.HttpMethod;
-import feign.RequestTemplate;
+import java.util.Collection;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
-import java.util.Collection;
-import java.util.Map;
-
 import static org.hamcrest.Matchers.contains;
+
+import feign.Request.HttpMethod;
+import feign.RequestTemplate;
 
 /**
  * @author João Pedro Evangelista

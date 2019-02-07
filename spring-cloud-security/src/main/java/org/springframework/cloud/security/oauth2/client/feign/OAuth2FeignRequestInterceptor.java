@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,16 +35,22 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 
 /**
- * Pre-defined custom RequestInterceptor for Feign Requests It uses the
+ * Pre-defined custom RequestInterceptor for Feign Requests. It uses the
  * {@link OAuth2ClientContext OAuth2ClientContext} provided from the environment and
- * construct a new header on the request before it is made by Feign
+ * construct a new header on the request before it is made by Feign.
  *
  * @author Joao Pedro Evangelista
  */
 public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
+	/**
+	 * The name of the token.
+	 */
 	public static final String BEARER = "Bearer";
 
+	/**
+	 * The name of the header.
+	 */
 	public static final String AUTHORIZATION = "Authorization";
 
 	private final OAuth2ClientContext oAuth2ClientContext;
@@ -63,7 +69,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	/**
 	 * Default constructor which uses the provided OAuth2ClientContext and Bearer tokens
-	 * within Authorization header
+	 * within Authorization header.
 	 * @param oAuth2ClientContext provided context
 	 * @param resource type of resource to be accessed
 	 */
@@ -74,7 +80,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	/**
 	 * Fully customizable constructor for changing token type and header name, in cases of
-	 * Bearer and Authorization is not the default such as "bearer", "authorization"
+	 * Bearer and Authorization is not the default such as "bearer", "authorization".
 	 * @param oAuth2ClientContext current oAuth2 Context
 	 * @param resource type of resource to be accessed
 	 * @param tokenType type of token e.g. "token", "Bearer"
@@ -89,7 +95,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	}
 
 	/**
-	 * Create a template with the header of provided name and extracted extract
+	 * Create a template with the header of provided name and extracted extract.
 	 *
 	 * @see RequestInterceptor#apply(RequestTemplate)
 	 */
@@ -101,7 +107,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	/**
 	 * Extracts the token extract id the access token exists or returning an empty extract
 	 * if there is no one on the context it may occasionally causes Unauthorized response
-	 * since the token extract is empty
+	 * since the token extract is empty.
 	 * @param tokenType type name of token
 	 * @return token value from context if it exists otherwise empty String
 	 */
@@ -112,7 +118,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	/**
 	 * Extract the access token within the request or try to acquire a new one by
-	 * delegating it to {@link #acquireAccessToken()}
+	 * delegating it to {@link #acquireAccessToken()}.
 	 * @return valid token
 	 */
 	public OAuth2AccessToken getToken() {
@@ -139,10 +145,10 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	}
 
 	/**
-	 * Try to acquire the token using a access token provider
+	 * Try to acquire the token using a access token provider.
+	 * @return valid access token
 	 * @throws UserRedirectRequiredException in case the user needs to be redirected to an
 	 * approval page or login page
-	 * @return valid access token
 	 */
 	protected OAuth2AccessToken acquireAccessToken()
 			throws UserRedirectRequiredException {

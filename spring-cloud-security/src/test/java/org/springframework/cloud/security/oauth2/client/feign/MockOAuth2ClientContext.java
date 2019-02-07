@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package org.springframework.cloud.security.oauth2.client.feign;
 
+import java.util.HashMap;
+
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-
-import java.util.HashMap;
 
 /**
  * Mocks the current client context
@@ -33,7 +33,7 @@ final class MockOAuth2ClientContext implements OAuth2ClientContext {
 
 	private final String value;
 
-	public MockOAuth2ClientContext(String value) {
+	MockOAuth2ClientContext(String value) {
 		this.value = value;
 	}
 

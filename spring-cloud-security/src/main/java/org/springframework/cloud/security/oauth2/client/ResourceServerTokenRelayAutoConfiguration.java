@@ -72,6 +72,12 @@ public class ResourceServerTokenRelayAutoConfiguration {
 		return new AccessTokenContextRelay(context);
 	}
 
+	/**
+	 * A {@link WebMvcConfigurer} for the access token interceptor.
+	 *
+	 * @author Dave Syer
+	 *
+	 */
 	@Configuration
 	public static class ResourceServerTokenRelayRegistrationAutoConfiguration
 			implements WebMvcConfigurer {
@@ -109,7 +115,7 @@ public class ResourceServerTokenRelayAutoConfiguration {
 	private static class OAuth2OnClientInResourceServerCondition
 			extends AllNestedConditions {
 
-		public OAuth2OnClientInResourceServerCondition() {
+		OAuth2OnClientInResourceServerCondition() {
 			super(ConfigurationPhase.REGISTER_BEAN);
 		}
 

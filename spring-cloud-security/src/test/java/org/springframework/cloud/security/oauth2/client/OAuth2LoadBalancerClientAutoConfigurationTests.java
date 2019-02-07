@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@
 
 package org.springframework.cloud.security.oauth2.client;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.net.URI;
 
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoRestTemplateFactory;
@@ -34,6 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Dave Syer
@@ -61,10 +61,12 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 						"security.oauth2.resource.userInfoUri:http://example.com")
 				.run();
 
-		assertFalse(
-				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
-		assertFalse(this.context
-				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
+		assertThat(
+				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"))
+						.isFalse();
+		assertThat(this.context
+				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"))
+						.isFalse();
 	}
 
 	@Test
@@ -76,10 +78,12 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 						"security.oauth2.resource.loadBalanced=true")
 				.run();
 
-		assertTrue(
-				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
-		assertFalse(this.context
-				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"));
+		assertThat(
+				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"))
+						.isTrue();
+		assertThat(this.context
+				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"))
+						.isFalse();
 
 		OAuth2RestTemplate template = this.context
 				.getBean(UserInfoRestTemplateFactory.class).getUserInfoRestTemplate();

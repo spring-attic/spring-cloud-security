@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -59,10 +59,13 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = {
 		"security.oauth2.resource.jwt.keyValue=secret",
-		"spring.cloud.gateway.enabled=false", })
+		"spring.cloud.gateway.enabled=false" })
 public class ResourceServerTokenRelayTests {
 
-	protected static final String TOKEN_VALID_UNTIL_2085 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjM2NDA2ODU4ODIsInVzZXJfbmFtZSI6InJlYWRlciIsImF1dGhvcml0aWVzIjpbIlJPTEVfUkVBREVSIl0sImp0aSI6ImRkOTAzZGM2LTI0NDctNDViMi04MDZjLTIzZjU3ODVhNGQ4MCIsImNsaWVudF9pZCI6IndlYi1hcHAiLCJzY29wZSI6WyJyZWFkIl19.6hoNtxmN1_o5Ki0D0ae4amSOTRmit3pmaqv-z1-Qk4Y";
+	protected static final String TOKEN_VALID_UNTIL_2085 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+			+ "eyJleHAiOjM2NDA2ODU4ODIsInVzZXJfbmFtZSI6InJlYWRlciIsImF1dGhvcml0aWVzIjpbIlJPTEVfUkVBREVSIl0s"
+			+ "Imp0aSI6ImRkOTAzZGM2LTI0NDctNDViMi04MDZjLTIzZjU3ODVhNGQ4MCIsImNsaWVudF9pZCI6IndlYi1hcHAiLCJzY29wZSI6WyJyZWFkIl19."
+			+ "6hoNtxmN1_o5Ki0D0ae4amSOTRmit3pmaqv-z1-Qk4Y";
 
 	protected static final String AUTH_HEADER_TO_BE_RELAYED = "Bearer "
 			+ TOKEN_VALID_UNTIL_2085;
@@ -89,8 +92,8 @@ public class ResourceServerTokenRelayTests {
 		ResponseEntity<String> exchange = testRestTemplate.exchange("/token-relay",
 				HttpMethod.GET, authorizationHeader, String.class);
 
-		assertEquals(HttpStatus.OK.value(), exchange.getStatusCodeValue());
-		assertEquals(TEST_RESPONSE, exchange.getBody());
+		assertThat(exchange.getStatusCodeValue()).isEqualTo(HttpStatus.OK.value());
+		assertThat(exchange.getBody()).isEqualTo(TEST_RESPONSE);
 
 		mockServerToReceiveRelay.verify();
 		verify(accessTokenContextRelay).copyToken();

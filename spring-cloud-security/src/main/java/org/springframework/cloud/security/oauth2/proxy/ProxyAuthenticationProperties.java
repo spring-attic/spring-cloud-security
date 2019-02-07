@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.cloud.security.oauth2.proxy;
 
 import java.util.HashMap;
@@ -58,6 +59,10 @@ public class ProxyAuthenticationProperties {
 		this.loadBalanced = loadBalanced;
 	}
 
+	/**
+	 * The route to the endpoint.
+	 *
+	 */
 	public static class Route {
 
 		/**
@@ -90,12 +95,25 @@ public class ProxyAuthenticationProperties {
 			this.scheme = scheme;
 		}
 
-		public static class Scheme {
+		/**
+		 * The scheme for the pseudo-URL in the endpoint.
+		 *
+		 */
+		public static final class Scheme {
 
+			/**
+			 * Fixed scheme of "oauth2".
+			 */
 			public static final Scheme OAUTH2 = new Scheme("oauth2");
 
+			/**
+			 * Fixed scheme of "passthru".
+			 */
 			public static final Scheme PASSTHRU = new Scheme("passthru");
 
+			/**
+			 * Fixed scheme of "none".
+			 */
 			public static final Scheme NONE = new Scheme("none");
 
 			private final String value;

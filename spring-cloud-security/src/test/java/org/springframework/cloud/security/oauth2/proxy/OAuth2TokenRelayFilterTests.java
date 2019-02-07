@@ -16,16 +16,13 @@
 
 package org.springframework.cloud.security.oauth2.proxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import com.netflix.zuul.context.RequestContext;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,7 +36,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 
-import com.netflix.zuul.context.RequestContext;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author Dave Syer
@@ -74,26 +72,27 @@ public class OAuth2TokenRelayFilterTests {
 
 	@Test
 	public void emptyContextNoFilter() {
-		assertNotNull(RequestContext.getCurrentContext());
-		assertFalse(filter.shouldFilter());
+		assertThat(RequestContext.getCurrentContext()).isNotNull();
+		assertThat(filter.shouldFilter()).isFalse();
 	}
 
 	@Test
 	public void securityContextTriggersFilter() {
-		assertNotNull(RequestContext.getCurrentContext());
+		assertThat(RequestContext.getCurrentContext()).isNotNull();
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		assertTrue(filter.shouldFilter());
+		assertThat(filter.shouldFilter()).isTrue();
 	}
 
 	@Test
 	public void tokenRelayedWithoutRestTemplate() {
-		assertNotNull(RequestContext.getCurrentContext());
+		assertThat(RequestContext.getCurrentContext()).isNotNull();
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		assertTrue(filter.shouldFilter());
-		assertEquals("FOO", RequestContext.getCurrentContext().get("ACCESS_TOKEN"));
+		assertThat(filter.shouldFilter()).isTrue();
+		assertThat(RequestContext.getCurrentContext().get("ACCESS_TOKEN"))
+				.isEqualTo("FOO");
 		filter.run();
-		assertNotNull(RequestContext.getCurrentContext().getZuulRequestHeaders()
-				.get("authorization"));
+		assertThat(RequestContext.getCurrentContext().getZuulRequestHeaders()
+				.get("authorization")).isNotNull();
 	}
 
 	@Test
@@ -105,13 +104,14 @@ public class OAuth2TokenRelayFilterTests {
 		Mockito.when(restTemplate.getAccessToken())
 				.thenReturn(new DefaultOAuth2AccessToken("BAR"));
 		filter.setRestTemplate(restTemplate);
-		assertNotNull(RequestContext.getCurrentContext());
+		assertThat(RequestContext.getCurrentContext()).isNotNull();
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		assertTrue(filter.shouldFilter());
-		assertEquals("FOO", RequestContext.getCurrentContext().get("ACCESS_TOKEN"));
+		assertThat(filter.shouldFilter()).isTrue();
+		assertThat(RequestContext.getCurrentContext().get("ACCESS_TOKEN"))
+				.isEqualTo("FOO");
 		filter.run();
-		assertEquals("bearer BAR", RequestContext.getCurrentContext()
-				.getZuulRequestHeaders().get("authorization"));
+		assertThat(RequestContext.getCurrentContext().getZuulRequestHeaders()
+				.get("authorization")).isEqualTo("bearer BAR");
 	}
 
 	@Test
@@ -122,16 +122,16 @@ public class OAuth2TokenRelayFilterTests {
 		Mockito.when(restTemplate.getResource()).thenReturn(resource);
 		Mockito.when(restTemplate.getAccessToken()).thenThrow(new RuntimeException());
 		filter.setRestTemplate(restTemplate);
-		assertNotNull(RequestContext.getCurrentContext());
+		assertThat(RequestContext.getCurrentContext()).isNotNull();
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		assertTrue(filter.shouldFilter());
+		assertThat(filter.shouldFilter()).isTrue();
 		try {
 			filter.run();
 			fail("Expected BadCredentialsException");
 		}
 		catch (BadCredentialsException e) {
-			assertEquals(401,
-					RequestContext.getCurrentContext().get("error.status_code"));
+			assertThat(RequestContext.getCurrentContext().get("error.status_code"))
+					.isEqualTo(401);
 
 		}
 	}

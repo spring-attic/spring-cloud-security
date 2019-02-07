@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.cloud.security.oauth2.proxy;
+
+import com.netflix.zuul.ZuulFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -26,8 +29,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
-
-import com.netflix.zuul.ZuulFilter;
 
 /**
  * @author Dave Syer
