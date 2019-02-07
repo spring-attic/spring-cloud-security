@@ -19,6 +19,9 @@ package org.springframework.cloud.security.oauth2.client.feign;
 import java.util.Collection;
 import java.util.Map;
 
+import feign.Request.HttpMethod;
+import feign.RequestTemplate;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,9 +32,6 @@ import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedExc
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 import static org.hamcrest.Matchers.contains;
-
-import feign.Request.HttpMethod;
-import feign.RequestTemplate;
 
 /**
  * @author João Pedro Evangelista

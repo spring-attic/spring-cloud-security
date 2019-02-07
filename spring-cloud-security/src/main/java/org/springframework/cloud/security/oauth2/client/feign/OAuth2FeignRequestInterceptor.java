@@ -18,6 +18,9 @@ package org.springframework.cloud.security.oauth2.client.feign;
 
 import java.util.Arrays;
 
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.http.AccessTokenRequiredException;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
@@ -30,9 +33,6 @@ import org.springframework.security.oauth2.client.token.grant.code.Authorization
 import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
 
 /**
  * Pre-defined custom RequestInterceptor for Feign Requests. It uses the
