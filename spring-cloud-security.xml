@@ -255,6 +255,10 @@ classpath (via <literal>@EnableZuulProxy</literal>). The
 <link xl:href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java">filter</link>
 just extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.</simpara>
+<note>
+<simpara>Spring Boot does not create an <literal>OAuth2RestOperations</literal> automatically which is needed for <literal>refresh_token</literal>. In that case you need to create your own
+<literal>OAuth2RestOperations</literal> so <literal>OAuth2TokenRelayFilter</literal> can refresh the token if needed.</simpara>
+</note>
 </section>
 <section xml:id="_resource_server_token_relay">
 <title>Resource Server Token Relay</title>
