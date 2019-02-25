@@ -170,7 +170,7 @@ use it to send requests with the same access token.
 If your app is not using `UserInfoTokenServices` but is still a client
 (i.e. it declares `@EnableOAuth2Client` or `@EnableOAuth2Sso`), then
 with Spring Security Cloud any `OAuth2RestOperations` that the user
-creates from an `@Autowired` `@OAuth2Context` will also forward
+creates from an `@Autowired` `OAuth2Context` will also forward
 tokens. This feature is implemented by default as an MVC handler
 interceptor, so it only works in Spring MVC. If you are not using MVC
 you could use a custom filter or AOP interceptor wrapping an
