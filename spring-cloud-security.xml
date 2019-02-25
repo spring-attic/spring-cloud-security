@@ -285,7 +285,7 @@ use it to send requests with the same access token.</simpara>
 <simpara>If your app is not using <literal>UserInfoTokenServices</literal> but is still a client
 (i.e. it declares <literal>@EnableOAuth2Client</literal> or <literal>@EnableOAuth2Sso</literal>), then
 with Spring Security Cloud any <literal>OAuth2RestOperations</literal> that the user
-creates from an <literal>@Autowired</literal> <literal>@OAuth2Context</literal> will also forward
+creates from an <literal>@Autowired</literal> <literal>OAuth2Context</literal> will also forward
 tokens. This feature is implemented by default as an MVC handler
 interceptor, so it only works in Spring MVC. If you are not using MVC
 you could use a custom filter or AOP interceptor wrapping an

@@ -92,7 +92,7 @@ your configuration. For example:</p><p><b>MyConfiguration.java.&nbsp;</b>
 use it to send requests with the same access token.</p><p>If your app is not using <code class="literal">UserInfoTokenServices</code> but is still a client
 (i.e. it declares <code class="literal">@EnableOAuth2Client</code> or <code class="literal">@EnableOAuth2Sso</code>), then
 with Spring Security Cloud any <code class="literal">OAuth2RestOperations</code> that the user
-creates from an <code class="literal">@Autowired</code> <code class="literal">@OAuth2Context</code> will also forward
+creates from an <code class="literal">@Autowired</code> <code class="literal">OAuth2Context</code> will also forward
 tokens. This feature is implemented by default as an MVC handler
 interceptor, so it only works in Spring MVC. If you are not using MVC
 you could use a custom filter or AOP interceptor wrapping an
