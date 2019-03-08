@@ -1,0 +1,17 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>3.&nbsp;Configuring Authentication Downstream of a Zuul Proxy</title><link rel="stylesheet" type="text/css" href="css/manual-multipage.css"><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"><link rel="home" href="multi_spring-cloud-security.html" title="Spring Cloud Security"><link rel="up" href="multi_spring-cloud-security.html" title="Spring Cloud Security"><link rel="prev" href="multi__more_detail.html" title="2.&nbsp;More Detail"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.&nbsp;Configuring Authentication Downstream of a Zuul Proxy</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="multi__more_detail.html">Prev</a>&nbsp;</td><th width="60%" align="center">&nbsp;</th><td width="20%" align="right">&nbsp;</td></tr></table><hr></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="_configuring_authentication_downstream_of_a_zuul_proxy" href="#_configuring_authentication_downstream_of_a_zuul_proxy"></a>3.&nbsp;Configuring Authentication Downstream of a Zuul Proxy</h1></div></div></div><p>You can control the authorization behaviour downstream of an
+<code class="literal">@EnableZuulProxy</code> through the <code class="literal">proxy.auth.*</code> settings. Example:</p><p><b>application.yml.&nbsp;</b>
+</p><pre class="programlisting"><span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">proxy</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">  auth</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    routes</span>:
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      customers</span>: oauth2
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      stores</span>: passthru
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      recommendations</span>: none</pre><p>
+</p><p>In this example the "customers" service gets an OAuth2 token relay,
+the "stores" service gets a passthrough (the authorization header is
+just passed downstream), and the "recommendations" service has its
+authorization header removed. The default behaviour is to do a token
+relay if there is a token available, and passthru otherwise.</p><p>See
+<a class="link" href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties" target="_top">
+ProxyAuthenticationProperties</a> for full details.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="multi__more_detail.html">Prev</a>&nbsp;</td><td width="20%" align="center">&nbsp;</td><td width="40%" align="right">&nbsp;</td></tr><tr><td width="40%" align="left" valign="top">2.&nbsp;More Detail&nbsp;</td><td width="20%" align="center"><a accesskey="h" href="multi_spring-cloud-security.html">Home</a></td><td width="40%" align="right" valign="top">&nbsp;</td></tr></table></div></body></html>
