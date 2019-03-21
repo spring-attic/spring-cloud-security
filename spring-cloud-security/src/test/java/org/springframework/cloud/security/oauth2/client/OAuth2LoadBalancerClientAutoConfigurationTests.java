@@ -58,7 +58,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
 						"spring.cloud.gateway.enabled=false",
-						"security.oauth2.resource.userInfoUri:http://example.com")
+						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 
 		assertThat(
@@ -74,7 +74,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
 						"spring.cloud.gateway.enabled=false",
-						"security.oauth2.resource.userInfoUri:http://nosuchservice",
+						"security.oauth2.resource.userInfoUri:https://nosuchservice",
 						"security.oauth2.resource.loadBalanced=true")
 				.run();
 
@@ -88,7 +88,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 		OAuth2RestTemplate template = this.context
 				.getBean(UserInfoRestTemplateFactory.class).getUserInfoRestTemplate();
 		ClientHttpRequest request = template.getRequestFactory()
-				.createRequest(new URI("http://nosuchservice"), HttpMethod.GET);
+				.createRequest(new URI("https://nosuchservice"), HttpMethod.GET);
 		expected.expectMessage("No instances available for nosuchservice");
 		request.execute();
 	}
