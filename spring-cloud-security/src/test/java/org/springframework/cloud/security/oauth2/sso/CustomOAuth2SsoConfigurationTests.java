@@ -51,8 +51,8 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 @TestPropertySource(properties = { "spring.oauth2.client.clientId=client",
 		"spring.oauth2.client.clientSecret=secret",
-		"spring.oauth2.client.authorizationUri=http://example.com/oauth/authorize",
-		"spring.oauth2.client.tokenUri=http://example.com/oauth/token",
+		"spring.oauth2.client.authorizationUri=https://example.com/oauth/authorize",
+		"spring.oauth2.client.tokenUri=https://example.com/oauth/token",
 		"spring.oauth2.resource.jwt.keyValue=SSSSHHH" })
 public class CustomOAuth2SsoConfigurationTests {
 

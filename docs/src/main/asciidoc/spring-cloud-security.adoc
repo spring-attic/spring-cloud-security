@@ -251,7 +251,7 @@ Server.
 ==== Client Token Relay
 
 If your app has a
-http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy[Spring
+https://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy[Spring
 Cloud Zuul] embedded reverse proxy (using `@EnableZuulProxy`) then you
 can ask it to forward OAuth2 access tokens downstream to the services
 it is proxying. Thus the SSO app above can be enhanced simply like this:

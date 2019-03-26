@@ -52,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestConfiguration.class)
 @WebAppConfiguration
-@TestPropertySource(properties = { "debug:true", "spring.oauth2.resource.userInfoUri=http://start.spring.io" })
+@TestPropertySource(properties = { "debug:true", "spring.oauth2.resource.userInfoUri=https://start.spring.io" })
 public class BasicOAuth2ResourceConfigurationTests {
 
 	@Autowired

@@ -33,7 +33,7 @@ public class ResourceServerPropertiesTests {
 
 	@Test
 	public void json() throws Exception {
-		properties.getJwt().setKeyUri("http://example.com/token_key");
+		properties.getJwt().setKeyUri("https://example.com/token_key");
 		ObjectMapper mapper = new ObjectMapper();
 		String json = mapper.writeValueAsString(properties);
 		@SuppressWarnings("unchecked")
@@ -45,7 +45,7 @@ public class ResourceServerPropertiesTests {
 
 	@Test
 	public void tokenKeyDerived() throws Exception {
-		properties.setUserInfoUri("http://example.com/userinfo");
+		properties.setUserInfoUri("https://example.com/userinfo");
 		assertNotNull("Wrong properties: " + properties, properties.getJwt().getKeyUri());
 	}
 
