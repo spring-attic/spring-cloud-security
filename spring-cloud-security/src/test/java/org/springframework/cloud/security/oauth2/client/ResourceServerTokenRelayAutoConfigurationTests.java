@@ -63,7 +63,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	public void clientNotConfigured() {
 		this.context = new SpringApplicationBuilder(NoClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.userInfoUri:http://example.com")
+						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 		assertFalse(this.context.containsBean("loadBalancedOauth2RestTemplate"));
 	}
@@ -72,7 +72,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	public void clientConfigured() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.userInfoUri:http://example.com",
+						"security.oauth2.resource.userInfoUri:https://example.com",
 						"security.oauth2.client.clientId=foo")
 				.run();
 		RequestContextHolder.setRequestAttributes(
@@ -83,7 +83,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 		OAuth2RestTemplate template = (OAuth2RestTemplate) ReflectionTestUtils
 				.getField(services, "restTemplate");
 		MockRestServiceServer server = MockRestServiceServer.createServer(template);
-		server.expect(requestTo("http://example.com"))
+		server.expect(requestTo("https://example.com"))
 				.andRespond(withSuccess("{\"id\":\"user\"}", MediaType.APPLICATION_JSON));
 		services.loadAuthentication("FOO");
 		assertEquals("FOO", client.getAccessToken().getValue());
@@ -94,7 +94,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	public void noUserInfo() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.tokenInfoUri:http://example.com",
+						"security.oauth2.resource.tokenInfoUri:https://example.com",
 						"security.oauth2.client.clientId=foo")
 				.run();
 		HandlerInterceptor interceptor = this.context
