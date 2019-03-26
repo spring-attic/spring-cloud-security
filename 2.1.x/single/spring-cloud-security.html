@@ -79,7 +79,7 @@ simple example (paired with the client above):</p><p><b>app.groovy.&nbsp;</b>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      preferTokenInfo</span>: <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">false</span></pre><p>
 </p></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="_more_detail" href="#_more_detail"></a>2.&nbsp;More Detail</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_single_sign_on" href="#_single_sign_on"></a>2.1&nbsp;Single Sign On</h2></div></div></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>All of the OAuth2 SSO and resource server features moved to Spring Boot
 in version 1.3. You can find documentation in the
-<a class="link" href="http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/" target="_top">Spring Boot user guide</a>.</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_token_relay" href="#_token_relay"></a>2.2&nbsp;Token Relay</h2></div></div></div><p>A Token Relay is where an OAuth2 consumer acts as a Client and
+<a class="link" href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/" target="_top">Spring Boot user guide</a>.</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_token_relay" href="#_token_relay"></a>2.2&nbsp;Token Relay</h2></div></div></div><p>A Token Relay is where an OAuth2 consumer acts as a Client and
 forwards the incoming token to outgoing resource requests. The
 consumer can be a pure Client (like an SSO application) or a Resource
 Server.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="_client_token_relay_in_spring_cloud_gateway" href="#_client_token_relay_in_spring_cloud_gateway"></a>2.2.1&nbsp;Client Token Relay in Spring Cloud Gateway</h3></div></div></div><p>If your app also has a
@@ -127,7 +127,7 @@ Security and Spring Boot.)</p><div class="note" style="margin-left: 0.5in; margi
 <code class="literal">client_credentials</code> tokens. In that case you need to create your own
 <code class="literal">ClientCredentialsResourceDetails</code> and configure it with
 <code class="literal">@ConfigurationProperties("security.oauth2.client")</code>.</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="_client_token_relay_in_zuul_proxy" href="#_client_token_relay_in_zuul_proxy"></a>2.2.3&nbsp;Client Token Relay in Zuul Proxy</h3></div></div></div><p>If your app also has a
-<a class="link" href="http://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy" target="_top">Spring
+<a class="link" href="https://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy" target="_top">Spring
 Cloud Zuul</a> embedded reverse proxy (using <code class="literal">@EnableZuulProxy</code>) then you
 can ask it to forward OAuth2 access tokens downstream to the services
 it is proxying. Thus the SSO app above can be enhanced simply like
