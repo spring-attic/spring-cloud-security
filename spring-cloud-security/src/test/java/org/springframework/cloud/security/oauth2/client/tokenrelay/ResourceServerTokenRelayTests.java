@@ -77,7 +77,7 @@ public class ResourceServerTokenRelayTests {
 	public void tokenRelayJWT() throws Exception {
 
 		mockServerToReceiveRelay
-			.expect(requestTo("http://example.com/test"))
+			.expect(requestTo("https://example.com/test"))
 			.andExpect(header("authorization", AUTH_HEADER_TO_BE_RELAYED))
 			.andRespond(withSuccess(TEST_RESPONSE, MediaType.APPLICATION_JSON));
 
@@ -130,7 +130,7 @@ public class ResourceServerTokenRelayTests {
 		@GetMapping("/token-relay")
 		public String callAnotherService() {
 
-			return oAuth2RestTemplate.getForEntity("http://example.com/test", String.class).getBody();
+			return oAuth2RestTemplate.getForEntity("https://example.com/test", String.class).getBody();
 
 		}
 	}

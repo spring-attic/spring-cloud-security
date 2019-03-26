@@ -61,7 +61,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	public void userInfoNotLoadBalanced() {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.userInfoUri:http://example.com")
+						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 
 		assertFalse(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"));
