@@ -41,7 +41,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 public class UserInfoTokenServicesTests {
 
 	private UserInfoTokenServices services = new UserInfoTokenServices(
-			"http://example.com", "foo");
+			"https://example.com", "foo");
 	private BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
 	private OAuth2RestOperations template = Mockito.mock(OAuth2RestOperations.class);
 	private OAuth2ClientContext clientContext = Mockito.mock(OAuth2ClientContext.class);
@@ -79,7 +79,7 @@ public class UserInfoTokenServicesTests {
 
 	@Test
 	public void noClientId() {
-		services = new UserInfoTokenServices("http://example.com", null);
+		services = new UserInfoTokenServices("https://example.com", null);
 		resource.setClientId(null);
 		services.setRestTemplate(template);
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());
@@ -88,9 +88,9 @@ public class UserInfoTokenServicesTests {
 	@Test
 	public void noAccessToken() {
 		Mockito.when(template.getAccessToken()).thenThrow(
-				new UserRedirectRequiredException("http://another.com", Collections
+				new UserRedirectRequiredException("https://another.com", Collections
 						.<String, String> emptyMap()));
-		services = new UserInfoTokenServices("http://example.com", null);
+		services = new UserInfoTokenServices("https://example.com", null);
 		resource.setClientId(null);
 		services.setRestTemplate(template);
 		assertEquals("unknown", services.loadAuthentication("FOO").getName());

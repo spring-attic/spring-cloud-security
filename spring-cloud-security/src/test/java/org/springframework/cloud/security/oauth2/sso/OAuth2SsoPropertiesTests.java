@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class OAuth2SsoPropertiesTests {
 	
-	private OAuth2SsoProperties properties = new OAuth2SsoProperties("http://example.com");
+	private OAuth2SsoProperties properties = new OAuth2SsoProperties("https://example.com");
 
 	@Test
 	public void defaultRoot() {
