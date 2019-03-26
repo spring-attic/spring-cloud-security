@@ -58,7 +58,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
 						"spring.cloud.gateway.enabled=false",
-						"security.oauth2.resource.userInfoUri:http://example.com")
+						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 
 		assertThat(
