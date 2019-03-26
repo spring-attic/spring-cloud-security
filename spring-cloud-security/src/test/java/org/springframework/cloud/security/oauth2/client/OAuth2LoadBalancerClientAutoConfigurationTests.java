@@ -59,7 +59,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	public void clientNotConfigured() {
 		this.context = new SpringApplicationBuilder(NoClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.userInfoUri:http://example.com")
+						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 		assertFalse(this.context.containsBean("loadBalancedOauth2RestTemplate"));
 	}
@@ -68,7 +68,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	public void clientConfigured() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
 				.properties("spring.config.name=test", "server.port=0",
-						"security.oauth2.resource.userInfoUri:http://example.com",
+						"security.oauth2.resource.userInfoUri:https://example.com",
 						"security.oauth2.client.clientId=foo")
 				.run();
 		OAuth2RestTemplate template = this.context
