@@ -371,6 +371,20 @@ and puts it in a request header for the downstream requests.</p>
 <div class="paragraph">
 <p>For a full working sample see <a href="https://github.com/spring-cloud-samples/sample-gateway-oauth2login">this project</a>.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The default implementation of <code>ReactiveOAuth2AuthorizedClientService</code> used by <code>TokenRelayGatewayFilterFactory</code>
+uses an in-memory data store.  You will need to provide your own implementation <code>ReactiveOAuth2AuthorizedClientService</code>
+if you need a more robust solution.
+</td>
+</tr>
+</table>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_client_token_relay"><a class="link" href="#_client_token_relay">Client Token Relay</a></h4>
