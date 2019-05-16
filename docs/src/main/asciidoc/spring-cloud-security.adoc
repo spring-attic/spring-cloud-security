@@ -85,6 +85,10 @@ and puts it in a request header for the downstream requests.
 
 For a full working sample see https://github.com/spring-cloud-samples/sample-gateway-oauth2login[this project].
 
+NOTE: The default implementation of `ReactiveOAuth2AuthorizedClientService` used by `TokenRelayGatewayFilterFactory`
+uses an in-memory data store.  You will need to provide your own implementation `ReactiveOAuth2AuthorizedClientService`
+if you need a more robust solution.
+
 ==== Client Token Relay
 
 If your app is a user facing OAuth2 client (i.e. has declared
