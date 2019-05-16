@@ -38,7 +38,8 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
  */
 @Configuration
 @ConditionalOnClass(OAuth2RestTemplate.class)
-@ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced", matchIfMissing = false)
+@ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced",
+		matchIfMissing = false)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
 public class OAuth2LoadBalancerClientAutoConfiguration {
 

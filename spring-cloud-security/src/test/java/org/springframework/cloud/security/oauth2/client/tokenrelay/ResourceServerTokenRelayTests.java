@@ -57,9 +57,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  *
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = {
-		"security.oauth2.resource.jwt.keyValue=secret",
-		"spring.cloud.gateway.enabled=false" })
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
+		properties = { "security.oauth2.resource.jwt.keyValue=secret",
+				"spring.cloud.gateway.enabled=false" })
 public class ResourceServerTokenRelayTests {
 
 	protected static final String TOKEN_VALID_UNTIL_2085 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
