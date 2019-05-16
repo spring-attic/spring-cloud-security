@@ -204,6 +204,11 @@ pass the authentication token downstream to the services (in this case
 extracts an access token from the currently authenticated user,
 and puts it in a request header for the downstream requests.</simpara>
 <simpara>For a full working sample see <link xl:href="https://github.com/spring-cloud-samples/sample-gateway-oauth2login">this project</link>.</simpara>
+<note>
+<simpara>The default implementation of <literal>ReactiveOAuth2AuthorizedClientService</literal> used by <literal>TokenRelayGatewayFilterFactory</literal>
+uses an in-memory data store.  You will need to provide your own implementation <literal>ReactiveOAuth2AuthorizedClientService</literal>
+if you need a more robust solution.</simpara>
+</note>
 </section>
 <section xml:id="_client_token_relay">
 <title>Client Token Relay</title>
