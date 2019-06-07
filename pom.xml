@@ -21,9 +21,9 @@
 		<tag>HEAD</tag>
 	</scm>
 	<properties>
-		<spring-cloud-commons.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-netflix.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
-		<spring-cloud-openfeign.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
+		<spring-cloud-commons.version>2.0.4.BUILD-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-netflix.version>2.0.4.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-cloud-openfeign.version>2.0.4.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<bintray.package>security</bintray.package>
 	</properties>
 	<modules>
