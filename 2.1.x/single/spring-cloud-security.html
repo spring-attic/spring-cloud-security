@@ -10,22 +10,22 @@ Spring Boot and Spring Security OAuth2 we can quickly create systems that
 implement common patterns like single sign on, token relay and token
 exchange.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td><th align="left">Note</th></tr><tr><td align="left" valign="top"><p>Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <a class="link" href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/asciidoc" target="_top">github</a>.</p></td></tr></table></div></div><div class="chapter"><div class="titlepage"><div><div><h1 class="title"><a name="_quickstart" href="#_quickstart"></a>1.&nbsp;Quickstart</h1></div></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_oauth2_single_sign_on" href="#_oauth2_single_sign_on"></a>1.1&nbsp;OAuth2 Single Sign On</h2></div></div></div><p>Here&#8217;s a Spring Cloud "Hello World" app with HTTP Basic
 authentication and a single user account:</p><p><b>app.groovy.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Grab('spring-boot-starter-security')</span></em>
-<em><span class="hl-annotation" style="color: gray">@Controller</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Grab('spring-boot-starter-security')</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Controller</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
 
-  <em><span class="hl-annotation" style="color: gray">@RequestMapping('/')</span></em>
+  <xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RequestMapping('/')</xslthl:annotation>
   String home() {
     <span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">'Hello World'</span>
   }
 
 }</pre><p>
 </p><p>You can run it with <code class="literal">spring run app.groovy</code> and watch the logs for the password (username is "user"). So far this is just the default for a Spring Boot app.</p><p>Here&#8217;s a Spring Cloud app with OAuth2 SSO:</p><p><b>app.groovy.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Controller</span></em>
-<em><span class="hl-annotation" style="color: gray">@EnableOAuth2Sso</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Controller</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@EnableOAuth2Sso</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
 
-  <em><span class="hl-annotation" style="color: gray">@RequestMapping('/')</span></em>
+  <xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RequestMapping('/')</xslthl:annotation>
   String home() {
     <span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">'Hello World'</span>
   }
@@ -41,7 +41,7 @@ configuration:</p><p><b>application.yml.&nbsp;</b>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">  oauth2</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    client</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientId</span>: bd1c0a783ccdd1c9b9e4
-<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientSecret</span>: <span class="hl-number">1</span>a9030fbca47a5b2c28e92f19050bb77824b5ad1
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientSecret</span>: <xslthl:number xmlns:xslthl="http://xslthl.sourceforge.net/">1</xslthl:number>a9030fbca47a5b2c28e92f19050bb77824b5ad1
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      accessTokenUri</span>: https://github.com/login/oauth/access_token
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      userAuthorizationUri</span>: https://github.com/login/oauth/authorize
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      clientAuthenticationScheme</span>: form
@@ -60,12 +60,12 @@ same code in Java (or Groovy) you need to add Spring Security OAuth2
 to the classpath (e.g. see the
 <a class="link" href="https://github.com/spring-cloud-samples/sso" target="_top">sample here</a>).</p></td></tr></table></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="_oauth2_protected_resource" href="#_oauth2_protected_resource"></a>1.2&nbsp;OAuth2 Protected Resource</h2></div></div></div><p>You want to protect an API resource with an OAuth2 token? Here&#8217;s a
 simple example (paired with the client above):</p><p><b>app.groovy.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Grab('spring-cloud-starter-security')</span></em>
-<em><span class="hl-annotation" style="color: gray">@RestController</span></em>
-<em><span class="hl-annotation" style="color: gray">@EnableResourceServer</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Grab('spring-cloud-starter-security')</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RestController</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@EnableResourceServer</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
 
-  <em><span class="hl-annotation" style="color: gray">@RequestMapping('/')</span></em>
+  <xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RequestMapping('/')</xslthl:annotation>
   def home() {
     [message: <span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">'Hello World'</span>]
   }
@@ -88,10 +88,10 @@ Cloud Gateway</a> embedded reverse proxy then you
 can ask it to forward OAuth2 access tokens downstream to the services
 it is proxying. Thus the SSO app above can be enhanced simply like
 this:</p><p><b>App.java.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Autowired</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">private</span> TokenRelayGatewayFilterFactory filterFactory;
 
-<em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Bean</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
     <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">return</span> builder.routes()
             .route(<span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">"resource"</span>, r -&gt; r.path(<span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">"/resource"</span>)
@@ -105,7 +105,7 @@ this:</p><p><b>App.java.&nbsp;</b>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    gateway</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      routes</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      - id</span>: resource
-<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        uri</span>: http://localhost:<span class="hl-number">9000</span>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        uri</span>: http://localhost:<xslthl:number xmlns:xslthl="http://xslthl.sourceforge.net/">9000</xslthl:number>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        predicates</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        - Path</span>=/resource
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        filters</span>:
@@ -134,9 +134,9 @@ Cloud Zuul</a> embedded reverse proxy (using <code class="literal">@EnableZuulPr
 can ask it to forward OAuth2 access tokens downstream to the services
 it is proxying. Thus the SSO app above can be enhanced simply like
 this:</p><p><b>app.groovy.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Controller</span></em>
-<em><span class="hl-annotation" style="color: gray">@EnableOAuth2Sso</span></em>
-<em><span class="hl-annotation" style="color: gray">@EnableZuulProxy</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Controller</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@EnableOAuth2Sso</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@EnableZuulProxy</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
 
 }</pre><p>
@@ -163,7 +163,7 @@ authentication process before it hits the backend code). Equivalently
 (with Spring Boot 1.4), you could inject a
 <code class="literal">UserInfoRestTemplateFactory</code> and grab its <code class="literal">OAuth2RestTemplate</code> in
 your configuration. For example:</p><p><b>MyConfiguration.java.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Bean</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
     <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">return</span> factory.getUserInfoRestTemplate();
 }</pre><p>
@@ -180,10 +180,10 @@ you could use a custom filter or AOP interceptor wrapping an
 example showing the use of an autowired rest template created
 elsewhere ("foo.com" is a Resource Server accepting the same tokens as
 the surrounding app):</p><p><b>MyController.java.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Autowired</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">private</span> OAuth2RestOperations restTemplate;
 
-<em><span class="hl-annotation" style="color: gray">@RequestMapping("/relay")</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RequestMapping("/relay")</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> String relay() {
     ResponseEntity&lt;String&gt; response =
       restTemplate.getForEntity(<span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">"https://foo.com/bar"</span>, String.<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span>);

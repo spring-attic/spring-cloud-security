@@ -11,10 +11,10 @@ Cloud Gateway</a> embedded reverse proxy then you
 can ask it to forward OAuth2 access tokens downstream to the services
 it is proxying. Thus the SSO app above can be enhanced simply like
 this:</p><p><b>App.java.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Autowired</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">private</span> TokenRelayGatewayFilterFactory filterFactory;
 
-<em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Bean</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
     <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">return</span> builder.routes()
             .route(<span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">"resource"</span>, r -&gt; r.path(<span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">"/resource"</span>)
@@ -28,7 +28,7 @@ this:</p><p><b>App.java.&nbsp;</b>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">    gateway</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      routes</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">      - id</span>: resource
-<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        uri</span>: http://localhost:<span class="hl-number">9000</span>
+<span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        uri</span>: http://localhost:<xslthl:number xmlns:xslthl="http://xslthl.sourceforge.net/">9000</xslthl:number>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        predicates</span>:
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        - Path</span>=/resource
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-attribute">        filters</span>:
@@ -57,9 +57,9 @@ Cloud Zuul</a> embedded reverse proxy (using <code class="literal">@EnableZuulPr
 can ask it to forward OAuth2 access tokens downstream to the services
 it is proxying. Thus the SSO app above can be enhanced simply like
 this:</p><p><b>app.groovy.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Controller</span></em>
-<em><span class="hl-annotation" style="color: gray">@EnableOAuth2Sso</span></em>
-<em><span class="hl-annotation" style="color: gray">@EnableZuulProxy</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Controller</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@EnableOAuth2Sso</xslthl:annotation>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@EnableZuulProxy</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span> Application {
 
 }</pre><p>
@@ -86,7 +86,7 @@ authentication process before it hits the backend code). Equivalently
 (with Spring Boot 1.4), you could inject a
 <code class="literal">UserInfoRestTemplateFactory</code> and grab its <code class="literal">OAuth2RestTemplate</code> in
 your configuration. For example:</p><p><b>MyConfiguration.java.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Bean</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Bean</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
     <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">return</span> factory.getUserInfoRestTemplate();
 }</pre><p>
@@ -103,10 +103,10 @@ you could use a custom filter or AOP interceptor wrapping an
 example showing the use of an autowired rest template created
 elsewhere ("foo.com" is a Resource Server accepting the same tokens as
 the surrounding app):</p><p><b>MyController.java.&nbsp;</b>
-</p><pre class="programlisting"><em><span class="hl-annotation" style="color: gray">@Autowired</span></em>
+</p><pre class="programlisting"><xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@Autowired</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">private</span> OAuth2RestOperations restTemplate;
 
-<em><span class="hl-annotation" style="color: gray">@RequestMapping("/relay")</span></em>
+<xslthl:annotation xmlns:xslthl="http://xslthl.sourceforge.net/">@RequestMapping("/relay")</xslthl:annotation>
 <span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">public</span> String relay() {
     ResponseEntity&lt;String&gt; response =
       restTemplate.getForEntity(<span xmlns:d="http://docbook.org/ns/docbook" class="hl-string">"https://foo.com/bar"</span>, String.<span xmlns:d="http://docbook.org/ns/docbook" class="hl-keyword">class</span>);
