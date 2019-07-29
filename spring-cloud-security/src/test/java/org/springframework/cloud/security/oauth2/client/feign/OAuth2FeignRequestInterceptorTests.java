@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
+import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author João Pedro Evangelista
+ * @author Tim Ysewyn
  */
 public class OAuth2FeignRequestInterceptorTests {
 
@@ -77,6 +83,40 @@ public class OAuth2FeignRequestInterceptorTests {
 				.setAccessTokenProvider(new MockAccessTokenProvider(mockedToken));
 		Assert.assertEquals("Should return same mocked token instance", mockedToken,
 				oAuth2FeignRequestInterceptor.acquireAccessToken());
+	}
+
+	@Test
+	public void applyAuthorizationHeaderOnlyOnce() {
+		OAuth2ClientContext oAuth2ClientContext = mock(OAuth2ClientContext.class);
+		when(oAuth2ClientContext.getAccessToken())
+				.thenReturn(new MockOAuth2AccessToken("MOCKED_TOKEN"));
+
+		OAuth2FeignRequestInterceptor oAuth2FeignRequestInterceptor = new OAuth2FeignRequestInterceptor(
+				oAuth2ClientContext, new BaseOAuth2ProtectedResourceDetails());
+
+		oAuth2FeignRequestInterceptor.apply(requestTemplate);
+
+		// First idempotent call failed, retry mechanism kicks in, and token has expired
+		// in the meantime
+
+		OAuth2AccessToken expiredAccessToken = mock(OAuth2AccessToken.class);
+		when(expiredAccessToken.isExpired()).thenReturn(true);
+		when(oAuth2ClientContext.getAccessToken()).thenReturn(expiredAccessToken);
+		AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+		when(oAuth2ClientContext.getAccessTokenRequest()).thenReturn(accessTokenRequest);
+		OAuth2AccessToken newToken = new MockOAuth2AccessToken("Fancy");
+		oAuth2FeignRequestInterceptor
+				.setAccessTokenProvider(new MockAccessTokenProvider(newToken));
+
+		oAuth2FeignRequestInterceptor.apply(requestTemplate);
+
+		Map<String, Collection<String>> headers = requestTemplate.headers();
+		Assert.assertTrue("RequestTemplate must have a Authorization header",
+				headers.containsKey("Authorization"));
+		Assert.assertThat("Authorization must have a extract of Fancy",
+				headers.get("Authorization"), hasSize(1));
+		Assert.assertThat("Authorization must have a extract of Fancy",
+				headers.get("Authorization"), contains("Bearer Fancy"));
 	}
 
 }

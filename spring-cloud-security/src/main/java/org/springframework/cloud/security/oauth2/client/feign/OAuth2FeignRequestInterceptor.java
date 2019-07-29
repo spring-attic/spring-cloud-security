@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2015 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
  * construct a new header on the request before it is made by Feign.
  *
  * @author Joao Pedro Evangelista
+ * @author Tim Ysewyn
  */
 public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
@@ -101,6 +102,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	 */
 	@Override
 	public void apply(RequestTemplate template) {
+		template.header(header); // Clears out the header, no "clear" method available.
 		template.header(header, extract(tokenType));
 	}
 
