@@ -102,7 +102,7 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	 */
 	@Override
 	public void apply(RequestTemplate template) {
-		template.header(header);
+		template.header(header); // Clears out the header, no "clear" method available.
 		template.header(header, extract(tokenType));
 	}
 
