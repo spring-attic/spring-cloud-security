@@ -23,7 +23,7 @@ import feign.codec.ErrorDecoder;
 import java.util.Date;
 
 /**
- * Pre-defined custom ErrorDecoder for Feign сдшутеы. In case of 401 error, this error
+ * Pre-defined custom ErrorDecoder for Feign client. In case of 401 error, this error
  * decode return {@link OAuth2FeignRetryableException}. For all other errors it delegates
  * to underlying error decoder.
  *
