@@ -94,7 +94,7 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	}
 
 	@EnableAutoConfiguration
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableOAuth2Sso
 	protected static class ClientConfiguration {
 

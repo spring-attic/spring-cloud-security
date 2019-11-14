@@ -34,7 +34,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
  * @author Dave Syer
  *
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ ZuulFilter.class, EnableOAuth2Client.class,
 		SecurityProperties.class })
 @ConditionalOnWebApplication
@@ -65,7 +65,7 @@ public class OAuth2ProxyAutoConfiguration {
 	}
 
 	@ConditionalOnClass({ ProxyRequestHelper.class })
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class AuthenticationHeaderFilterConfiguration {
 
 		@Bean

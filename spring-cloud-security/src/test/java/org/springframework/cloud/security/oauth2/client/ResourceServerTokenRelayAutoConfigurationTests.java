@@ -90,14 +90,14 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	}
 
 	@EnableAutoConfiguration
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableResourceServer
 	protected static class NoClientConfiguration {
 
 	}
 
 	@EnableAutoConfiguration
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableResourceServer
 	@EnableOAuth2Sso
 	protected static class ClientConfiguration {

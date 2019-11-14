@@ -60,7 +60,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  * @author Dave Syer
  *
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
 @ConditionalOnOAuth2ClientInResourceServer
 @ConditionalOnClass(ResourceServerConfiguration.class)
@@ -78,7 +78,7 @@ public class ResourceServerTokenRelayAutoConfiguration {
 	 * @author Dave Syer
 	 *
 	 */
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class ResourceServerTokenRelayRegistrationAutoConfiguration
 			implements WebMvcConfigurer {
 

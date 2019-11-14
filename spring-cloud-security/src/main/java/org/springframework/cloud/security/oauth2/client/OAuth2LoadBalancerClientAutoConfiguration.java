@@ -36,14 +36,14 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
  * @author Dave Syer
  *
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(OAuth2RestTemplate.class)
 @ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced",
 		matchIfMissing = false)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
 public class OAuth2LoadBalancerClientAutoConfiguration {
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnBean(LoadBalancerInterceptor.class)
 	protected static class UserInfoLoadBalancerConfig {
 
@@ -63,7 +63,7 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnBean(RetryLoadBalancerInterceptor.class)
 	protected static class UserInfoRetryLoadBalancerConfig {
 
