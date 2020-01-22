@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-security-parent</artifactId>
-		<version>2.2.1.BUILD-SNAPSHOT</version>
+		<version>3.0.0.BUILD-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<packaging>pom</packaging>
@@ -15,7 +15,7 @@
 	<properties>
         <docs.main>spring-cloud-security</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
-		<docs.whitelisted.branches>1.1.x,1.2.x,2.1.x</docs.whitelisted.branches>
+		<docs.whitelisted.branches>2.1.x,2.2.x</docs.whitelisted.branches>
 	</properties>
  	<build>
 		<plugins>
