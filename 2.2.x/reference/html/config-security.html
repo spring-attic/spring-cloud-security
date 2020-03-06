@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<title>Certificate Based Security (X509)</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+.hidden {
+	display: none;
+}
+
+.switch {
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+	display: inline-block;
+}
+
+.switch--item {
+	padding: 10px;
+	background-color: #ffffff;
+	color: #7a2518;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+}
+
+.switch--item.selected {
+	background-color: #7a2519;
+	color: #ffffff;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+	$('.primary').each(function() {
+		primary = $(this);
+		createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+		primary.children('.title').remove();
+	});
+	$('.secondary').each(function(idx, node) {
+		secondary = $(node);
+		primary = findPrimary(secondary);
+		switchItem = createSwitchItem(secondary, primary.children('.switch'));
+		switchItem.content.addClass('hidden');
+		findPrimary(secondary).append(switchItem.content);
+		secondary.remove();
+	});
+}
+
+function createBlockSwitch(primary) {
+	blockSwitch = $('<div class="switch"></div>');
+	primary.prepend(blockSwitch);
+	return blockSwitch;
+}
+
+function findPrimary(secondary) {
+	candidate = secondary.prev();
+	while (!candidate.is('.primary')) {
+		candidate = candidate.prev();
+	}
+	return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+	blockName = block.children('.title').text();
+	content = block.children('.content').first().append(block.next('.colist'));
+	item = $('<div class="switch--item">' + blockName + '</div>');
+	item.on('click', '', content, function(e) {
+		$(this).addClass('selected');
+		$(this).siblings().removeClass('selected');
+		e.data.siblings('.content').addClass('hidden');
+		e.data.removeClass('hidden');
+	});
+	blockSwitch.append(item);
+	return {'item': item, 'content': content};
+}
+
+$(addBlockSwitches);
+</script>
+
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel2">
+<li><a href="#_certificate_based_security_x509">Certificate Based Security (X509)</a></li>
+<li><a href="#_kerberos">Kerberos</a></li>
+<li><a href="#_oauth2_bearer_token">OAuth2 Bearer Token</a></li>
+<li><a href="#_http_basic_security">HTTP Basic Security</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In a real system (not a demo) the Config Server should be able to
+authenticate clients that want to use the property source resources.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_certificate_based_security_x509"><a class="link" href="#_certificate_based_security_x509">Certificate Based Security (X509)</a></h3>
+<div class="paragraph">
+<p>If clients can communicate with the Config Server directly over HTTPS,
+then they can authenticate through a certificate. This requires the
+certificate to be installed in the client (could be a shared keystore
+file), and to be readable (usually requires a password). If the Config
+Server only accepts HTTP connections (like in Cloud Foundry) it&#8217;s a
+challenge because then the front-end router has to have the
+certificate processing and header population, and you probably want it
+to be different in different environments (e.g. production vs. test).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_kerberos"><a class="link" href="#_kerberos">Kerberos</a></h3>
+<div class="paragraph">
+<p>If the client apps can be kerberized (the user they run as is trusted
+by a Kerberos server), then they might be able to authenticate with
+the server with minimal changes to the clients. That should be a
+winning strategy in a lot of environments, but currently not really
+very convenient in Cloud Foundry. The server has to be kerberized as
+well, which is a tightly controlled process, but could be arranged
+given that it can be given network access to a Kerberos installation
+somewhere. The hardest thing to achieve (e.g. in a PaaS) might be a
+reverse-resolvable hostname (but if you control the Kerberos
+installation you can switch off that requirement).</p>
+</div>
+<div class="paragraph">
+<p>TBD: Kerberos client (how do you do <code>RestTemplate</code> for the current
+UN*X user?). Theoretically it&#8217;s possible, but not supported yet in
+Spring Kerberos.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_oauth2_bearer_token"><a class="link" href="#_oauth2_bearer_token">OAuth2 Bearer Token</a></h3>
+<div class="paragraph">
+<p>OAuth2 bearer tokens are a standard way for computers to authenticate
+with one another. This is a valuable option for the Spring Cloud
+Config Client if it happens to be running in an environment where
+OAuth2 tokens are relatively easy to come by (e.g. if we had an OAuth2
+service for client credentials in Cloud Foundry).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_http_basic_security"><a class="link" href="#_http_basic_security">HTTP Basic Security</a></h3>
+<div class="paragraph">
+<p>The simplest thing that could possibly work would be HTTP Basic
+security, and Spring Boot already does that for free with almost no
+hassle on the server (really just a question of setting
+<code>security.user.password</code>). The problem then becomes how to keep the
+password safe and have it distributed to clients. So what are the
+options? The password is stored in a client via
+<code>ConfigSecurityProperties</code> with a property "password". The password
+can be set using an external config property
+<code>config.security.password</code>, or it can be set using a more elaborate
+scheme if that turns out to be desirable.</p>
+</div>
+<div class="paragraph">
+<p>Desirable features of whatever scheme we choose to protect the
+password:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Apps can still be developed and deployed in a non-production
+environment without jumping through too many hoops or repeating
+configuration too much.</p>
+</li>
+<li>
+<p>Deploying into production should not require a lot of extra steps or
+repetitive tasks for operations people or automation agents.</p>
+</li>
+<li>
+<p>Whatever scheme or schemes we provide there has to be something that
+works well in a PaaS environment (Cloud Foundry in particular).</p>
+</li>
+<li>
+<p>Secrets can be changed if compromised. Ideally all client apps would
+be able to refresh without a restart, e.g. using a Spring Cloud Bus
+signal, assuming they might need the Config Server in between
+restarts.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_configuration_file"><a class="link" href="#_configuration_file">Configuration File</a></h4>
+<div class="paragraph">
+<p>A configuration file can have the password in plain text as long as
+only apps (or config admin users) can read it. The problem is reduced
+to how to protect the configuration file, and there are several
+options.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>UN*X file permissions. Client apps all have access to a filesystem
+resource that is protected by UN*X permissions. E.g. apps run as the
+"app" user, and the config file belongs to the "config" user (in the
+same group as the app user), with group read permissions (640). This
+is pretty robust and if there is a shared file system with proper then
+the password can be changed easily in a single place. Doesn&#8217;t work
+very well in a PaaS unless you can fabricate a shared filesystem from
+somewhere, and that isn&#8217;t easy if you fold in the requirement for file
+permissions.</p>
+</li>
+<li>
+<p>HTTP(S) server (or any URL resource). Doesn&#8217;t really solve the
+problem on its own since you need to secure access to the file server
+for the same reasons you need to secure the Config Server. At best you
+might have a generic solution already in place in a given production
+environment (e.g. kerberized authentication) that cannot be easily
+duplicated in the Config Server. In that case it works pretty well.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_environment_variables"><a class="link" href="#_environment_variables">Environment Variables</a></h4>
+<div class="paragraph">
+<p>Every client app has to be started with an environment variable for
+the password (e.g. <code>CONFIG_SECURITY_PASSWORD</code>). This can be made
+relatively secure since presumably only a privileged user can start an
+app. It can be a pain to set up, unless there is a platform for
+deploying apps that can be configured to set the environment
+variable. You could do that (for instance) with a CI system deploying
+to a PaaS, and then the security is all in the CI server. Also, if you
+want to change the password, you have to restart all the app instances
+(since an environment variable is baked into the process).</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cloud_foundry_service_binding"><a class="link" href="#_cloud_foundry_service_binding">Cloud Foundry Service Binding</a></h4>
+<div class="paragraph">
+<p>A special case of environment variables is credentials from a Cloud
+Foundry service, since they are embedded in a JSON object that is an
+environment variable. Apps in Cloud Foundry already benefit (a bit)
+from binding to a Config Server service (they get the base URL), but
+if the credentials also (optionally) contained a password, that would
+be more valuable. Using a Spring Cloud Connector we might even be able
+to reduce the level of involvement for both users and operators. It
+would really be a sweet spot if the Config Server itself didn&#8217;t have
+to configure its own password (say it was generated randomly), but
+it was still transmitted to client apps as credentials.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_config_server"><a class="link" href="#_config_server">Config Server</a></h4>
+<div class="paragraph">
+<p>The Config Server itself could be enhanced to be able to reveal its
+own secret to trusted parties. How is this any better than just being
+insecure (trust everyone)? It&#8217;s a question of who you trust, and how
+flexible you want to be about changing the secret. For instance you
+might be prepared to trust anyone who can prove that they own an IP
+address in the same subnet as the Config Server, or an app deployed in
+a particular space ID in a Cloud Foundry instance.</p>
+</div>
+<div class="paragraph">
+<p>Example flow:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Config Server exposes a <code>/password</code> endpoint</p>
+</li>
+<li>
+<p>Client POSTs to <code>/password</code> with a body containing data (or hashes
+of data) that it can derive from its environment (like a space ID, an
+IP address, or a hostname, or some combination of those)</p>
+</li>
+<li>
+<p>Server verifies the data (e.g. by pinging an endpoint on the Client
+and getting a successful response, or looking up a space ID in a
+database)</p>
+</li>
+<li>
+<p>Server returns password in body of response (or 403 if the request
+cannot be validated)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>(There is an assumption that doing this once in return for a password,
+is better than having to do it for all the endpoints in the Config
+Server.)</p>
+</div>
+<div class="paragraph">
+<p>To make it (optionally) more secure the server could XOR the password
+with the value of a shared secret (e.g. shared by environment
+variables amongst all apps). This <strong>is</strong> actually better than just
+sharing the password using an environment variable because the server
+gets to do the extra computations on the data provided by the client.</p>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript" src="js/tocbot/tocbot.min.js"></script>
+<script type="text/javascript" src="js/toc.js"></script>
+<link rel="stylesheet" href="js/highlight/styles/atom-one-dark-reasonable.min.css">
+<script src="js/highlight/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

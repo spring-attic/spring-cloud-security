@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<title>Spring Cloud Security</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+.hidden {
+	display: none;
+}
+
+.switch {
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+	display: inline-block;
+}
+
+.switch--item {
+	padding: 10px;
+	background-color: #ffffff;
+	color: #7a2518;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+}
+
+.switch--item.selected {
+	background-color: #7a2519;
+	color: #ffffff;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+	$('.primary').each(function() {
+		primary = $(this);
+		createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+		primary.children('.title').remove();
+	});
+	$('.secondary').each(function(idx, node) {
+		secondary = $(node);
+		primary = findPrimary(secondary);
+		switchItem = createSwitchItem(secondary, primary.children('.switch'));
+		switchItem.content.addClass('hidden');
+		findPrimary(secondary).append(switchItem.content);
+		secondary.remove();
+	});
+}
+
+function createBlockSwitch(primary) {
+	blockSwitch = $('<div class="switch"></div>');
+	primary.prepend(blockSwitch);
+	return blockSwitch;
+}
+
+function findPrimary(secondary) {
+	candidate = secondary.prev();
+	while (!candidate.is('.primary')) {
+		candidate = candidate.prev();
+	}
+	return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+	blockName = block.children('.title').text();
+	content = block.children('.content').first().append(block.next('.colist'));
+	item = $('<div class="switch--item">' + blockName + '</div>');
+	item.on('click', '', content, function(e) {
+		$(this).addClass('selected');
+		$(this).siblings().removeClass('selected');
+		e.data.siblings('.content').addClass('hidden');
+		e.data.removeClass('hidden');
+	});
+	blockSwitch.append(item);
+	return {'item': item, 'content': content};
+}
+
+$(addBlockSwitches);
+</script>
+
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>Spring Cloud Security</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_quickstart">Quickstart</a>
+<ul class="sectlevel2">
+<li><a href="#_oauth2_single_sign_on">OAuth2 Single Sign On</a></li>
+<li><a href="#_oauth2_protected_resource">OAuth2 Protected Resource</a></li>
+</ul>
+</li>
+<li><a href="#_more_detail">More Detail</a>
+<ul class="sectlevel2">
+<li><a href="#_single_sign_on">Single Sign On</a></li>
+<li><a href="#_token_relay">Token Relay</a></li>
+</ul>
+</li>
+<li><a href="#_configuring_authentication_downstream_of_a_zuul_proxy">Configuring Authentication Downstream of a Zuul Proxy</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Security offers a set of primitives for building secure
+applications and services with minimum fuss. A declarative model which
+can be heavily configured externally (or centrally) lends itself to
+the implementation of large systems of co-operating, remote components,
+usually with a central indentity management service. It is also extremely
+easy to use in a service platform like Cloud Foundry. Building on
+Spring Boot and Spring Security OAuth2 we can quickly create systems that
+implement common patterns like single sign on, token relay and token
+exchange.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like to contribute to this section of the documentation or if you find an error, please find the source code and issue trackers in the project at <a href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/asciidoc">github</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quickstart"><a class="link" href="#_quickstart">Quickstart</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_oauth2_single_sign_on"><a class="link" href="#_oauth2_single_sign_on">OAuth2 Single Sign On</a></h3>
+<div class="paragraph">
+<p>Here&#8217;s a Spring Cloud "Hello World" app with HTTP Basic
+authentication and a single user account:</p>
+</div>
+<div class="listingblock">
+<div class="title">app.groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Grab('spring-boot-starter-security')
+@Controller
+class Application {
+
+  @RequestMapping('/')
+  String home() {
+    'Hello World'
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can run it with <code>spring run app.groovy</code> and watch the logs for the password (username is "user"). So far this is just the default for a Spring Boot app.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a Spring Cloud app with OAuth2 SSO:</p>
+</div>
+<div class="listingblock">
+<div class="title">app.groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Controller
+@EnableOAuth2Sso
+class Application {
+
+  @RequestMapping('/')
+  String home() {
+    'Hello World'
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Spot the difference? This app will actually behave exactly the same as
+the previous one, because it doesn&#8217;t know it&#8217;s OAuth2 credentals
+yet.</p>
+</div>
+<div class="paragraph">
+<p>You can register an app in github quite easily, so try that if you
+want a production app on your own domain. If you are happy to test on
+localhost:8080, then set up these properties in your application
+configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">security:
+  oauth2:
+    client:
+      clientId: bd1c0a783ccdd1c9b9e4
+      clientSecret: 1a9030fbca47a5b2c28e92f19050bb77824b5ad1
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user
+      preferTokenInfo: false</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>run the app above and it will redirect to github for authorization. If
+you are already signed into github you won&#8217;t even notice that it has
+authenticated.  These credentials will only work if your app is
+running on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>To limit the scope that the client asks for when it obtains an access token
+you can set <code>security.oauth2.client.scope</code> (comma separated or an array in YAML). By
+default the scope is empty and it is up to to Authorization Server to
+decide what the defaults should be, usually depending on the settings in
+the client registration that it holds.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The examples above are all Groovy scripts. If you want to write the
+same code in Java (or Groovy) you need to add Spring Security OAuth2
+to the classpath (e.g. see the
+<a href="https://github.com/spring-cloud-samples/sso">sample here</a>).
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_oauth2_protected_resource"><a class="link" href="#_oauth2_protected_resource">OAuth2 Protected Resource</a></h3>
+<div class="paragraph">
+<p>You want to protect an API resource with an OAuth2 token? Here&#8217;s a
+simple example (paired with the client above):</p>
+</div>
+<div class="listingblock">
+<div class="title">app.groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Grab('spring-cloud-starter-security')
+@RestController
+@EnableResourceServer
+class Application {
+
+  @RequestMapping('/')
+  def home() {
+    [message: 'Hello World']
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">security:
+  oauth2:
+    resource:
+      userInfoUri: https://api.github.com/user
+      preferTokenInfo: false</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_more_detail"><a class="link" href="#_more_detail">More Detail</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_single_sign_on"><a class="link" href="#_single_sign_on">Single Sign On</a></h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All of the OAuth2 SSO and resource server features moved to Spring Boot
+in version 1.3. You can find documentation in the
+<a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/">Spring Boot user guide</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_token_relay"><a class="link" href="#_token_relay">Token Relay</a></h3>
+<div class="paragraph">
+<p>A Token Relay is where an OAuth2 consumer acts as a Client and
+forwards the incoming token to outgoing resource requests. The
+consumer can be a pure Client (like an SSO application) or a Resource
+Server.</p>
+</div>
+<div class="sect3">
+<h4 id="_client_token_relay_in_spring_cloud_gateway"><a class="link" href="#_client_token_relay_in_spring_cloud_gateway">Client Token Relay in Spring Cloud Gateway</a></h4>
+<div class="paragraph">
+<p>If your app also has a
+<a href="https://cloud.spring.io/spring-cloud-static/current/single/spring-cloud.html#_spring_cloud_gateway">Spring
+Cloud Gateway</a> embedded reverse proxy then you
+can ask it to forward OAuth2 access tokens downstream to the services
+it is proxying. Thus the SSO app above can be enhanced simply like
+this:</p>
+</div>
+<div class="listingblock">
+<div class="title">App.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Autowired
+private TokenRelayGatewayFilterFactory filterFactory;
+
+@Bean
+public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+    return builder.routes()
+            .route("resource", r -&gt; r.path("/resource")
+                    .filters(f -&gt; f.filter(filterFactory.apply()))
+                    .uri("http://localhost:9000"))
+            .build();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>or this</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: resource
+        uri: http://localhost:9000
+        predicates:
+        - Path=/resource
+        filters:
+        - TokenRelay=</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and it will (in addition to logging the user in and grabbing a token)
+pass the authentication token downstream to the services (in this case
+<code>/resource</code>).</p>
+</div>
+<div class="paragraph">
+<p>To enable this for Spring Cloud Gateway add the following dependencies</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>org.springframework.boot:spring-boot-starter-oauth2-client</code></p>
+</li>
+<li>
+<p><code>org.springframework.cloud:spring-cloud-starter-security</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>How does it work?  The
+<a href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/gateway/TokenRelayGatewayFilterFactory.java">filter</a>
+extracts an access token from the currently authenticated user,
+and puts it in a request header for the downstream requests.</p>
+</div>
+<div class="paragraph">
+<p>For a full working sample see <a href="https://github.com/spring-cloud-samples/sample-gateway-oauth2login">this project</a>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The default implementation of <code>ReactiveOAuth2AuthorizedClientService</code> used by <code>TokenRelayGatewayFilterFactory</code>
+uses an in-memory data store.  You will need to provide your own implementation <code>ReactiveOAuth2AuthorizedClientService</code>
+if you need a more robust solution.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_client_token_relay"><a class="link" href="#_client_token_relay">Client Token Relay</a></h4>
+<div class="paragraph">
+<p>If your app is a user facing OAuth2 client (i.e. has declared
+<code>@EnableOAuth2Sso</code> or <code>@EnableOAuth2Client</code>) then it has an
+<code>OAuth2ClientContext</code> in request scope from Spring Boot. You can
+create your own <code>OAuth2RestTemplate</code> from this context and an
+autowired <code>OAuth2ProtectedResourceDetails</code>, and then the context will
+always forward the access token downstream, also refreshing the access
+token automatically if it expires. (These are features of Spring
+Security and Spring Boot.)</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Spring Boot (1.4.1) does not create an
+<code>OAuth2ProtectedResourceDetails</code> automatically if you are using
+<code>client_credentials</code> tokens. In that case you need to create your own
+<code>ClientCredentialsResourceDetails</code> and configure it with
+<code>@ConfigurationProperties("security.oauth2.client")</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_client_token_relay_in_zuul_proxy"><a class="link" href="#_client_token_relay_in_zuul_proxy">Client Token Relay in Zuul Proxy</a></h4>
+<div class="paragraph">
+<p>If your app also has a
+<a href="https://cloud.spring.io/spring-cloud.html#netflix-zuul-reverse-proxy">Spring
+Cloud Zuul</a> embedded reverse proxy (using <code>@EnableZuulProxy</code>) then you
+can ask it to forward OAuth2 access tokens downstream to the services
+it is proxying. Thus the SSO app above can be enhanced simply like
+this:</p>
+</div>
+<div class="listingblock">
+<div class="title">app.groovy</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Controller
+@EnableOAuth2Sso
+@EnableZuulProxy
+class Application {
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and it will (in addition to logging the user in and grabbing a token)
+pass the authentication token downstream to the <code>/proxy/*</code>
+services. If those services are implemented with
+<code>@EnableResourceServer</code> then they will get a valid token in the
+correct header.</p>
+</div>
+<div class="paragraph">
+<p>How does it work? The <code>@EnableOAuth2Sso</code> annotation pulls in
+<code>spring-cloud-starter-security</code> (which you could do manually in a
+traditional app), and that in turn triggers some autoconfiguration for
+a <code>ZuulFilter</code>, which itself is activated because Zuul is on the
+classpath (via <code>@EnableZuulProxy</code>). The
+<a href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/OAuth2TokenRelayFilter.java">filter</a>
+just extracts an access token from the currently authenticated user,
+and puts it in a request header for the downstream requests.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Spring Boot does not create an <code>OAuth2RestOperations</code> automatically which is needed for <code>refresh_token</code>. In that case you need to create your own
+<code>OAuth2RestOperations</code> so <code>OAuth2TokenRelayFilter</code> can refresh the token if needed.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_resource_server_token_relay"><a class="link" href="#_resource_server_token_relay">Resource Server Token Relay</a></h4>
+<div class="paragraph">
+<p>If your app has <code>@EnableResourceServer</code> you might want to relay the
+incoming token downstream to other services. If you use a
+<code>RestTemplate</code> to contact the downstream services then this is just a
+matter of how to create the template with the right context.</p>
+</div>
+<div class="paragraph">
+<p>If your service uses <code>UserInfoTokenServices</code> to authenticate incoming
+tokens (i.e. it is using the <code>security.oauth2.user-info-uri</code>
+configuration), then you can simply create an <code>OAuth2RestTemplate</code>
+using an autowired <code>OAuth2ClientContext</code> (it will be populated by the
+authentication process before it hits the backend code). Equivalently
+(with Spring Boot 1.4), you could inject a
+<code>UserInfoRestTemplateFactory</code> and grab its <code>OAuth2RestTemplate</code> in
+your configuration. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">MyConfiguration.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Bean
+public OAuth2RestTemplate restTemplate(UserInfoRestTemplateFactory factory) {
+    return factory.getUserInfoRestTemplate();
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This rest template will then have the same <code>OAuth2ClientContext</code>
+(request-scoped) that is used by the authentication filter, so you can
+use it to send requests with the same access token.</p>
+</div>
+<div class="paragraph">
+<p>If your app is not using <code>UserInfoTokenServices</code> but is still a client
+(i.e. it declares <code>@EnableOAuth2Client</code> or <code>@EnableOAuth2Sso</code>), then
+with Spring Security Cloud any <code>OAuth2RestOperations</code> that the user
+creates from an <code>@Autowired</code> <code>OAuth2Context</code> will also forward
+tokens. This feature is implemented by default as an MVC handler
+interceptor, so it only works in Spring MVC. If you are not using MVC
+you could use a custom filter or AOP interceptor wrapping an
+<code>AccessTokenContextRelay</code> to provide the same feature.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a basic
+example showing the use of an autowired rest template created
+elsewhere ("foo.com" is a Resource Server accepting the same tokens as
+the surrounding app):</p>
+</div>
+<div class="listingblock">
+<div class="title">MyController.java</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Autowired
+private OAuth2RestOperations restTemplate;
+
+@RequestMapping("/relay")
+public String relay() {
+    ResponseEntity&lt;String&gt; response =
+      restTemplate.getForEntity("https://foo.com/bar", String.class);
+    return "Success! (" + response.getBody() + ")";
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t want to forward tokens (and that is a valid
+choice, since you might want to act as yourself, rather than the
+client that sent you the token), then you only need to create your own
+<code>OAuth2Context</code> instead of autowiring the default one.</p>
+</div>
+<div class="paragraph">
+<p>Feign clients will also pick up an interceptor that uses the
+<code>OAuth2ClientContext</code> if it is available, so they should also do a
+token relay anywhere where a <code>RestTemplate</code> would.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuring_authentication_downstream_of_a_zuul_proxy"><a class="link" href="#_configuring_authentication_downstream_of_a_zuul_proxy">Configuring Authentication Downstream of a Zuul Proxy</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can control the authorization behaviour downstream of an
+<code>@EnableZuulProxy</code> through the <code>proxy.auth.*</code> settings. Example:</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">proxy:
+  auth:
+    routes:
+      customers: oauth2
+      stores: passthru
+      recommendations: none</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this example the "customers" service gets an OAuth2 token relay,
+the "stores" service gets a passthrough (the authorization header is
+just passed downstream), and the "recommendations" service has its
+authorization header removed. The default behaviour is to do a token
+relay if there is a token available, and passthru otherwise.</p>
+</div>
+<div class="paragraph">
+<p>See
+<a href="https://github.com/spring-cloud/spring-cloud-security/tree/master/src/main/java/org/springframework/cloud/security/oauth2/proxy/ProxyAuthenticationProperties">
+ProxyAuthenticationProperties</a> for full details.</p>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript" src="js/tocbot/tocbot.min.js"></script>
+<script type="text/javascript" src="js/toc.js"></script>
+<link rel="stylesheet" href="js/highlight/styles/atom-one-dark-reasonable.min.css">
+<script src="js/highlight/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
