@@ -39,6 +39,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 		SecurityProperties.class })
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(ProxyAuthenticationProperties.class)
+@Deprecated
 public class OAuth2ProxyAutoConfiguration {
 
 	@Autowired

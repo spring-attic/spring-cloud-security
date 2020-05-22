@@ -39,6 +39,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
  * @author Dave Syer
  *
  */
+@Deprecated
 public class OAuth2TokenRelayFilter extends ZuulFilter {
 
 	private static final String ACCESS_TOKEN = "ACCESS_TOKEN";

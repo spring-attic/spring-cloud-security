@@ -36,6 +36,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
  * @author Dave Syer
  *
  */
+@Deprecated
 public class AccessTokenContextRelay {
 
 	private OAuth2ClientContext context;

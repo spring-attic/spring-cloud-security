@@ -7,3 +7,5 @@ easy to use in a service platform like Cloud Foundry. Building on
 Spring Boot and Spring Security OAuth2 we can quickly create systems that
 implement common patterns like single sign on, token relay and token
 exchange.
+
+WARNING: In a future major release, the functionality contained in this project will move to the respective projects.

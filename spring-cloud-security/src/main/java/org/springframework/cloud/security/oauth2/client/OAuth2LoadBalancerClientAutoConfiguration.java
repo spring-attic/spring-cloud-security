@@ -41,6 +41,7 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 @ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced",
 		matchIfMissing = false)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
+@Deprecated
 public class OAuth2LoadBalancerClientAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)

@@ -39,9 +39,11 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
  * {@link OAuth2ClientContext OAuth2ClientContext} provided from the environment and
  * construct a new header on the request before it is made by Feign.
  *
+ * @deprecated will move to Spring Cloud Openfeign in next major release.
  * @author Joao Pedro Evangelista
  * @author Tim Ysewyn
  */
+@Deprecated
 public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	/**

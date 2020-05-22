@@ -29,6 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  */
 @ConfigurationProperties("proxy.auth")
+@Deprecated
 public class ProxyAuthenticationProperties {
 
 	/**

@@ -39,6 +39,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 		SecurityWebFilterChain.class, SecurityProperties.class })
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(ProxyAuthenticationProperties.class)
+@Deprecated
 public class TokenRelayAutoConfiguration {
 
 	@Bean

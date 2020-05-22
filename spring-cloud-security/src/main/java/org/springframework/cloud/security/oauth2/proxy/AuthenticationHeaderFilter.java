@@ -32,6 +32,7 @@ import org.springframework.cloud.security.oauth2.proxy.ProxyAuthenticationProper
  * @author Dave Syer
  *
  */
+@Deprecated
 public class AuthenticationHeaderFilter extends ZuulFilter {
 
 	private Map<String, Route> routes = new HashMap<String, Route>();
