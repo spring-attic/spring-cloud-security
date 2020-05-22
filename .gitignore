@@ -20,3 +20,4 @@ _site/
 *.versionsBackup
 .vscode/
 .flattened-pom.xml
+.sdkmanrc
