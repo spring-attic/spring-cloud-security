@@ -17,6 +17,8 @@ Spring Boot and Spring Security OAuth2 we can quickly create systems that
 implement common patterns like single sign on, token relay and token
 exchange.
 
+WARNING: In a future major release, the functionality contained in this project will move to the respective projects.
+
 == Upgrading to 1.1.0
 
 Most of the OAuth2 features moved from this project to Spring Boot 1.3, so from version 1.1 things are a little different here. Here
@@ -114,6 +116,11 @@ https://www.springsource.com/developer/sts[Spring Tools Suite] or
 https://eclipse.org[Eclipse] when working with the code. We use the
 https://eclipse.org/m2e/[m2eclipse] eclipse plugin for maven support. Other IDEs and tools
 should also work without issue as long as they use Maven 3.3.3 or better.
+
+==== Activate the Spring Maven profile
+Spring Cloud projects require the 'spring' Maven profile to be activated to resolve
+the spring milestone and snapshot repositories. Use your preferred IDE to set this
+profile to be active, or you may experience build errors.
 
 ==== Importing into eclipse with m2eclipse
 We recommend the https://eclipse.org/m2e/[m2eclipse] eclipse plugin when working with
