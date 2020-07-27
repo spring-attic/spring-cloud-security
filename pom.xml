@@ -21,7 +21,7 @@
 		<tag>HEAD</tag>
 	</scm>
 	<properties>
-		<spring-cloud-commons.version>3.0.0-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-commons.version>3.0.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-gateway.version>3.0.0-SNAPSHOT</spring-cloud-gateway.version>
 		<spring-cloud-openfeign.version>3.0.0-SNAPSHOT</spring-cloud-openfeign.version>
 		<bintray.package>security</bintray.package>
