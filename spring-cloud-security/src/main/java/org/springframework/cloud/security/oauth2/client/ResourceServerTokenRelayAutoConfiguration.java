@@ -65,6 +65,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 @ConditionalOnOAuth2ClientInResourceServer
 @ConditionalOnClass(ResourceServerConfiguration.class)
 @ConditionalOnWebApplication
+@Deprecated
 public class ResourceServerTokenRelayAutoConfiguration {
 
 	@Bean

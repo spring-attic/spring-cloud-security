@@ -36,6 +36,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @ConditionalOnClass({ GatewayFilter.class, OAuth2AuthorizedClient.class,
 		SecurityWebFilterChain.class, SecurityProperties.class })
 @ConditionalOnWebApplication
+@Deprecated
 public class TokenRelayAutoConfiguration {
 
 	@Bean

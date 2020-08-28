@@ -29,8 +29,10 @@ import org.springframework.web.server.ServerWebExchange;
 
 /**
  * @author Joe Grandja
+ * @deprecated will move to Spring Cloud Gateway in next major release.
  */
 @Component
+@Deprecated
 public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
 	private ServerOAuth2AuthorizedClientRepository authorizedClientRepository;
