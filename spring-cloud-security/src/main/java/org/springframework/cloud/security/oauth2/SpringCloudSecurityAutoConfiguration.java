@@ -31,8 +31,7 @@ import org.springframework.context.annotation.Configuration;
 @Deprecated
 public class SpringCloudSecurityAutoConfiguration {
 
-	private static final Log LOG = LogFactory
-			.getLog(SpringCloudSecurityAutoConfiguration.class);
+	private static final Log LOG = LogFactory.getLog(SpringCloudSecurityAutoConfiguration.class);
 
 	public SpringCloudSecurityAutoConfiguration() {
 		LOG.warn("All Spring Cloud Security modules and starters are deprecated. "

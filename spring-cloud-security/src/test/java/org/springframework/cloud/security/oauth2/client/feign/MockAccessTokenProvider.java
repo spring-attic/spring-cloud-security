@@ -39,30 +39,26 @@ public class MockAccessTokenProvider implements AccessTokenProvider {
 	}
 
 	@Override
-	public OAuth2AccessToken obtainAccessToken(
-			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
-			AccessTokenRequest accessTokenRequest) throws UserRedirectRequiredException,
-			UserApprovalRequiredException, AccessDeniedException {
+	public OAuth2AccessToken obtainAccessToken(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
+			AccessTokenRequest accessTokenRequest)
+			throws UserRedirectRequiredException, UserApprovalRequiredException, AccessDeniedException {
 		return token;
 	}
 
 	@Override
-	public boolean supportsResource(
-			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
+	public boolean supportsResource(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
 		return true;
 	}
 
 	@Override
-	public OAuth2AccessToken refreshAccessToken(
-			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
+	public OAuth2AccessToken refreshAccessToken(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails,
 			OAuth2RefreshToken oAuth2RefreshToken, AccessTokenRequest accessTokenRequest)
 			throws UserRedirectRequiredException {
 		return null;
 	}
 
 	@Override
-	public boolean supportsRefresh(
-			OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
+	public boolean supportsRefresh(OAuth2ProtectedResourceDetails oAuth2ProtectedResourceDetails) {
 		return false;
 	}
 

@@ -64,11 +64,9 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
 	private final String header;
 
-	private AccessTokenProvider accessTokenProvider = new AccessTokenProviderChain(
-			Arrays.<AccessTokenProvider>asList(new AuthorizationCodeAccessTokenProvider(),
-					new ImplicitAccessTokenProvider(),
-					new ResourceOwnerPasswordAccessTokenProvider(),
-					new ClientCredentialsAccessTokenProvider()));
+	private AccessTokenProvider accessTokenProvider = new AccessTokenProviderChain(Arrays.<AccessTokenProvider>asList(
+			new AuthorizationCodeAccessTokenProvider(), new ImplicitAccessTokenProvider(),
+			new ResourceOwnerPasswordAccessTokenProvider(), new ClientCredentialsAccessTokenProvider()));
 
 	/**
 	 * Default constructor which uses the provided OAuth2ClientContext and Bearer tokens
@@ -154,27 +152,22 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 	 * @throws UserRedirectRequiredException in case the user needs to be redirected to an
 	 * approval page or login page
 	 */
-	protected OAuth2AccessToken acquireAccessToken()
-			throws UserRedirectRequiredException {
+	protected OAuth2AccessToken acquireAccessToken() throws UserRedirectRequiredException {
 		AccessTokenRequest tokenRequest = oAuth2ClientContext.getAccessTokenRequest();
 		if (tokenRequest == null) {
 			throw new AccessTokenRequiredException(
-					"Cannot find valid context on request for resource '"
-							+ resource.getId() + "'.",
-					resource);
+					"Cannot find valid context on request for resource '" + resource.getId() + "'.", resource);
 		}
 		String stateKey = tokenRequest.getStateKey();
 		if (stateKey != null) {
-			tokenRequest.setPreservedState(
-					oAuth2ClientContext.removePreservedState(stateKey));
+			tokenRequest.setPreservedState(oAuth2ClientContext.removePreservedState(stateKey));
 		}
 		OAuth2AccessToken existingToken = oAuth2ClientContext.getAccessToken();
 		if (existingToken != null) {
 			oAuth2ClientContext.setAccessToken(existingToken);
 		}
 		OAuth2AccessToken obtainableAccessToken;
-		obtainableAccessToken = accessTokenProvider.obtainAccessToken(resource,
-				tokenRequest);
+		obtainableAccessToken = accessTokenProvider.obtainAccessToken(resource, tokenRequest);
 		if (obtainableAccessToken == null || obtainableAccessToken.getValue() == null) {
 			throw new IllegalStateException(
 					" Access token provider returned a null token, which is illegal according to the contract.");

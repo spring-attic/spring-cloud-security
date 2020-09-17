@@ -58,8 +58,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
-		properties = { "security.oauth2.resource.jwt.keyValue=secret",
-				"spring.cloud.gateway.enabled=false" })
+		properties = { "security.oauth2.resource.jwt.keyValue=secret", "spring.cloud.gateway.enabled=false" })
 public class ResourceServerTokenRelayTests {
 
 	protected static final String TOKEN_VALID_UNTIL_2085 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
@@ -67,8 +66,7 @@ public class ResourceServerTokenRelayTests {
 			+ "Imp0aSI6ImRkOTAzZGM2LTI0NDctNDViMi04MDZjLTIzZjU3ODVhNGQ4MCIsImNsaWVudF9pZCI6IndlYi1hcHAiLCJzY29wZSI6WyJyZWFkIl19."
 			+ "6hoNtxmN1_o5Ki0D0ae4amSOTRmit3pmaqv-z1-Qk4Y";
 
-	protected static final String AUTH_HEADER_TO_BE_RELAYED = "Bearer "
-			+ TOKEN_VALID_UNTIL_2085;
+	protected static final String AUTH_HEADER_TO_BE_RELAYED = "Bearer " + TOKEN_VALID_UNTIL_2085;
 
 	protected static final String TEST_RESPONSE = "[\"test response\"]";
 
@@ -89,8 +87,8 @@ public class ResourceServerTokenRelayTests {
 				.andRespond(withSuccess(TEST_RESPONSE, MediaType.APPLICATION_JSON));
 
 		HttpEntity<String> authorizationHeader = createAuthorizationHeader();
-		ResponseEntity<String> exchange = testRestTemplate.exchange("/token-relay",
-				HttpMethod.GET, authorizationHeader, String.class);
+		ResponseEntity<String> exchange = testRestTemplate.exchange("/token-relay", HttpMethod.GET, authorizationHeader,
+				String.class);
 
 		assertThat(exchange.getStatusCodeValue()).isEqualTo(HttpStatus.OK.value());
 		assertThat(exchange.getBody()).isEqualTo(TEST_RESPONSE);
@@ -114,8 +112,7 @@ public class ResourceServerTokenRelayTests {
 	protected static class ClientConfiguration {
 
 		@Bean
-		public OAuth2RestTemplate oauth2RestTemplate(
-				OAuth2ProtectedResourceDetails resource,
+		public OAuth2RestTemplate oauth2RestTemplate(OAuth2ProtectedResourceDetails resource,
 				OAuth2ClientContext oauth2Context) {
 			return new OAuth2RestTemplate(resource, oauth2Context);
 
@@ -138,8 +135,7 @@ public class ResourceServerTokenRelayTests {
 		@GetMapping("/token-relay")
 		public String callAnotherService() {
 
-			return oAuth2RestTemplate
-					.getForEntity("https://example.com/test", String.class).getBody();
+			return oAuth2RestTemplate.getForEntity("https://example.com/test", String.class).getBody();
 
 		}
 

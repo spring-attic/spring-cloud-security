@@ -59,8 +59,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	@Test
 	public void clientNotConfigured() {
 		this.context = new SpringApplicationBuilder(NoClientConfiguration.class)
-				.properties("spring.config.name=test", "server.port=0",
-						"spring.cloud.gateway.enabled=false",
+				.properties("spring.config.name=test", "server.port=0", "spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 		assertThat(this.context.containsBean("loadBalancedOauth2RestTemplate")).isFalse();
@@ -68,19 +67,15 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 
 	@Test
 	public void clientConfigured() throws Exception {
-		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
-				.properties("spring.config.name=test", "server.port=0",
-						"spring.cloud.gateway.enabled=false",
-						"security.oauth2.resource.userInfoUri:https://example.com",
-						"security.oauth2.client.clientId=foo")
+		this.context = new SpringApplicationBuilder(ClientConfiguration.class).properties("spring.config.name=test",
+				"server.port=0", "spring.cloud.gateway.enabled=false",
+				"security.oauth2.resource.userInfoUri:https://example.com", "security.oauth2.client.clientId=foo")
 				.run();
-		RequestContextHolder.setRequestAttributes(
-				new ServletRequestAttributes(new MockHttpServletRequest()));
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
 		OAuth2ClientContext client = this.context.getBean(OAuth2ClientContext.class);
 		assertThat(client.getAccessToken()).isNull();
 		UserInfoTokenServices services = context.getBean(UserInfoTokenServices.class);
-		OAuth2RestTemplate template = (OAuth2RestTemplate) ReflectionTestUtils
-				.getField(services, "restTemplate");
+		OAuth2RestTemplate template = (OAuth2RestTemplate) ReflectionTestUtils.getField(services, "restTemplate");
 		MockRestServiceServer server = MockRestServiceServer.createServer(template);
 		server.expect(requestTo("https://example.com"))
 				.andRespond(withSuccess("{\"id\":\"user\"}", MediaType.APPLICATION_JSON));
@@ -103,8 +98,7 @@ public class ResourceServerTokenRelayAutoConfigurationTests {
 	protected static class ClientConfiguration {
 
 		@Bean
-		public OAuth2RestTemplate oauth2RestTemplate(
-				OAuth2ProtectedResourceDetails resource,
+		public OAuth2RestTemplate oauth2RestTemplate(OAuth2ProtectedResourceDetails resource,
 				OAuth2ClientContext oauth2Context) {
 			return new OAuth2RestTemplate(resource, oauth2Context);
 		}

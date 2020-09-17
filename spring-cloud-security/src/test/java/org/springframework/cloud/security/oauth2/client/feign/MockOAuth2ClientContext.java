@@ -49,8 +49,7 @@ final class MockOAuth2ClientContext implements OAuth2ClientContext {
 
 	@Override
 	public AccessTokenRequest getAccessTokenRequest() {
-		DefaultAccessTokenRequest tokenRequest = new DefaultAccessTokenRequest(
-				new HashMap<String, String[]>());
+		DefaultAccessTokenRequest tokenRequest = new DefaultAccessTokenRequest(new HashMap<String, String[]>());
 		tokenRequest.setExistingToken(new DefaultOAuth2AccessToken(value));
 		return tokenRequest;
 	}

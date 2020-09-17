@@ -56,39 +56,28 @@ public class OAuth2LoadBalancerClientAutoConfigurationTests {
 	@Test
 	public void userInfoNotLoadBalanced() {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
-				.properties("spring.config.name=test", "server.port=0",
-						"spring.cloud.gateway.enabled=false",
+				.properties("spring.config.name=test", "server.port=0", "spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:https://example.com")
 				.run();
 
-		assertThat(
-				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"))
-						.isFalse();
-		assertThat(this.context
-				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"))
-						.isFalse();
+		assertThat(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer")).isFalse();
+		assertThat(this.context.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer")).isFalse();
 	}
 
 	@Test
 	public void userInfoLoadBalancedNoRetry() throws Exception {
 		this.context = new SpringApplicationBuilder(ClientConfiguration.class)
-				.properties("spring.config.name=test", "server.port=0",
-						"spring.cloud.gateway.enabled=false",
+				.properties("spring.config.name=test", "server.port=0", "spring.cloud.gateway.enabled=false",
 						"security.oauth2.resource.userInfoUri:https://nosuchservice",
 						"security.oauth2.resource.loadBalanced=true")
 				.run();
 
-		assertThat(
-				this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer"))
-						.isTrue();
-		assertThat(this.context
-				.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer"))
-						.isFalse();
+		assertThat(this.context.containsBean("loadBalancedUserInfoRestTemplateCustomizer")).isTrue();
+		assertThat(this.context.containsBean("retryLoadBalancedUserInfoRestTemplateCustomizer")).isFalse();
 
-		OAuth2RestTemplate template = this.context
-				.getBean(UserInfoRestTemplateFactory.class).getUserInfoRestTemplate();
-		ClientHttpRequest request = template.getRequestFactory()
-				.createRequest(new URI("https://nosuchservice"), HttpMethod.GET);
+		OAuth2RestTemplate template = this.context.getBean(UserInfoRestTemplateFactory.class).getUserInfoRestTemplate();
+		ClientHttpRequest request = template.getRequestFactory().createRequest(new URI("https://nosuchservice"),
+				HttpMethod.GET);
 		expected.expectMessage("No instances available for nosuchservice");
 		request.execute();
 	}

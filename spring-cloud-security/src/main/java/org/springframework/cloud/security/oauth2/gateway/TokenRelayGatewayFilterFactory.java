@@ -37,8 +37,7 @@ public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory
 
 	private ServerOAuth2AuthorizedClientRepository authorizedClientRepository;
 
-	public TokenRelayGatewayFilterFactory(
-			ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
+	public TokenRelayGatewayFilterFactory(ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
 		super(Object.class);
 		this.authorizedClientRepository = authorizedClientRepository;
 	}
@@ -54,8 +53,7 @@ public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory
 				.filter(principal -> principal instanceof OAuth2AuthenticationToken)
 				.cast(OAuth2AuthenticationToken.class)
 				.flatMap(authentication -> authorizedClient(exchange, authentication))
-				.map(OAuth2AuthorizedClient::getAccessToken)
-				.map(token -> withBearerAuth(exchange, token))
+				.map(OAuth2AuthorizedClient::getAccessToken).map(token -> withBearerAuth(exchange, token))
 				// TODO: adjustable behavior if empty
 				.defaultIfEmpty(exchange).flatMap(chain::filter);
 	}
@@ -63,15 +61,11 @@ public class TokenRelayGatewayFilterFactory extends AbstractGatewayFilterFactory
 	private Mono<OAuth2AuthorizedClient> authorizedClient(ServerWebExchange exchange,
 			OAuth2AuthenticationToken oauth2Authentication) {
 		return this.authorizedClientRepository.loadAuthorizedClient(
-				oauth2Authentication.getAuthorizedClientRegistrationId(),
-				oauth2Authentication, exchange);
+				oauth2Authentication.getAuthorizedClientRegistrationId(), oauth2Authentication, exchange);
 	}
 
-	private ServerWebExchange withBearerAuth(ServerWebExchange exchange,
-			OAuth2AccessToken accessToken) {
-		return exchange.mutate()
-				.request(r -> r.headers(
-						headers -> headers.setBearerAuth(accessToken.getTokenValue())))
+	private ServerWebExchange withBearerAuth(ServerWebExchange exchange, OAuth2AccessToken accessToken) {
+		return exchange.mutate().request(r -> r.headers(headers -> headers.setBearerAuth(accessToken.getTokenValue())))
 				.build();
 	}
 

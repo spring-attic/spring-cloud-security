@@ -94,23 +94,19 @@ public class TokenRelayGatewayFilterFactoryTests {
 		OAuth2AccessToken accessToken = mock(OAuth2AccessToken.class);
 		when(accessToken.getTokenValue()).thenReturn("mytoken");
 
-		ClientRegistration clientRegistration = ClientRegistration
-				.withRegistrationId("myregistrationid")
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.clientId("myclientid").tokenUri("mytokenuri").build();
-		OAuth2AuthorizedClient authorizedClient = new OAuth2AuthorizedClient(
-				clientRegistration, "joe", accessToken);
+		ClientRegistration clientRegistration = ClientRegistration.withRegistrationId("myregistrationid")
+				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS).clientId("myclientid")
+				.tokenUri("mytokenuri").build();
+		OAuth2AuthorizedClient authorizedClient = new OAuth2AuthorizedClient(clientRegistration, "joe", accessToken);
 
-		when(repository.loadAuthorizedClient(anyString(),
-				any(OAuth2AuthenticationToken.class), any(ServerWebExchange.class)))
-						.thenReturn(Mono.just(authorizedClient));
+		when(repository.loadAuthorizedClient(anyString(), any(OAuth2AuthenticationToken.class),
+				any(ServerWebExchange.class))).thenReturn(Mono.just(authorizedClient));
 
-		OAuth2AuthenticationToken authenticationToken = new OAuth2AuthenticationToken(
-				mock(OAuth2User.class), Collections.emptyList(), "myId");
-		SecurityContextImpl securityContext = new SecurityContextImpl(
-				authenticationToken);
-		SecurityContextServerWebExchange exchange = new SecurityContextServerWebExchange(
-				mockExchange, Mono.just(securityContext));
+		OAuth2AuthenticationToken authenticationToken = new OAuth2AuthenticationToken(mock(OAuth2User.class),
+				Collections.emptyList(), "myId");
+		SecurityContextImpl securityContext = new SecurityContextImpl(authenticationToken);
+		SecurityContextServerWebExchange exchange = new SecurityContextServerWebExchange(mockExchange,
+				Mono.just(securityContext));
 
 		filter.filter(exchange, filterChain).block(TIMEOUT);
 
@@ -120,10 +116,9 @@ public class TokenRelayGatewayFilterFactoryTests {
 
 	@Test
 	public void principalIsNotOAuth2AuthenticationToken() {
-		SecurityContextImpl securityContext = new SecurityContextImpl(
-				new TestingAuthenticationToken("my", null));
-		SecurityContextServerWebExchange exchange = new SecurityContextServerWebExchange(
-				mockExchange, Mono.just(securityContext));
+		SecurityContextImpl securityContext = new SecurityContextImpl(new TestingAuthenticationToken("my", null));
+		SecurityContextServerWebExchange exchange = new SecurityContextServerWebExchange(mockExchange,
+				Mono.just(securityContext));
 
 		filter.filter(exchange, filterChain).block(TIMEOUT);
 

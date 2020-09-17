@@ -38,8 +38,7 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(OAuth2RestTemplate.class)
-@ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced",
-		matchIfMissing = false)
+@ConditionalOnProperty(value = "security.oauth2.resource.loadBalanced", matchIfMissing = false)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
 @Deprecated
 public class OAuth2LoadBalancerClientAutoConfiguration {
@@ -54,8 +53,7 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 			return new UserInfoRestTemplateCustomizer() {
 				@Override
 				public void customize(OAuth2RestTemplate restTemplate) {
-					List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(
-							restTemplate.getInterceptors());
+					List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(restTemplate.getInterceptors());
 					interceptors.add(loadBalancerInterceptor);
 					restTemplate.setInterceptors(interceptors);
 				}
@@ -74,8 +72,7 @@ public class OAuth2LoadBalancerClientAutoConfiguration {
 			return new UserInfoRestTemplateCustomizer() {
 				@Override
 				public void customize(OAuth2RestTemplate restTemplate) {
-					List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(
-							restTemplate.getInterceptors());
+					List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(restTemplate.getInterceptors());
 					interceptors.add(loadBalancerInterceptor);
 					restTemplate.setInterceptors(interceptors);
 				}

@@ -80,8 +80,7 @@ public class ResourceServerTokenRelayAutoConfiguration {
 	 *
 	 */
 	@Configuration(proxyBeanMethods = false)
-	public static class ResourceServerTokenRelayRegistrationAutoConfiguration
-			implements WebMvcConfigurer {
+	public static class ResourceServerTokenRelayRegistrationAutoConfiguration implements WebMvcConfigurer {
 
 		@Autowired
 		AccessTokenContextRelay accessTokenContextRelay;
@@ -92,9 +91,8 @@ public class ResourceServerTokenRelayAutoConfiguration {
 
 					new HandlerInterceptorAdapter() {
 						@Override
-						public boolean preHandle(HttpServletRequest request,
-								HttpServletResponse response, Object handler)
-								throws Exception {
+						public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+								Object handler) throws Exception {
 							accessTokenContextRelay.copyToken();
 							return true;
 						}
@@ -113,8 +111,7 @@ public class ResourceServerTokenRelayAutoConfiguration {
 
 	}
 
-	private static class OAuth2OnClientInResourceServerCondition
-			extends AllNestedConditions {
+	private static class OAuth2OnClientInResourceServerCondition extends AllNestedConditions {
 
 		OAuth2OnClientInResourceServerCondition() {
 			super(ConfigurationPhase.REGISTER_BEAN);

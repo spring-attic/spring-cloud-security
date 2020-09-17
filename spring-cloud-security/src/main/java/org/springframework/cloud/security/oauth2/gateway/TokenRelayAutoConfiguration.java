@@ -33,8 +33,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "spring.cloud.gateway.enabled", matchIfMissing = true)
-@ConditionalOnClass({ GatewayFilter.class, OAuth2AuthorizedClient.class,
-		SecurityWebFilterChain.class, SecurityProperties.class })
+@ConditionalOnClass({ GatewayFilter.class, OAuth2AuthorizedClient.class, SecurityWebFilterChain.class,
+		SecurityProperties.class })
 @ConditionalOnWebApplication
 @Deprecated
 public class TokenRelayAutoConfiguration {
