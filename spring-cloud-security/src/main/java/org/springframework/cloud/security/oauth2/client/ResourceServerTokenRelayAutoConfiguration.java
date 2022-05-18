@@ -27,12 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.security.oauth2.OAuth2AutoConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+import org.springframework.cloud.security.oauth2.client.ResourceServerTokenRelayAutoConfiguration.ConditionalOnNoClientCredentialsInResourceServer;
 import org.springframework.cloud.security.oauth2.client.ResourceServerTokenRelayAutoConfiguration.ConditionalOnOAuth2ClientInResourceServer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -62,6 +60,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  */
 @Configuration(proxyBeanMethods = false)
 @AutoConfigureAfter(OAuth2AutoConfiguration.class)
+@ConditionalOnNoClientCredentialsInResourceServer
 @ConditionalOnOAuth2ClientInResourceServer
 @ConditionalOnClass(ResourceServerConfiguration.class)
 @ConditionalOnWebApplication
@@ -125,6 +124,26 @@ public class ResourceServerTokenRelayAutoConfiguration {
 		@ConditionalOnBean(OAuth2ClientConfiguration.class)
 		static class Client {
 
+		}
+
+	}
+
+	@Target({ElementType.TYPE, ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	@Documented
+	@Conditional(NoClientCredentialsCondition.class)
+	@interface ConditionalOnNoClientCredentialsInResourceServer {
+
+	}
+
+	private static class NoClientCredentialsCondition extends NoneNestedConditions {
+
+		NoClientCredentialsCondition() {
+			super(ConfigurationPhase.PARSE_CONFIGURATION);
+		}
+
+		@ConditionalOnProperty(prefix = "security.oauth2.client", name = "grant-type", havingValue = "client_credentials", matchIfMissing = false)
+		static class ClientCredentialsActivated {
 		}
 
 	}
