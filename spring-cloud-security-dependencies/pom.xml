@@ -14,7 +14,7 @@
 	<name>spring-cloud-security-dependencies</name>
 	<description>Spring Cloud Security Dependencies</description>
 	<properties>
-		<spring-security-oauth2-autoconfigure.version>2.1.2.RELEASE</spring-security-oauth2-autoconfigure.version>
+		<spring-security-oauth2-autoconfigure.version>2.4.0</spring-security-oauth2-autoconfigure.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
